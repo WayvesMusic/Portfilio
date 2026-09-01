@@ -6,7 +6,6 @@
     <title>Wayves - Music Portfolio</title>
     <style>
         :root {
-            /* Synthwave / Dark Theme Palette */
             --bg-color: #0d0d12;
             --card-bg: #15151e;
             --text-primary: #f0f0f5;
@@ -163,38 +162,50 @@
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
         }
 
-        /* Pad Colors */
         .pad[data-color="cyan"]:active { background: var(--accent-cyan); border-color: #fff; box-shadow: 0 0 20px var(--accent-cyan); }
         .pad[data-color="pink"]:active { background: var(--accent-pink); border-color: #fff; box-shadow: 0 0 20px var(--accent-pink); }
         .pad[data-color="purple"]:active { background: var(--accent-purple); border-color: #fff; box-shadow: 0 0 20px var(--accent-purple); }
         .pad[data-color="yellow"]:active { background: #ffea00; border-color: #fff; box-shadow: 0 0 20px #ffea00; }
 
-        /* Genres */
-        .genres-grid {
+        /* Audio Player Styles */
+        .genre-block {
+            margin-bottom: 30px;
+        }
+
+        .genre-heading {
+            font-size: 1rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .tracks-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 15px;
         }
 
-        .genre-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+        .track-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .genre-card:hover {
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.1);
-            cursor: pointer;
+        .track-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        audio {
+            width: 100%;
+            height: 36px;
+            border-radius: 20px;
         }
 
         /* Navigation Links */
@@ -226,6 +237,7 @@
             .portfolio-container { padding: 30px 20px; }
             h1.title { font-size: 2.8rem; }
             .launchpad { gap: 10px; }
+            .tracks-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -246,27 +258,85 @@
             <p class="welcome">Welcome to my portfolio! Listen, interact, and explore the worlds I've built through sound.</p>
         </header>
 
+        <!-- Mini Synth Widget -->
         <div class="widget-container">
             <div class="widget-header">
                 <span>Mini Synth</span>
                 <span>Click Pads to Play</span>
             </div>
             <div class="launchpad">
-                <div class="pad" data-color="cyan" data-freq="261.63"></div> <div class="pad" data-color="pink" data-freq="329.63"></div> <div class="pad" data-color="purple" data-freq="392.00"></div> <div class="pad" data-color="yellow" data-freq="523.25"></div> </div>
+                <div class="pad" data-color="cyan" data-freq="261.63"></div>
+                <div class="pad" data-color="pink" data-freq="329.63"></div>
+                <div class="pad" data-color="purple" data-freq="392.00"></div>
+                <div class="pad" data-color="yellow" data-freq="523.25"></div>
+            </div>
         </div>
 
+        <!-- Music Showcase Section -->
         <section>
-            <h2 class="section-title">Soundscapes</h2>
-            <div class="genres-grid">
-                <div class="genre-card">Retro</div>
-                <div class="genre-card">Simulator</div>
-                <div class="genre-card">Boss Fight</div>
-                <div class="genre-card">Cinematic</div>
+            <h2 class="section-title">Music Portfolio</h2>
+
+            <!-- Retro Category -->
+            <div class="genre-block">
+                <h3 class="genre-heading">Retro</h3>
+                <div class="tracks-grid">
+                    <div class="track-card">
+                        <span class="track-title">Retro 1</span>
+                        <audio controls><source src="Retro%201.mp3" type="audio/mpeg"></audio>
+                    </div>
+                    <div class="track-card">
+                        <span class="track-title">Retro 2</span>
+                        <audio controls><source src="Retro%202.mp3" type="audio/mpeg"></audio>
+                    </div>
+                </div>
             </div>
+
+            <!-- Cinematic Category -->
+            <div class="genre-block">
+                <h3 class="genre-heading">Cinematic</h3>
+                <div class="tracks-grid">
+                    <div class="track-card">
+                        <span class="track-title">Cinematic 1</span>
+                        <audio controls><source src="Cinematic%201.mp3" type="audio/mpeg"></audio>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulator Category -->
+            <div class="genre-block">
+                <h3 class="genre-heading">Simulator</h3>
+                <div class="tracks-grid">
+                    <div class="track-card">
+                        <span class="track-title">Simulator 1</span>
+                        <audio controls><source src="Simulator%201.mp3" type="audio/mpeg"></audio>
+                    </div>
+                    <div class="track-card">
+                        <span class="track-title">Simulator 2</span>
+                        <audio controls><source src="Simulator%202.mp3" type="audio/mpeg"></audio>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boss Fight Category -->
+            <div class="genre-block">
+                <h3 class="genre-heading">Boss Fight</h3>
+                <div class="tracks-grid">
+                    <div class="track-card">
+                        <span class="track-title">Boss Fight 1</span>
+                        <audio controls><source src="Boss%20Fight%201.mp3" type="audio/mpeg"></audio>
+                    </div>
+                    <div class="track-card">
+                        <span class="track-title">Boss Fight 2</span>
+                        <audio controls><source src="Boss%20Fight%202.mp3" type="audio/mpeg"></audio>
+                    </div>
+                </div>
+            </div>
+
         </section>
 
+        <!-- Navigation Section -->
         <section>
-            <h2 class="section-title">Directory</h2>
+            <h2 class="section-title">Navigation</h2>
             <div class="nav-links">
                 <a href="#pricing">Pricing</a>
                 <a href="#partners">Partners</a>
@@ -276,44 +346,36 @@
     </div>
 
     <script>
-        // Set up the Web Audio API
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
         function playTone(frequency) {
-            // Initialize audio context on first click to comply with browser autoplay policies
             if (!audioCtx) {
                 audioCtx = new AudioContext();
             }
             
-            // Create oscillator and gain node
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
 
-            // Synth settings
-            oscillator.type = 'triangle'; // Gives a cool retro video game sound
+            oscillator.type = 'triangle';
             oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
             
-            // Envelope (fade out)
             gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
 
-            // Connect and play
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             oscillator.start();
             oscillator.stop(audioCtx.currentTime + 1);
         }
 
-        // Attach event listeners to pads
         document.querySelectorAll('.pad').forEach(pad => {
             pad.addEventListener('mousedown', () => {
                 const freq = parseFloat(pad.getAttribute('data-freq'));
                 playTone(freq);
             });
-            // Support for mobile touch
             pad.addEventListener('touchstart', (e) => {
-                e.preventDefault(); // Prevent double firing
+                e.preventDefault();
                 const freq = parseFloat(pad.getAttribute('data-freq'));
                 playTone(freq);
             });
