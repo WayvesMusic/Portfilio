@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wayves - Music Portfolio</title>
+    <style>
+        :root {
+            /* Color Palette */
+            --bg-color: #0f0f13;
+            --card-bg: #1a1a20;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --accent-color: #00e5ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .portfolio-container {
+            background-color: var(--card-bg);
+            max-width: 800px;
+            width: 100%;
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1.title {
+            font-size: 3.5rem;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        h1.title span {
+            color: var(--accent-color);
+        }
+
+        p.welcome {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        h2.section-title {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            margin-top: 40px;
+        }
+
+        /* Genres Grid */
+        .genres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .genre-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .genre-card:hover {
+            background: var(--accent-color);
+            color: #000;
+            transform: translateY(-5px);
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2);
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            border-color: var(--accent-color);
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent-color);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .portfolio-container {
+                padding: 30px 20px;
+            }
+            h1.title {
+                font-size: 2.5rem;
+            }
+            p.welcome {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portfolio-container">
+        
+        <header>
+            <h1 class="title">Way<span>ves</span></h1>
+            <p class="welcome">Welcome to my portfolio! Here, you can listen to some of my music and explore the work I’ve created.</p>
+        </header>
+
+        <section>
+            <h2 class="section-title">Genres</h2>
+            <div class="genres-grid">
+                <div class="genre-card">Retro</div>
+                <div class="genre-card">Simulator</div>
+                <div class="genre-card">Boss Fight</div>
+                <div class="genre-card">Cinematic</div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Navigation</h2>
+            <div class="nav-links">
+                <a href="#pricing">Pricing</a>
+                <a href="#partners">Partners</a>
+            </div>
+        </section>
+
+    </div>
+
+</body>
+</html>
