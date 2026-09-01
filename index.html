@@ -979,6 +979,7 @@ footer {
     .album-art { width: 165px; }
     .footer-inner { flex-direction: column; }
 }
+.music-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px}.music-filters{display:flex;gap:7px;flex-wrap:wrap}.filter{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:11px;padding:8px 13px;cursor:pointer;font-size:.78rem;transition:.2s ease}.filter:hover,.filter.active{color:var(--text);background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.4)}.track-count{color:var(--muted);font-size:.75rem;white-space:nowrap}@media(max-width:650px){.music-toolbar{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -1037,27 +1038,52 @@ footer {
             </div>
 
             <div class="music-layout">
+                <div class="music-toolbar">
+                    <div class="music-filters" id="musicFilters">
+                        <button class="filter active" data-filter="all">All</button>
+                        <button class="filter" data-filter="Retro">Retro</button>
+                        <button class="filter" data-filter="Cinematic">Cinematic</button>
+                        <button class="filter" data-filter="Simulator">Simulator</button>
+                        <button class="filter" data-filter="Boss Fight">Boss Fight</button>
+                    </div>
+                    <span class="track-count" id="trackCount">11 tracks</span>
+                </div>
                 <div class="music-list" id="musicList">
+                    <article class="track" data-title="Retro" data-genre="Retro" data-src="Retro.mp3">
+                        <div class="track-number">01</div><div class="track-info"><strong>Retro</strong><span>Retro / Game</span></div><div class="track-time">PLAY</div>
+                    </article>
                     <article class="track" data-title="Retro 1" data-genre="Retro" data-src="Retro%201.mp3">
-                        <div class="track-number">01</div>
+                        <div class="track-number">02</div>
                         <div class="track-info"><strong>Retro 1</strong><span>Retro / Game</span></div>
                         <div class="track-time">PLAY</div>
                     </article>
+                    <article class="track" data-title="Cinematic" data-genre="Cinematic" data-src="Cinematic.mp3">
+                        <div class="track-number">04</div><div class="track-info"><strong>Cinematic</strong><span>Cinematic / Atmosphere</span></div><div class="track-time">PLAY</div>
+                    </article>
                     <article class="track" data-title="Cinematic 1" data-genre="Cinematic" data-src="Cinematic%201.mp3">
-                        <div class="track-number">02</div>
+                        <div class="track-number">05</div>
                         <div class="track-info"><strong>Cinematic 1</strong><span>Cinematic / Atmosphere</span></div>
                         <div class="track-time">PLAY</div>
                     </article>
+                    <article class="track" data-title="Simulator" data-genre="Simulator" data-src="Simulator.mp3">
+                        <div class="track-number">06</div><div class="track-info"><strong>Simulator</strong><span>Simulator / Gameplay</span></div><div class="track-time">PLAY</div>
+                    </article>
                     <article class="track" data-title="Simulator 1" data-genre="Simulator" data-src="Simulator%201.mp3">
-                        <div class="track-number">03</div>
+                        <div class="track-number">07</div>
                         <div class="track-info"><strong>Simulator 1</strong><span>Simulator / Gameplay</span></div>
                         <div class="track-time">PLAY</div>
                     </article>
+                    <article class="track" data-title="Boss Fight" data-genre="Boss Fight" data-src="Boss%20Fight.mp3">
+                        <div class="track-number">09</div><div class="track-info"><strong>Boss Fight</strong><span>Boss Fight / Action</span></div><div class="track-time">PLAY</div>
+                    </article>
                     <article class="track" data-title="Boss Fight 1" data-genre="Boss Fight" data-src="Boss%20Fight%201.mp3">
-                        <div class="track-number">04</div>
+                        <div class="track-number">10</div>
                         <div class="track-info"><strong>Boss Fight 1</strong><span>Boss Fight / Action</span></div>
                         <div class="track-time">PLAY</div>
                     </article>
+                    <article class="track" data-title="Retro 2" data-genre="Retro" data-src="Retro%202.mp3"><div class="track-number">03</div><div class="track-info"><strong>Retro 2</strong><span>Retro / Game</span></div><div class="track-time">PLAY</div></article>
+                    <article class="track" data-title="Simulator 2" data-genre="Simulator" data-src="Simulator%202.mp3"><div class="track-number">08</div><div class="track-info"><strong>Simulator 2</strong><span>Simulator / Gameplay</span></div><div class="track-time">PLAY</div></article>
+                    <article class="track" data-title="Boss Fight 2" data-genre="Boss Fight" data-src="Boss%20Fight%202.mp3"><div class="track-number">11</div><div class="track-info"><strong>Boss Fight 2</strong><span>Boss Fight / Action</span></div><div class="track-time">PLAY</div></article>
                 </div>
 
                 <aside class="player">
@@ -1269,7 +1295,7 @@ footer {
             <div class="kicker">Start a project</div>
             <h2>Let's make something sound good.</h2>
             <p>Have a game, project or idea that needs music? Get in touch and tell me what you're making.</p>
-            <a class="btn primary" href="mailto:your-email@example.com">Contact me</a>
+            <a class="btn primary" href="https://discord.com/users/wayvesmusic" target="_blank" rel="noopener noreferrer">contact me</a>
         </div>
     </section>
 </main>
@@ -1304,6 +1330,26 @@ const waveform = document.getElementById("waveform");
 const toast = document.getElementById("toast");
 const navLinks = document.getElementById("navLinks");
 const menuBtn = document.getElementById("menuBtn");
+const filterButtons = [...document.querySelectorAll(".filter")];
+const trackCount = document.getElementById("trackCount");
+
+function filterTracks(filter){
+    let visible=0;
+    tracks.forEach(track=>{
+        const matches=filter==="all"||track.dataset.genre===filter;
+        track.style.display=matches?"":"none";
+        if(matches) visible++;
+    });
+    trackCount.textContent=`${visible} track${visible===1?"":"s"}`;
+}
+
+filterButtons.forEach(button=>button.addEventListener("click",()=>{
+    filterButtons.forEach(item=>item.classList.remove("active"));
+    button.classList.add("active");
+    filterTracks(button.dataset.filter);
+}));
+
+filterTracks("all");
 
 let currentIndex = -1;
 let audioContext;
