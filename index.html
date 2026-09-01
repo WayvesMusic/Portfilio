@@ -6,13 +6,18 @@
     <title>Wayves - Music Portfolio</title>
     <style>
         :root {
-            --bg-color: #0d0d12;
-            --card-bg: #15151e;
-            --text-primary: #f0f0f5;
+            --bg-color: #060913;
+            --card-bg: rgba(12, 17, 32, 0.6);
+            --text-primary: #ffffff;
             --text-secondary: #8a8a9d;
-            --accent-cyan: #00e5ff;
-            --accent-pink: #ff00ea;
-            --accent-purple: #b026ff;
+            
+            /* Neon Colors */
+            --neon-cyan: #00e5ff;
+            --neon-pink: #ff00ea;
+            --neon-purple: #b026ff;
+            --neon-green: #00ff73;
+            --neon-red: #ff3c3c;
+            --neon-blue: #2b70ff;
         }
 
         * {
@@ -24,49 +29,89 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(0, 229, 255, 0.05), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(255, 0, 234, 0.05), transparent 25%);
+            /* Dark mode forces default HTML audio players to look sleek */
+            color-scheme: dark; 
             color: var(--text-primary);
             line-height: 1.6;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             padding: 20px;
+            /* Faint background grid lines */
+            background-image: 
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
 
         .portfolio-container {
-            background-color: var(--card-bg);
-            max-width: 850px;
+            max-width: 1000px;
             width: 100%;
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 229, 255, 0.1);
-            position: relative;
-            overflow: hidden;
+            padding: 20px 40px 60px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }
 
-        /* Animated Visualizer Header */
+        /* Top Navigation */
+        nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* Header / Logo */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1.title {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-blue);
+        }
+
+        /* Animated Visualizer */
         .visualizer {
             display: flex;
             justify-content: center;
             align-items: flex-end;
             gap: 4px;
-            height: 40px;
-            margin-bottom: 20px;
+            height: 30px;
+            margin-bottom: 15px;
         }
 
         .bar {
-            width: 8px;
-            background: linear-gradient(to top, var(--accent-purple), var(--accent-cyan));
+            width: 4px;
+            background: var(--neon-cyan);
             border-radius: 4px;
             animation: bounce 1s infinite alternate ease-in-out;
+            box-shadow: 0 0 10px var(--neon-cyan);
         }
 
         .bar:nth-child(1) { animation-delay: 0.1s; height: 40%; }
         .bar:nth-child(2) { animation-delay: 0.3s; height: 80%; }
-        .bar:nth-child(3) { animation-delay: 0.0s; height: 100%; }
+        .bar:nth-child(3) { animation-delay: 0.0s; height: 100%; background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
         .bar:nth-child(4) { animation-delay: 0.4s; height: 60%; }
         .bar:nth-child(5) { animation-delay: 0.2s; height: 70%; }
 
@@ -75,169 +120,161 @@
             100% { transform: scaleY(1); }
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        h1.title {
-            font-size: 4rem;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-            letter-spacing: -2px;
-            text-transform: uppercase;
-            font-style: italic;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-
-        h1.title span {
-            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
         p.welcome {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--text-secondary);
             margin: 0 auto;
-            max-width: 600px;
+            max-width: 500px;
         }
+
+        /* Base Neon Box Style */
+        .neon-box {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Specific Glow Colors */
+        .glow-cyan { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 229, 255, 0.15), inset 0 0 10px rgba(0, 229, 255, 0.1); }
+        .glow-purple { border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(176, 38, 255, 0.15), inset 0 0 10px rgba(176, 38, 255, 0.1); }
+        .glow-green { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 115, 0.15), inset 0 0 10px rgba(0, 255, 115, 0.1); }
+        .glow-red { border-color: var(--neon-red); box-shadow: 0 0 15px rgba(255, 60, 60, 0.15), inset 0 0 10px rgba(255, 60, 60, 0.1); }
+        .glow-blue { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(43, 112, 255, 0.15), inset 0 0 10px rgba(43, 112, 255, 0.1); }
 
         h2.section-title {
             font-size: 1.2rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--accent-purple);
-            margin-bottom: 20px;
-            margin-top: 40px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        h2.section-title::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(to right, rgba(176, 38, 255, 0.5), transparent);
-        }
-
-        /* Interactive Launchpad Widget */
-        .widget-container {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 40px;
-        }
-
-        .widget-header {
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            text-transform: uppercase;
             letter-spacing: 1px;
+            color: #fff;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
-        .launchpad {
+        /* Top Info Row (Pricing & Partners) */
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        /* Genres Row */
+        .genres-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 15px;
         }
 
-        .pad {
-            aspect-ratio: 1;
-            background: #232330;
-            border: 2px solid #333344;
-            border-radius: 8px;
+        .genre-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
             cursor: pointer;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.3);
-            transition: all 0.1s ease;
+            transition: all 0.3s ease;
         }
 
-        .pad:active {
-            transform: scale(0.92);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        .genre-card:hover {
+            transform: translateY(-5px);
+            filter: brightness(1.3);
         }
 
-        .pad[data-color="cyan"]:active { background: var(--accent-cyan); border-color: #fff; box-shadow: 0 0 20px var(--accent-cyan); }
-        .pad[data-color="pink"]:active { background: var(--accent-pink); border-color: #fff; box-shadow: 0 0 20px var(--accent-pink); }
-        .pad[data-color="purple"]:active { background: var(--accent-purple); border-color: #fff; box-shadow: 0 0 20px var(--accent-purple); }
-        .pad[data-color="yellow"]:active { background: #ffea00; border-color: #fff; box-shadow: 0 0 20px #ffea00; }
-
-        /* Audio Player Styles */
-        .genre-block {
-            margin-bottom: 30px;
+        .genre-name {
+            margin-top: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
 
-        .genre-heading {
-            font-size: 1rem;
-            color: var(--accent-cyan);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-        }
-
-        .tracks-grid {
+        /* Main Content Split */
+        .main-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        /* Tracks List */
+        .tracks-list {
+            display: flex;
+            flex-direction: column;
             gap: 15px;
         }
 
-        .track-card {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 12px;
+        .track-item {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
+        .track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
         .track-title {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 600;
-            color: var(--text-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Custom icons for tracks */
+        .icon {
+            font-size: 1.2rem;
         }
 
         audio {
             width: 100%;
-            height: 36px;
-            border-radius: 20px;
+            height: 35px;
+            border-radius: 50px;
+            outline: none;
         }
 
-        /* Navigation Links */
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+        /* Sound Effects / Launchpad */
+        .launchpad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px 30px;
+        .pad {
+            aspect-ratio: 1;
+            background: #111526;
+            border: 2px solid #2a314d;
             border-radius: 8px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: all 0.1s ease;
         }
 
-        .nav-links a:hover {
-            background: var(--text-primary);
-            color: var(--bg-color);
-            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+        .pad:active {
+            transform: scale(0.9);
         }
 
-        @media (max-width: 600px) {
-            .portfolio-container { padding: 30px 20px; }
-            h1.title { font-size: 2.8rem; }
-            .launchpad { gap: 10px; }
-            .tracks-grid { grid-template-columns: 1fr; }
+        /* Colored Pads */
+        .pad-pink { background: rgba(255, 0, 234, 0.2); border-color: var(--neon-pink); box-shadow: 0 0 10px rgba(255,0,234,0.4); }
+        .pad-purple { background: rgba(176, 38, 255, 0.2); border-color: var(--neon-purple); box-shadow: 0 0 10px rgba(176,38,255,0.4); }
+        .pad-cyan { background: rgba(0, 229, 255, 0.2); border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,229,255,0.4); }
+
+        .pad-pink:active { background: var(--neon-pink); }
+        .pad-purple:active { background: var(--neon-purple); }
+        .pad-cyan:active { background: var(--neon-cyan); }
+
+        /* Responsive Design */
+        @media (max-width: 800px) {
+            .info-row, .genres-grid, .main-content {
+                grid-template-columns: 1fr;
+            }
+            nav {
+                justify-content: center;
+            }
+            .launchpad-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
     </style>
 </head>
@@ -245,103 +282,117 @@
 
     <div class="portfolio-container">
         
-        <div class="visualizer">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
+        <nav>
+            <a href="#">About</a>
+            <a href="#">Projects</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+        </nav>
 
         <header>
-            <h1 class="title">Way<span>ves</span></h1>
-            <p class="welcome">Welcome to my portfolio! Listen, interact, and explore the worlds I've built through sound.</p>
+            <h1 class="title">WAYVES</h1>
+            <div class="visualizer">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <p class="welcome">Welcome to my portfolio! Here, you can listen to some of my music and explore the work I've created.</p>
         </header>
 
-        <!-- Mini Synth Widget -->
-        <div class="widget-container">
-            <div class="widget-header">
-                <span>Mini Synth</span>
-                <span>Click Pads to Play</span>
+        <div class="info-row">
+            <div class="neon-box glow-cyan">
+                <h2 class="section-title">Pricing</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Minimal plan layout of your customs glow.</p>
             </div>
-            <div class="launchpad">
-                <div class="pad" data-color="cyan" data-freq="261.63"></div>
-                <div class="pad" data-color="pink" data-freq="329.63"></div>
-                <div class="pad" data-color="purple" data-freq="392.00"></div>
-                <div class="pad" data-color="yellow" data-freq="523.25"></div>
+            <div class="neon-box glow-cyan">
+                <h2 class="section-title">Partners</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Collaborations and trusted audio engines.</p>
             </div>
         </div>
 
-        <!-- Music Showcase Section -->
-        <section>
-            <h2 class="section-title">Music Portfolio</h2>
+        <div>
+            <h2 class="section-title">Genres</h2>
+            <div class="genres-grid">
+                <div class="neon-box genre-card glow-purple">
+                    <span class="icon">👾</span>
+                    <span class="genre-name" style="color: var(--neon-purple);">Retro</span>
+                </div>
+                <div class="neon-box genre-card glow-green">
+                    <span class="icon">🚀</span>
+                    <span class="genre-name" style="color: var(--neon-green);">Simulator</span>
+                </div>
+                <div class="neon-box genre-card glow-red">
+                    <span class="icon">⚔️</span>
+                    <span class="genre-name" style="color: var(--neon-red);">Boss Fight</span>
+                </div>
+                <div class="neon-box genre-card glow-blue">
+                    <span class="icon">🌌</span>
+                    <span class="genre-name" style="color: var(--neon-blue);">Cinematic</span>
+                </div>
+            </div>
+        </div>
 
-            <!-- Retro Category -->
-            <div class="genre-block">
-                <h3 class="genre-heading">Retro</h3>
-                <div class="tracks-grid">
-                    <div class="track-card">
-                        <span class="track-title">Retro 1</span>
+        <div class="main-content">
+            
+            <div>
+                <h2 class="section-title">Featured Music</h2>
+                <div class="tracks-list">
+                    
+                    <div class="neon-box track-item glow-purple">
+                        <div class="track-header">
+                            <span class="track-title"><span class="icon">👾</span> Retro 1</span>
+                        </div>
                         <audio controls><source src="Retro%201.mp3" type="audio/mpeg"></audio>
                     </div>
-                    <div class="track-card">
-                        <span class="track-title">Retro 2</span>
-                        <audio controls><source src="Retro%202.mp3" type="audio/mpeg"></audio>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Cinematic Category -->
-            <div class="genre-block">
-                <h3 class="genre-heading">Cinematic</h3>
-                <div class="tracks-grid">
-                    <div class="track-card">
-                        <span class="track-title">Cinematic 1</span>
+                    <div class="neon-box track-item glow-blue">
+                        <div class="track-header">
+                            <span class="track-title"><span class="icon">🌌</span> Cinematic 1</span>
+                        </div>
                         <audio controls><source src="Cinematic%201.mp3" type="audio/mpeg"></audio>
                     </div>
-                </div>
-            </div>
 
-            <!-- Simulator Category -->
-            <div class="genre-block">
-                <h3 class="genre-heading">Simulator</h3>
-                <div class="tracks-grid">
-                    <div class="track-card">
-                        <span class="track-title">Simulator 1</span>
+                    <div class="neon-box track-item glow-green">
+                        <div class="track-header">
+                            <span class="track-title"><span class="icon">🚀</span> Simulator 1</span>
+                        </div>
                         <audio controls><source src="Simulator%201.mp3" type="audio/mpeg"></audio>
                     </div>
-                    <div class="track-card">
-                        <span class="track-title">Simulator 2</span>
-                        <audio controls><source src="Simulator%202.mp3" type="audio/mpeg"></audio>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Boss Fight Category -->
-            <div class="genre-block">
-                <h3 class="genre-heading">Boss Fight</h3>
-                <div class="tracks-grid">
-                    <div class="track-card">
-                        <span class="track-title">Boss Fight 1</span>
+                    <div class="neon-box track-item glow-red">
+                        <div class="track-header">
+                            <span class="track-title"><span class="icon">⚔️</span> Boss Fight 1</span>
+                        </div>
                         <audio controls><source src="Boss%20Fight%201.mp3" type="audio/mpeg"></audio>
                     </div>
-                    <div class="track-card">
-                        <span class="track-title">Boss Fight 2</span>
-                        <audio controls><source src="Boss%20Fight%202.mp3" type="audio/mpeg"></audio>
+
+                </div>
+            </div>
+
+            <div>
+                <div class="neon-box glow-cyan" style="height: 100%;">
+                    <h2 class="section-title">Sound Effects</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem;">Tap pads to synthesize.</p>
+                    
+                    <div class="launchpad-grid">
+                        <div class="pad pad-pink" data-freq="261.63"></div>
+                        <div class="pad pad-purple" data-freq="293.66"></div>
+                        <div class="pad pad-cyan" data-freq="329.63"></div>
+                        
+                        <div class="pad" data-freq="349.23"></div>
+                        <div class="pad" data-freq="392.00"></div>
+                        <div class="pad" data-freq="440.00"></div>
+
+                        <div class="pad" data-freq="493.88"></div>
+                        <div class="pad" data-freq="523.25"></div>
+                        <div class="pad" data-freq="587.33"></div>
                     </div>
                 </div>
             </div>
 
-        </section>
-
-        <!-- Navigation Section -->
-        <section>
-            <h2 class="section-title">Navigation</h2>
-            <div class="nav-links">
-                <a href="#pricing">Pricing</a>
-                <a href="#partners">Partners</a>
-            </div>
-        </section>
+        </div>
 
     </div>
 
@@ -357,16 +408,16 @@
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
 
-            oscillator.type = 'triangle';
+            oscillator.type = 'square'; // Changed to square for a more retro SFX vibe
             oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
             
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
 
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 1);
+            oscillator.stop(audioCtx.currentTime + 0.5);
         }
 
         document.querySelectorAll('.pad').forEach(pad => {
