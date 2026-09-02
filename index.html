@@ -716,6 +716,8 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 
 .boot-logo-row { display: flex; align-items: center; gap: 18px; }
 
+.boot-logo-img { max-height: 70px; max-width: 280px; object-fit: contain; }
+
 .boot-flag {
     width: 54px;
     height: 54px;
@@ -869,14 +871,131 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 }
 
 .balloon-body .balloon-icon { font-size: 22px; }
+
+.clippy-wrap {
+    position: fixed;
+    left: 16px;
+    bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    z-index: 32000;
+}
+
+.clippy-bubble {
+    position: relative;
+    width: 240px;
+    background: #ffffff;
+    border: 2px solid #000;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-family: "Comic Sans MS", "Chalkboard SE", cursive, Tahoma, sans-serif;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: #000;
+    box-shadow: 3px 3px 0 rgba(0,0,0,.25);
+}
+
+.clippy-bubble[hidden] { display: none; }
+
+.clippy-bubble::after {
+    content: "";
+    position: absolute;
+    left: 28px;
+    bottom: -14px;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    border-top-color: #000;
+}
+
+.clippy-bubble::before {
+    content: "";
+    position: absolute;
+    left: 30px;
+    bottom: -10px;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-top-color: #fff;
+    z-index: 1;
+}
+
+.clippy-close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #000;
+    background: var(--face);
+    font-size: 9px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: default;
+}
+
+.clippy-text { padding-right: 14px; margin-bottom: 8px; }
+
+.clippy-buttons { display: flex; gap: 6px; justify-content: flex-end; }
+
+.clippy-buttons[hidden] { display: none; }
+
+.clippy-btn {
+    font-family: "Comic Sans MS", "Chalkboard SE", cursive, Tahoma, sans-serif;
+    font-size: 11.5px;
+    padding: 4px 10px;
+    border: 0;
+    background: var(--face);
+    cursor: default;
+    box-shadow:
+        inset -1px -1px 0 var(--dark-shadow),
+        inset 1px 1px 0 var(--highlight),
+        inset -2px -2px 0 var(--shadow),
+        inset 2px 2px 0 var(--light);
+}
+
+.clippy-btn:active {
+    box-shadow:
+        inset -1px -1px 0 var(--highlight),
+        inset 1px 1px 0 var(--dark-shadow),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--shadow);
+    transform: translate(1px, 1px);
+}
+
+.clippy-btn:disabled { opacity: .45; }
+
+.clippy-char {
+    width: 54px;
+    height: 68px;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    animation: clippy-bob 2.6s ease-in-out infinite;
+}
+
+.clippy-img { width: 54px; height: 68px; object-fit: contain; display: block; }
+
+@keyframes clippy-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
 </style>
 </head>
 <body>
 
 <div id="bootScreen">
     <div class="boot-logo-row">
-        <div class="boot-flag"><span></span><span></span><span></span><span></span></div>
-        <div class="boot-text"><b>Windows</b><sup>98</sup></div>
+        <img id="bootLogoImg" class="boot-logo-img" src="Windows98Logo.png" alt="Windows 98"
+             onerror="this.style.display='none'; document.getElementById('bootLogoFallback').style.display='flex';">
+        <div id="bootLogoFallback" class="boot-logo-row" style="display:none;">
+            <div class="boot-flag"><span></span><span></span><span></span><span></span></div>
+            <div class="boot-text"><b>Windows</b><sup>98</sup></div>
+        </div>
     </div>
     <div class="boot-progress" id="bootProgress"></div>
     <div class="boot-caption">Starting up&hellip;</div>
@@ -1107,6 +1226,37 @@ body.custom-cursor-ready .custom-cursor { display: block; }
     </div>
 </div>
 
+<div class="clippy-wrap app-hidden" id="clippyWrap">
+    <div class="clippy-bubble" id="clippyBubble" hidden>
+        <button class="clippy-close" id="clippyCloseBtn">✕</button>
+        <div class="clippy-text" id="clippyText"></div>
+        <div class="clippy-buttons" id="clippyIntroButtons">
+            <button class="clippy-btn" id="clippyNoBtn">No thanks</button>
+            <button class="clippy-btn" id="clippyYesBtn">Sure!</button>
+        </div>
+        <div class="clippy-buttons" id="clippyTourButtons" hidden>
+            <button class="clippy-btn" id="clippyBackBtn">Back</button>
+            <button class="clippy-btn" id="clippyNextBtn">Next</button>
+        </div>
+    </div>
+    <button class="clippy-char" id="clippyChar" title="Need help?">
+        <img id="clippyImg" class="clippy-img" src="Clippy.png" alt="Clippy"
+             onerror="this.style.display='none'; document.getElementById('clippySvgFallback').style.display='block';">
+        <svg id="clippySvgFallback" style="display:none;" viewBox="0 0 60 80" width="54" height="68">
+            <path d="M22,14 C22,8 30,6 36,10 C42,14 42,22 42,28 L42,56 C42,64 33,66 28,60 C24,55 25,50 25,46 L25,24 C25,20 30,19 31,23 L31,44" fill="none" stroke="#8a8a8a" stroke-width="5" stroke-linecap="round"/>
+            <path d="M22,14 C22,8 30,6 36,10 C42,14 42,22 42,28 L42,56 C42,64 33,66 28,60 C24,55 25,50 25,46 L25,24 C25,20 30,19 31,23 L31,44" fill="none" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round"/>
+            <g class="clippy-eye">
+                <ellipse cx="24" cy="20" rx="5" ry="6" fill="#fff" stroke="#000" stroke-width="1"/>
+                <circle cx="25" cy="21" r="2" fill="#000"/>
+            </g>
+            <g class="clippy-eye">
+                <ellipse cx="37" cy="20" rx="5" ry="6" fill="#fff" stroke="#000" stroke-width="1"/>
+                <circle cx="38" cy="21" r="2" fill="#000"/>
+            </g>
+        </svg>
+    </button>
+</div>
+
 <script>
 const loginScreen = document.getElementById("loginScreen");
 const bootScreen = document.getElementById("bootScreen");
@@ -1153,6 +1303,78 @@ function hideBalloon() {
 
 balloonCloseBtn.addEventListener("click", hideBalloon);
 
+const clippyWrap = document.getElementById("clippyWrap");
+const clippyBubble = document.getElementById("clippyBubble");
+const clippyText = document.getElementById("clippyText");
+const clippyChar = document.getElementById("clippyChar");
+const clippyCloseBtn = document.getElementById("clippyCloseBtn");
+const clippyIntroButtons = document.getElementById("clippyIntroButtons");
+const clippyTourButtons = document.getElementById("clippyTourButtons");
+const clippyYesBtn = document.getElementById("clippyYesBtn");
+const clippyNoBtn = document.getElementById("clippyNoBtn");
+const clippyBackBtn = document.getElementById("clippyBackBtn");
+const clippyNextBtn = document.getElementById("clippyNextBtn");
+
+const clippyIntroText = "Hi, I'm Clippy! Want a quick tour of this computer?";
+const clippySteps = [
+    "Double-click any icon on the desktop to open a program.",
+    "Give \"Media Player\" a try \u2014 I've got some tunes waiting for you in there! \ud83c\udfb5",
+    "Drag a window around by its title bar, and use the buttons in the corner to minimize, maximize, or close it.",
+    "The taskbar down here shows every open program. Click Start to browse the full program menu.",
+    "Don't forget Minesweeper \u2014 open its Game menu to pick a difficulty. Have fun exploring!"
+];
+
+let clippyStepIndex = 0;
+
+function showClippyIntro() {
+    clippyIntroButtons.hidden = false;
+    clippyTourButtons.hidden = true;
+    clippyText.textContent = clippyIntroText;
+    clippyBubble.hidden = false;
+}
+
+function renderClippyStep() {
+    clippyText.textContent = clippySteps[clippyStepIndex];
+    clippyBackBtn.disabled = clippyStepIndex === 0;
+    clippyNextBtn.textContent = clippyStepIndex === clippySteps.length - 1 ? "Finish" : "Next";
+}
+
+function startClippyTour() {
+    clippyStepIndex = 0;
+    clippyIntroButtons.hidden = true;
+    clippyTourButtons.hidden = false;
+    renderClippyStep();
+}
+
+function hideClippyBubble() {
+    clippyBubble.hidden = true;
+}
+
+clippyYesBtn.addEventListener("click", startClippyTour);
+clippyNoBtn.addEventListener("click", hideClippyBubble);
+clippyCloseBtn.addEventListener("click", hideClippyBubble);
+
+clippyBackBtn.addEventListener("click", () => {
+    if (clippyStepIndex > 0) {
+        clippyStepIndex--;
+        renderClippyStep();
+    }
+});
+
+clippyNextBtn.addEventListener("click", () => {
+    if (clippyStepIndex === clippySteps.length - 1) {
+        hideClippyBubble();
+        return;
+    }
+    clippyStepIndex++;
+    renderClippyStep();
+});
+
+clippyChar.addEventListener("click", () => {
+    if (clippyBubble.hidden) showClippyIntro();
+    else hideClippyBubble();
+});
+
 function signIn() {
     loginScreen.classList.add("fade-out");
     document.getElementById("desktop").classList.remove("app-hidden");
@@ -1167,6 +1389,11 @@ function signIn() {
         revealed = true;
         document.querySelector(".desktop-icons").classList.add("show");
         showBalloon();
+        clippyWrap.classList.remove("app-hidden");
+        setTimeout(showClippyIntro, 2200);
+        setInterval(() => {
+            if (clippyBubble.hidden) showClippyIntro();
+        }, 45000);
     }
 
     startupSound.addEventListener("ended", revealDesktopContents, { once: true });
@@ -1238,7 +1465,7 @@ function showToast(message) {
 }
 
 document.addEventListener("click", event => {
-    if (event.target.closest(".track, .filter, .control, .ms-smiley, .desktop-icon, .start-item, .task-button, #startButton, .title-btn, .ms-menu-option, .ms-menu-item, #signInBtn, .balloon-close")) {
+    if (event.target.closest(".track, .filter, .control, .ms-smiley, .desktop-icon, .start-item, .task-button, #startButton, .title-btn, .ms-menu-option, .ms-menu-item, #signInBtn, .balloon-close, .clippy-btn, .clippy-close, #clippyChar")) {
         playClickSound();
     }
 }, true);
