@@ -3,47 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#141414">
-<title>WAYVES | Music Portfolio</title>
+<meta name="theme-color" content="#008080">
+<title>WAYVES Media Player</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
-
 :root {
-    --bg: #141414;
-    --ink: #f4efe4;
-    --grey: #3a3a3d;
-    --grey-line: #555558;
-    --grey-hi: #4c4c50;
-    --active: #232323;
-    --green: #35c94a;
-    --muted: #9a968c;
+    --face: #c0c0c0;
+    --shadow: #808080;
+    --dark-shadow: #0a0a0a;
+    --light: #dfdfdf;
+    --highlight: #ffffff;
+    --navy: #000080;
+    --navy-2: #1084d0;
+    --desktop: #008080;
+    --lcd-bg: #0a1f0a;
+    --lcd-text: #39ff6a;
+    --text: #000000;
+    --muted: #4b4b4b;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     min-height: 100vh;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    background: var(--desktop);
+    color: var(--text);
+    font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+    font-size: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 48px 16px 32px;
+    padding: 40px 12px;
 }
 
+/* ---------- bevel helpers (classic Win98 3D borders) ---------- */
+.raised {
+    background: var(--face);
+    box-shadow:
+        inset -1px -1px 0 var(--dark-shadow),
+        inset 1px 1px 0 var(--highlight),
+        inset -2px -2px 0 var(--shadow),
+        inset 2px 2px 0 var(--light);
+}
+
+.sunken {
+    background: var(--face);
+    box-shadow:
+        inset -1px -1px 0 var(--highlight),
+        inset 1px 1px 0 var(--dark-shadow),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--shadow);
+}
+
+/* ---------- window chrome ---------- */
 .player-wrap {
     width: 100%;
-    max-width: 440px;
+    max-width: 420px;
+    padding: 3px;
 }
+
+.player-wrap.raised { }
+
+.title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 22px;
+    padding: 2px 3px 2px 5px;
+    margin-bottom: 3px;
+    background: linear-gradient(90deg, var(--navy), var(--navy-2));
+    color: #fff;
+}
+
+.title-bar-text {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .01em;
+}
+
+.title-bar-controls {
+    display: flex;
+    gap: 3px;
+    pointer-events: none;
+}
+
+.title-bar-controls span {
+    width: 16px;
+    height: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 10px;
+    line-height: 1;
+    color: #000;
+}
+
+.window-body { padding: 8px; }
 
 /* ---------- genre filters ---------- */
 .filters {
     display: flex;
     flex-wrap: nowrap;
     width: 100%;
-    gap: 6px;
-    margin-bottom: 14px;
+    gap: 2px;
+    margin-bottom: 8px;
 }
 
 .filter {
@@ -55,34 +116,33 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    height: 36px;
-    padding: 0 8px;
+    height: 24px;
+    padding: 0 4px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--ink);
-    border-radius: 999px;
-    background: var(--grey);
-    color: var(--ink);
-    font: 600 clamp(.6rem, 2.4vw, .85rem) "IBM Plex Sans", sans-serif;
+    border: 0;
+    font: 700 clamp(.56rem, 2.2vw, .75rem) Tahoma, "MS Sans Serif", sans-serif;
+    color: var(--text);
     cursor: pointer;
-    transition: background .15s ease, color .15s ease;
 }
 
 .filter:focus { outline: none; }
-
-.filter:hover { background: var(--grey-hi); }
+.filter:active { transform: translate(1px, 1px); }
 
 .filter.active {
-    background: var(--green);
-    color: #0d1a0f;
-    border-color: var(--green);
+    background: var(--navy);
+    color: #fff;
 }
 
-/* ---------- stacked track buttons ---------- */
+/* ---------- track listbox ---------- */
 .tracks {
     display: flex;
     flex-direction: column;
+    background: #fff;
+    padding: 2px;
+    max-height: 260px;
+    overflow-y: auto;
 }
 
 .track {
@@ -90,154 +150,195 @@ body {
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-height: 68px;
-    padding: 10px 24px;
-    border: 3px solid var(--ink);
-    background: var(--grey);
-    box-shadow: inset -3px -3px 0 rgba(255,255,255,.25);
+    gap: 6px;
+    min-height: 26px;
+    padding: 3px 8px;
+    color: var(--text);
     cursor: pointer;
-    z-index: 1;
 }
 
-.tracks .track:not(:first-child) { margin-top: -3px; }
-.tracks .track:first-child { border-radius: 20px 20px 0 0; }
-.tracks .track:last-child { border-radius: 0 0 20px 20px; }
-.tracks .track:only-child { border-radius: 20px; }
-
-.track:hover { background: var(--grey-hi); }
+.track:hover { background: #dcdcdc; }
 
 .track.active {
-    background: var(--active);
-    z-index: 2;
+    background: var(--navy);
+    color: #fff;
 }
 
 .track-label {
-    font: 700 1.15rem "Baloo 2", sans-serif;
-    color: #fff;
-    text-shadow: 0 1px 1px rgba(0,0,0,.15);
+    font: 400 12px Tahoma, "MS Sans Serif", sans-serif;
 }
-
-.track.active .track-label { color: var(--ink); text-shadow: none; }
 
 .play-indicator {
-    position: absolute;
-    left: 20px;
     width: 0;
     height: 0;
-    border-top: 11px solid transparent;
-    border-bottom: 11px solid transparent;
-    border-left: 16px solid var(--green);
-    display: none;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid #fff;
+    visibility: hidden;
+    flex: 0 0 auto;
 }
 
-.track.active.playing .play-indicator { display: block; }
+.track.active.playing .play-indicator { visibility: visible; }
 
-/* ---------- player controls ---------- */
+/* ---------- player panel ---------- */
 .player {
-    margin-top: 22px;
-    padding: 20px 22px;
-    border: 3px solid var(--ink);
-    border-radius: 20px;
-    background: var(--active);
+    margin-top: 8px;
+    padding: 8px;
+}
+
+.lcd {
+    padding: 8px 10px;
+    background: var(--lcd-bg);
+    color: var(--lcd-text);
+    font-family: "Courier New", monospace;
+    text-align: center;
+    overflow: hidden;
 }
 
 .player-title {
-    font: 700 1.15rem "Baloo 2", sans-serif;
-    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .player-genre {
-    text-align: center;
-    color: var(--muted);
-    font-size: .85rem;
+    font-size: 10px;
     margin-top: 2px;
+    opacity: .85;
 }
 
-.progress-wrap { margin-top: 16px; }
+.progress-wrap { margin-top: 10px; padding: 0 2px; }
 
 input[type="range"] {
     width: 100%;
     appearance: none;
-    height: 8px;
-    border-radius: 6px;
-    background: var(--grey);
-    border: 2px solid var(--ink);
+    -webkit-appearance: none;
+    height: 6px;
+    background: var(--face);
+    box-shadow:
+        inset -1px -1px 0 var(--highlight),
+        inset 1px 1px 0 var(--dark-shadow),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--shadow);
     outline: none;
     cursor: pointer;
+    margin: 6px 0;
 }
 
 input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
     appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--green);
-    border: 2px solid var(--ink);
+    width: 12px;
+    height: 16px;
+    background: var(--face);
+    box-shadow:
+        inset -1px -1px 0 var(--dark-shadow),
+        inset 1px 1px 0 var(--highlight),
+        inset -2px -2px 0 var(--shadow),
+        inset 2px 2px 0 var(--light);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 16px;
+    border: 0;
+    background: var(--face);
+    box-shadow:
+        inset -1px -1px 0 var(--dark-shadow),
+        inset 1px 1px 0 var(--highlight),
+        inset -2px -2px 0 var(--shadow),
+        inset 2px 2px 0 var(--light);
 }
 
 .time-row {
     display: flex;
     justify-content: space-between;
     color: var(--muted);
-    font-size: .72rem;
-    margin-top: 6px;
+    font-size: 11px;
+    padding: 0 2px;
 }
 
 .controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 14px;
-    margin-top: 18px;
+    gap: 6px;
+    margin-top: 10px;
 }
 
 .control {
+    -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 30px;
     display: grid;
     place-items: center;
-    border: 3px solid var(--ink);
-    border-radius: 50%;
-    background: var(--grey);
-    color: #fff;
+    border: 0;
+    background: var(--face);
+    color: var(--text);
+    font-size: 13px;
     cursor: pointer;
+    box-shadow:
+        inset -1px -1px 0 var(--dark-shadow),
+        inset 1px 1px 0 var(--highlight),
+        inset -2px -2px 0 var(--shadow),
+        inset 2px 2px 0 var(--light);
 }
 
-.control:hover { background: var(--grey-hi); }
+.control:active {
+    box-shadow:
+        inset -1px -1px 0 var(--highlight),
+        inset 1px 1px 0 var(--dark-shadow),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--shadow);
+    transform: translate(1px, 1px);
+}
 
 .control.main {
-    width: 58px;
-    height: 58px;
-    background: var(--green);
-    font-size: 1.2rem;
+    width: 46px;
+    height: 34px;
+    font-size: 14px;
 }
 
 .volume {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 18px;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 0 2px;
     color: var(--muted);
-    font-size: .82rem;
+    font-size: 11px;
 }
 
 .volume input { flex: 1; }
 
+.status-bar {
+    margin-top: 8px;
+    padding: 2px 6px;
+    font-size: 11px;
+    color: var(--muted);
+}
+
 .toast {
     position: fixed;
     left: 50%;
-    bottom: 26px;
+    bottom: 24px;
     transform: translate(-50%, 20px);
     opacity: 0;
     pointer-events: none;
-    padding: 10px 16px;
-    border: 2px solid var(--ink);
-    border-radius: 12px;
-    background: var(--active);
-    font-size: .82rem;
-    transition: .2s ease;
+    padding: 8px 14px;
+    background: var(--face);
+    box-shadow:
+        inset -1px -1px 0 var(--dark-shadow),
+        inset 1px 1px 0 var(--highlight),
+        inset -2px -2px 0 var(--shadow),
+        inset 2px 2px 0 var(--light);
+    font-size: 12px;
+    color: var(--text);
+    transition: .15s ease;
+    max-width: 320px;
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
@@ -269,73 +370,90 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 </head>
 <body>
 
-<div class="player-wrap">
-    <div class="filters" id="musicFilters">
-        <button class="filter active" data-filter="all">All</button>
-        <button class="filter" data-filter="Retro">Retro</button>
-        <button class="filter" data-filter="Cinematic">Cinematic</button>
-        <button class="filter" data-filter="Simulator">Simulator</button>
-        <button class="filter" data-filter="Boss Fight">Boss Fight</button>
-    </div>
-
-    <div class="tracks" id="musicList">
-        <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
-            <span class="play-indicator"></span><span class="track-label">Retro</span>
-        </div>
-        <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-cat="Retro" data-src="Retro%201.mp3">
-            <span class="play-indicator"></span><span class="track-label">Retro 1</span>
-        </div>
-        <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic.mp3">
-            <span class="play-indicator"></span><span class="track-label">Cinematic</span>
-        </div>
-        <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic%201.mp3">
-            <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
-        </div>
-        <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator.mp3">
-            <span class="play-indicator"></span><span class="track-label">Simulator</span>
-        </div>
-        <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
-            <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
-        </div>
-        <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
-            <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
-        </div>
-        <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight%201.mp3">
-            <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
+<div class="player-wrap raised">
+    <div class="title-bar">
+        <span class="title-bar-text">WAYVES Media Player</span>
+        <div class="title-bar-controls">
+            <span class="raised">_</span>
+            <span class="raised">□</span>
+            <span class="raised">✕</span>
         </div>
     </div>
 
-    <div class="player">
-        <div class="player-title" id="playerTitle">Nothing selected</div>
-        <div class="player-genre" id="playerGenre">Choose a track above</div>
-
-        <div class="progress-wrap">
-            <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
-            <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+    <div class="window-body">
+        <div class="filters raised" id="musicFilters">
+            <button class="filter active" data-filter="all">All</button>
+            <button class="filter" data-filter="Retro">Retro</button>
+            <button class="filter" data-filter="Cinematic">Cinematic</button>
+            <button class="filter" data-filter="Simulator">Simulator</button>
+            <button class="filter" data-filter="Boss Fight">Boss Fight</button>
         </div>
 
-        <div class="controls">
-            <button class="control" id="prevBtn" aria-label="Previous track">↶</button>
-            <button class="control main" id="playBtn" aria-label="Play">▶</button>
-            <button class="control" id="nextBtn" aria-label="Next track">↷</button>
+        <div class="tracks sunken" id="musicList">
+            <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
+                <span class="play-indicator"></span><span class="track-label">Retro</span>
+            </div>
+            <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-cat="Retro" data-src="Retro%201.mp3">
+                <span class="play-indicator"></span><span class="track-label">Retro 1</span>
+            </div>
+            <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic.mp3">
+                <span class="play-indicator"></span><span class="track-label">Cinematic</span>
+            </div>
+            <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic%201.mp3">
+                <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
+            </div>
+            <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator.mp3">
+                <span class="play-indicator"></span><span class="track-label">Simulator</span>
+            </div>
+            <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
+                <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
+            </div>
+            <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
+                <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
+            </div>
+            <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight%201.mp3">
+                <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
+            </div>
         </div>
 
-        <div class="volume">
-            <span>Vol</span>
-            <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
+        <div class="player raised">
+            <div class="lcd sunken">
+                <div class="player-title" id="playerTitle">NO TRACK LOADED</div>
+                <div class="player-genre" id="playerGenre">SELECT A TRACK ABOVE</div>
+            </div>
+
+            <div class="progress-wrap">
+                <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
+                <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+            </div>
+
+            <div class="controls">
+                <button class="control" id="prevBtn" aria-label="Previous track">◀◀</button>
+                <button class="control main" id="playBtn" aria-label="Play">▶</button>
+                <button class="control" id="nextBtn" aria-label="Next track">▶▶</button>
+            </div>
+
+            <div class="volume">
+                <span>Vol</span>
+                <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
+            </div>
+
+            <audio id="audio" preload="metadata"></audio>
         </div>
 
-        <audio id="audio" preload="metadata"></audio>
+        <div class="status-bar sunken">Ready</div>
     </div>
 </div>
 
 <audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
+<audio id="errorSound" src="ErrorSound.mp3" preload="auto"></audio>
 <div class="toast" id="toast"></div>
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
 <script>
 const audio = document.getElementById("audio");
 const clickSound = document.getElementById("clickSound");
+const errorSound = document.getElementById("errorSound");
 const tracks = [...document.querySelectorAll(".track")];
 const filterButtons = [...document.querySelectorAll(".filter")];
 const playBtn = document.getElementById("playBtn");
@@ -388,11 +506,20 @@ function formatTime(seconds) {
     return `${mins}:${secs}`;
 }
 
+function playErrorSound() {
+    try {
+        const sound = errorSound.cloneNode(true);
+        sound.volume = 0.6;
+        sound.play().catch(() => {});
+    } catch {}
+}
+
 function showToast(message) {
     toast.textContent = message;
     toast.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    playErrorSound();
 }
 
 function setPlayingVisuals(playing) {
