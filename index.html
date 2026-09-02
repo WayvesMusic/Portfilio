@@ -37,6 +37,48 @@ body {
     max-width: 440px;
 }
 
+/* ---------- genre filters ---------- */
+.filters {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.filter {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 36px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--grey);
+    color: var(--ink);
+    font: 600 clamp(.6rem, 2.4vw, .85rem) "IBM Plex Sans", sans-serif;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+
+.filter:focus { outline: none; }
+
+.filter:hover { background: var(--grey-hi); }
+
+.filter.active {
+    background: var(--green);
+    color: #0d1a0f;
+    border-color: var(--green);
+}
+
 /* ---------- stacked track buttons ---------- */
 .tracks {
     display: flex;
@@ -44,6 +86,7 @@ body {
 }
 
 .track {
+    -webkit-tap-highlight-color: transparent;
     position: relative;
     display: flex;
     align-items: center;
@@ -150,6 +193,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .control {
+    -webkit-tap-highlight-color: transparent;
     width: 44px;
     height: 44px;
     display: grid;
@@ -202,39 +246,38 @@ input[type="range"]::-webkit-slider-thumb {
 <body>
 
 <div class="player-wrap">
+    <div class="filters" id="musicFilters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="Retro">Retro</button>
+        <button class="filter" data-filter="Cinematic">Cinematic</button>
+        <button class="filter" data-filter="Simulator">Simulator</button>
+        <button class="filter" data-filter="Boss Fight">Boss Fight</button>
+    </div>
+
     <div class="tracks" id="musicList">
-        <div class="track" data-title="Retro" data-genre="Retro / Game" data-src="Retro.mp3">
+        <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
             <span class="play-indicator"></span><span class="track-label">Retro</span>
         </div>
-        <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-src="Retro%201.mp3">
+        <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-cat="Retro" data-src="Retro%201.mp3">
             <span class="play-indicator"></span><span class="track-label">Retro 1</span>
         </div>
-        <div class="track" data-title="Retro 2" data-genre="Retro / Game" data-src="Retro%202.mp3">
-            <span class="play-indicator"></span><span class="track-label">Retro 2</span>
-        </div>
-        <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-src="Cinematic.mp3">
+        <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic.mp3">
             <span class="play-indicator"></span><span class="track-label">Cinematic</span>
         </div>
-        <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-src="Cinematic%201.mp3">
+        <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic%201.mp3">
             <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
         </div>
-        <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-src="Simulator.mp3">
+        <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator.mp3">
             <span class="play-indicator"></span><span class="track-label">Simulator</span>
         </div>
-        <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-src="Simulator%201.mp3">
+        <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
             <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
         </div>
-        <div class="track" data-title="Simulator 2" data-genre="Simulator / Gameplay" data-src="Simulator%202.mp3">
-            <span class="play-indicator"></span><span class="track-label">Simulator 2</span>
-        </div>
-        <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-src="Boss%20Fight.mp3">
+        <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
             <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
         </div>
-        <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-src="Boss%20Fight%201.mp3">
+        <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight%201.mp3">
             <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
-        </div>
-        <div class="track" data-title="Boss Fight 2" data-genre="Boss Fight / Action" data-src="Boss%20Fight%202.mp3">
-            <span class="play-indicator"></span><span class="track-label">Boss Fight 2</span>
         </div>
     </div>
 
@@ -262,11 +305,14 @@ input[type="range"]::-webkit-slider-thumb {
     </div>
 </div>
 
+<audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
 <div class="toast" id="toast"></div>
 
 <script>
 const audio = document.getElementById("audio");
+const clickSound = document.getElementById("clickSound");
 const tracks = [...document.querySelectorAll(".track")];
+const filterButtons = [...document.querySelectorAll(".filter")];
 const playBtn = document.getElementById("playBtn");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -282,6 +328,33 @@ let currentIndex = -1;
 let toastTimer;
 
 audio.volume = Number(volume.value);
+
+/* Click sound — cloning the node lets rapid taps overlap instead of
+   cutting each other off, and calling play() synchronously inside the
+   event handler is what makes this reliable on iOS/Android too. */
+function playClickSound() {
+    try {
+        const sound = clickSound.cloneNode(true);
+        sound.volume = 0.5;
+        sound.play().catch(() => {});
+    } catch {}
+}
+
+document.addEventListener("click", event => {
+    if (event.target.closest(".track, .filter, .control")) playClickSound();
+}, true);
+
+function filterTracks(filter) {
+    tracks.forEach(track => {
+        track.style.display = (filter === "all" || track.dataset.cat === filter) ? "" : "none";
+    });
+}
+
+filterButtons.forEach(button => button.addEventListener("click", () => {
+    filterButtons.forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+    filterTracks(button.dataset.filter);
+}));
 
 function formatTime(seconds) {
     if (!Number.isFinite(seconds)) return "0:00";
