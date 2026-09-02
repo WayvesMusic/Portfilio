@@ -74,7 +74,11 @@ body {
     flex-wrap: wrap;
     align-content: flex-start;
     gap: 4px;
+    opacity: 0;
+    transition: opacity .5s ease;
 }
+
+.desktop-icons.show { opacity: 1; }
 
 .desktop-icon {
     width: 78px;
@@ -671,7 +675,7 @@ input[type="range"]::-moz-range-thumb {
     width: 20px;
     height: 20px;
     pointer-events: none;
-    z-index: 40000;
+    z-index: 70000;
     transform: translate(-1000px, -1000px);
     will-change: transform;
     display: none;
@@ -1153,11 +1157,21 @@ function signIn() {
     loginScreen.classList.add("fade-out");
     document.getElementById("desktop").classList.remove("app-hidden");
     document.getElementById("taskbar").classList.remove("app-hidden");
-    playStartupSound();
     setTimeout(() => {
         loginScreen.remove();
     }, 400);
-    setTimeout(showBalloon, 700);
+
+    let revealed = false;
+    function revealDesktopContents() {
+        if (revealed) return;
+        revealed = true;
+        document.querySelector(".desktop-icons").classList.add("show");
+        showBalloon();
+    }
+
+    startupSound.addEventListener("ended", revealDesktopContents, { once: true });
+    playStartupSound();
+    setTimeout(revealDesktopContents, 3000);
 }
 
 signInBtn.addEventListener("click", signIn);
