@@ -3,1472 +3,282 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#08080d">
+<meta name="theme-color" content="#141414">
 <title>WAYVES | Music Portfolio</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
 :root {
-    --bg: #07070b;
-    --surface: #0d0d13;
-    --surface-2: #12121a;
-    --line: rgba(255,255,255,.09);
-    --text: #f5f5f7;
-    --muted: #8e8e9d;
-    --accent: #a78bfa;
-    --accent-2: #6ee7f9;
-    --accent-3: #f472b6;
-    --radius: 22px;
-    --shadow: 0 24px 80px rgba(0,0,0,.35);
+    --bg: #141414;
+    --ink: #f4efe4;
+    --grey: #3a3a3d;
+    --grey-line: #555558;
+    --grey-hi: #4c4c50;
+    --active: #232323;
+    --green: #35c94a;
+    --muted: #9a968c;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
-
 body {
     min-height: 100vh;
-    background:
-        radial-gradient(circle at 15% 5%, rgba(167,139,250,.12), transparent 30rem),
-        radial-gradient(circle at 85% 18%, rgba(110,231,249,.08), transparent 28rem),
-        var(--bg);
-    color: var(--text);
-    font-family: "DM Sans", system-ui, sans-serif;
-    line-height: 1.6;
-    overflow-x: hidden;
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: .22;
-    background-image:
-        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: linear-gradient(to bottom, black, transparent 80%);
-}
-
-button, input { font: inherit; }
-
-button { color: inherit; }
-
-a { color: inherit; text-decoration: none; }
-
-.container {
-    width: min(1160px, calc(100% - 36px));
-    margin: auto;
-}
-
-header {
-    position: sticky;
-    top: 14px;
-    z-index: 50;
-    margin: 14px auto 0;
-}
-
-.nav {
-    width: min(1160px, calc(100% - 36px));
-    margin: auto;
-    height: 68px;
-    padding: 0 18px 0 22px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    background: rgba(10,10,15,.72);
-    backdrop-filter: blur(22px);
-    box-shadow: 0 14px 50px rgba(0,0,0,.2);
+    padding: 48px 16px 32px;
 }
 
 .logo {
-    font: 700 1.15rem "Space Grotesk", sans-serif;
-    letter-spacing: .18em;
+    font: 800 1.4rem "Baloo 2", sans-serif;
+    letter-spacing: .02em;
+    margin-bottom: 30px;
 }
 
-.logo span { color: var(--accent); }
+.logo span { color: var(--green); }
 
-.nav-links {
+.player-wrap {
+    width: 100%;
+    max-width: 440px;
+}
+
+/* ---------- stacked track buttons ---------- */
+.tracks {
     display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.nav-links a {
-    padding: 10px 14px;
-    border-radius: 12px;
-    color: var(--muted);
-    font-size: .9rem;
-    transition: .2s ease;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-    color: var(--text);
-    background: rgba(255,255,255,.06);
-}
-
-.menu {
-    display: none;
-    width: 42px;
-    height: 42px;
-    border: 1px solid var(--line);
-    background: var(--surface-2);
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-.hero {
-    min-height: 680px;
-    display: grid;
-    align-items: center;
-    padding: 90px 0 70px;
-    position: relative;
-}
-
-.hero-grid {
-    display: grid;
-    grid-template-columns: 1.15fr .85fr;
-    gap: 70px;
-    align-items: center;
-}
-
-.eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    color: var(--accent-2);
-    text-transform: uppercase;
-    letter-spacing: .18em;
-    font-size: .72rem;
-    font-weight: 700;
-    margin-bottom: 22px;
-}
-
-.live-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--accent-2);
-    box-shadow: 0 0 16px var(--accent-2);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    50% { opacity: .35; transform: scale(.7); }
-}
-
-h1 {
-    font: 700 clamp(4.5rem, 11vw, 8.7rem)/.82 "Space Grotesk", sans-serif;
-    letter-spacing: -.075em;
-    margin-left: -.07em;
-}
-
-.hero h1 .gradient {
-    background: linear-gradient(105deg, #fff 10%, var(--accent) 50%, var(--accent-2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.hero-copy {
-    max-width: 590px;
-    margin-top: 28px;
-    color: var(--muted);
-    font-size: 1.08rem;
-}
-
-.hero-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 30px;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 48px;
-    padding: 0 20px;
-    border-radius: 13px;
-    border: 1px solid var(--line);
-    background: rgba(255,255,255,.04);
-    cursor: pointer;
-    transition: transform .2s, background .2s, border-color .2s;
-}
-
-.btn:hover { transform: translateY(-2px); background: rgba(255,255,255,.08); }
-
-.btn.primary {
-    border-color: transparent;
-    background: var(--text);
-    color: #09090d;
-    font-weight: 700;
-}
-
-.btn.primary:hover { background: #dddde4; }
-
-.studio-card {
-    position: relative;
-    min-height: 430px;
-    padding: 24px;
-    border: 1px solid var(--line);
-    border-radius: 30px;
-    background:
-        radial-gradient(circle at 50% 20%, rgba(167,139,250,.17), transparent 50%),
-        linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
-    box-shadow: var(--shadow);
-    overflow: hidden;
-}
-
-.studio-card::after {
-    content: "";
-    position: absolute;
-    inset: auto -20% -55% 10%;
-    height: 280px;
-    background: radial-gradient(ellipse, rgba(110,231,249,.14), transparent 65%);
-}
-
-.deck-top {
-    display: flex;
-    justify-content: space-between;
-    color: var(--muted);
-    font-size: .72rem;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-}
-
-.album-art {
-    width: 190px;
-    aspect-ratio: 1;
-    margin: 42px auto 30px;
-    border-radius: 28px;
-    position: relative;
-    background:
-        radial-gradient(circle at 35% 35%, #fff 0 2%, transparent 3%),
-        conic-gradient(from 20deg, var(--accent), #28203c, var(--accent-2), #171720, var(--accent));
-    box-shadow: 0 20px 70px rgba(167,139,250,.2);
-    animation: artSpin 12s linear infinite;
-    animation-play-state: paused;
-}
-
-.album-art.playing { animation-play-state: running; }
-
-.album-art::before {
-    content: "";
-    position: absolute;
-    inset: 21%;
-    border-radius: 50%;
-    background: #0a0a0e;
-    box-shadow: 0 0 0 2px rgba(255,255,255,.1);
-}
-
-.album-art::after {
-    content: "";
-    position: absolute;
-    inset: 47%;
-    border-radius: 50%;
-    background: #fff;
-}
-
-@keyframes artSpin { to { transform: rotate(360deg); } }
-
-.deck-track {
-    text-align: center;
-    position: relative;
-    z-index: 2;
-}
-
-.deck-track strong {
-    display: block;
-    font: 600 1.15rem "Space Grotesk", sans-serif;
-}
-
-.deck-track span { color: var(--muted); font-size: .85rem; }
-
-.waveform {
-    height: 46px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 3px;
-    margin-top: 18px;
-}
-
-.waveform i {
-    width: 3px;
-    height: 35%;
-    border-radius: 8px;
-    background: linear-gradient(to top, var(--accent), var(--accent-2));
-    opacity: .8;
-}
-
-.waveform.playing i { animation: wave .65s ease-in-out infinite alternate; }
-
-.waveform i:nth-child(2n) { animation-delay: .1s; }
-.waveform i:nth-child(3n) { animation-delay: .22s; }
-.waveform i:nth-child(4n) { animation-delay: .35s; }
-
-@keyframes wave { to { height: 95%; } }
-
-section { padding: 90px 0; }
-
-.section-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 20px;
-    margin-bottom: 28px;
-}
-
-.kicker {
-    color: var(--accent);
-    font-size: .72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .18em;
-    margin-bottom: 8px;
-}
-
-h2 {
-    font: 600 clamp(2rem, 4vw, 3.1rem)/1 "Space Grotesk", sans-serif;
-    letter-spacing: -.045em;
-}
-
-.section-head p { color: var(--muted); max-width: 430px; }
-
-.music-layout {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 18px;
-}
-
-.music-list {
-    display: grid;
-    gap: 10px;
+    flex-direction: column;
 }
 
 .track {
-    display: grid;
-    grid-template-columns: 54px 1fr auto;
+    position: relative;
+    display: flex;
     align-items: center;
-    gap: 16px;
-    min-height: 82px;
-    padding: 12px 16px 12px 12px;
-    border: 1px solid var(--line);
-    border-radius: 17px;
-    background: var(--surface);
+    justify-content: center;
+    min-height: 68px;
+    padding: 10px 24px;
+    border: 3px solid var(--ink);
+    background: var(--grey);
+    box-shadow: inset -3px -3px 0 rgba(255,255,255,.25);
     cursor: pointer;
-    transition: .2s ease;
+    z-index: 1;
 }
 
-.track:hover { background: var(--surface-2); transform: translateX(3px); }
+.tracks .track:not(:first-child) { margin-top: -3px; }
+.tracks .track:first-child { border-radius: 20px 20px 0 0; }
+.tracks .track:last-child { border-radius: 0 0 20px 20px; }
+.tracks .track:only-child { border-radius: 20px; }
+
+.track:hover { background: var(--grey-hi); }
 
 .track.active {
-    border-color: rgba(167,139,250,.45);
-    background: linear-gradient(100deg, rgba(167,139,250,.1), rgba(255,255,255,.025));
+    background: var(--active);
+    z-index: 2;
 }
 
-.track-number {
-    width: 54px;
-    height: 54px;
-    display: grid;
-    place-items: center;
-    border-radius: 13px;
-    background: #171720;
-    color: var(--muted);
-    font-size: .8rem;
+.track-label {
+    font: 700 1.15rem "Baloo 2", sans-serif;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0,0,0,.15);
 }
 
-.track.active .track-number {
-    color: var(--text);
-    background: linear-gradient(135deg, var(--accent), #6b5bd6);
+.track.active .track-label { color: var(--ink); text-shadow: none; }
+
+.play-indicator {
+    position: absolute;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    border-left: 16px solid var(--green);
+    display: none;
 }
 
-.track-info strong { display: block; font-size: .96rem; }
-.track-info span { color: var(--muted); font-size: .78rem; }
+.track.active.playing .play-indicator { display: block; }
 
-.track-time { color: var(--muted); font-size: .78rem; }
-
+/* ---------- player controls ---------- */
 .player {
-    position: sticky;
-    top: 98px;
-    height: fit-content;
-    padding: 22px;
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    background: var(--surface);
-}
-
-.player-label {
-    display: flex;
-    justify-content: space-between;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .13em;
-    font-size: .65rem;
+    margin-top: 22px;
+    padding: 20px 22px;
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    background: var(--active);
 }
 
 .player-title {
-    font: 600 1.35rem "Space Grotesk", sans-serif;
-    margin-top: 22px;
+    font: 700 1.15rem "Baloo 2", sans-serif;
+    text-align: center;
 }
 
-.player-genre { color: var(--muted); font-size: .8rem; }
+.player-genre {
+    text-align: center;
+    color: var(--muted);
+    font-size: .85rem;
+    margin-top: 2px;
+}
 
-.progress-wrap { margin-top: 24px; }
+.progress-wrap { margin-top: 16px; }
 
 input[type="range"] {
     width: 100%;
     appearance: none;
-    height: 4px;
-    border-radius: 5px;
-    background: #2a2a34;
+    height: 8px;
+    border-radius: 6px;
+    background: var(--grey);
+    border: 2px solid var(--ink);
     outline: none;
     cursor: pointer;
 }
 
 input[type="range"]::-webkit-slider-thumb {
     appearance: none;
-    width: 13px;
-    height: 13px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: var(--text);
+    background: var(--green);
+    border: 2px solid var(--ink);
 }
 
 .time-row {
     display: flex;
     justify-content: space-between;
     color: var(--muted);
-    font-size: .68rem;
-    margin-top: 7px;
+    font-size: .72rem;
+    margin-top: 6px;
 }
 
-.player-controls {
+.controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin: 22px 0;
+    gap: 14px;
+    margin-top: 18px;
 }
 
 .control {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: grid;
     place-items: center;
-    border: 1px solid var(--line);
+    border: 3px solid var(--ink);
     border-radius: 50%;
-    background: #15151c;
+    background: var(--grey);
+    color: #fff;
     cursor: pointer;
 }
 
+.control:hover { background: var(--grey-hi); }
+
 .control.main {
-    width: 54px;
-    height: 54px;
-    background: var(--text);
-    color: #08080b;
-    border: 0;
-    font-size: 1.1rem;
+    width: 58px;
+    height: 58px;
+    background: var(--green);
+    font-size: 1.2rem;
 }
 
 .volume {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 18px;
     color: var(--muted);
+    font-size: .82rem;
 }
 
 .volume input { flex: 1; }
 
-.about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-}
-
-.panel {
-    padding: 30px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: var(--surface);
-}
-
-.panel p { color: var(--muted); margin-top: 14px; }
-
-.price {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-top: 22px;
-}
-
-.price strong {
-    font: 700 3rem "Space Grotesk", sans-serif;
-}
-
-.price span { color: var(--muted); }
-
-.price-note {
-    color: var(--muted);
-    font-size: .8rem;
-    margin-top: 7px;
-}
-
-.service-list {
-    display: grid;
-    gap: 9px;
-    margin-top: 24px;
-}
-
-.service {
-    padding: 13px 15px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    display: flex;
-    justify-content: space-between;
-    color: var(--muted);
-}
-
-.service strong { color: var(--text); font-size: .88rem; }
-
-.genre-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-}
-
-.genre {
-    min-height: 155px;
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.01));
-    overflow: hidden;
-    position: relative;
-    transition: .25s ease;
-}
-
-.genre:hover { transform: translateY(-5px); border-color: rgba(255,255,255,.18); }
-
-.genre::before {
-    content: "";
-    position: absolute;
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    top: -45px;
-    right: -35px;
-    filter: blur(2px);
-    opacity: .55;
-}
-
-.genre:nth-child(1)::before { background: var(--accent); }
-.genre:nth-child(2)::before { background: var(--accent-2); }
-.genre:nth-child(3)::before { background: var(--accent-3); }
-.genre:nth-child(4)::before { background: #818cf8; }
-
-.genre small {
-    position: relative;
-    color: var(--muted);
-    font-size: .65rem;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-}
-
-.genre strong {
-    position: relative;
-    margin-top: 3px;
-    font: 600 1.25rem "Space Grotesk", sans-serif;
-}
-
-.pad-section {
-    display: grid;
-    grid-template-columns: .8fr 1.2fr;
-    gap: 18px;
-}
-
-.pad-copy, .launchpad {
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: var(--surface);
-    padding: 28px;
-}
-
-.pad-copy p { color: var(--muted); margin-top: 12px; }
-
-.keys {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 9px;
-    margin-top: 22px;
-}
-
-.key {
-    aspect-ratio: 1.25;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: #15151d;
-    cursor: pointer;
-    transition: .08s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 12px;
-}
-
-.key span { color: var(--muted); font-size: .68rem; }
-.key strong { font-size: .9rem; }
-
-.key:hover { border-color: rgba(167,139,250,.6); }
-.key:active, .key.hit {
-    transform: scale(.95);
-    background: linear-gradient(135deg, rgba(167,139,250,.35), rgba(110,231,249,.2));
-    border-color: var(--accent);
-}
-
-.contact {
-    text-align: center;
-    padding: 105px 20px 130px;
-}
-
-.contact p {
-    max-width: 540px;
-    margin: 16px auto 25px;
-    color: var(--muted);
-}
-
-footer {
-    border-top: 1px solid var(--line);
-    padding: 24px 0;
-    color: var(--muted);
-    font-size: .75rem;
-}
-
-.footer-inner {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-}
-
 .toast {
     position: fixed;
     left: 50%;
-    bottom: 28px;
-    z-index: 100;
-    transform: translate(-50%, 30px);
+    bottom: 26px;
+    transform: translate(-50%, 20px);
     opacity: 0;
     pointer-events: none;
-    padding: 11px 16px;
-    border: 1px solid var(--line);
+    padding: 10px 16px;
+    border: 2px solid var(--ink);
     border-radius: 12px;
-    background: rgba(18,18,25,.92);
-    backdrop-filter: blur(15px);
-    font-size: .8rem;
-    transition: .25s ease;
+    background: var(--active);
+    font-size: .82rem;
+    transition: .2s ease;
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-
-.pricing-intro {
-    margin-bottom: 14px;
-    padding: 26px 30px;
-}
-
-.pricing-intro h3 {
-    font: 600 1.15rem "Space Grotesk", sans-serif;
-}
-
-.pricing-intro p {
-    margin-top: 8px;
-    color: var(--muted);
-    max-width: 850px;
-}
-
-.pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-
-.price-card {
-    min-height: 245px;
-    padding: 27px;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    background: var(--surface);
-    position: relative;
-    overflow: hidden;
-    transition: .25s ease;
-}
-
-.price-card::before {
-    content: "";
-    position: absolute;
-    width: 180px;
-    height: 180px;
-    right: -80px;
-    top: -80px;
-    border-radius: 50%;
-    background: rgba(167,139,250,.12);
-    filter: blur(10px);
-}
-
-.price-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255,255,255,.18);
-}
-
-.price-card.featured {
-    border-color: rgba(167,139,250,.4);
-    background: linear-gradient(145deg, rgba(167,139,250,.1), var(--surface));
-}
-
-.price-range {
-    display: block;
-    color: var(--accent);
-    font: 600 1.7rem "Space Grotesk", sans-serif;
-    letter-spacing: -.04em;
-}
-
-.price-card h3 {
-    margin-top: 15px;
-    font: 600 1.05rem "Space Grotesk", sans-serif;
-}
-
-.price-card p {
-    color: var(--muted);
-    margin-top: 7px;
-    font-size: .88rem;
-}
-
-.price-example {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid var(--line);
-    color: #c3c3ce;
-    font-size: .78rem;
-}
-
-.pricing-detail {
-    margin-top: 12px;
-    display: grid;
-    grid-template-columns: 55px 1fr;
-    gap: 18px;
-    align-items: start;
-}
-
-.detail-mark, .partner-index {
-    color: var(--accent);
-    font: 600 .8rem "Space Grotesk", sans-serif;
-    letter-spacing: .08em;
-}
-
-.pricing-detail h3 {
-    font: 600 1.05rem "Space Grotesk", sans-serif;
-}
-
-.pricing-detail p {
-    color: var(--muted);
-    margin-top: 7px;
-    font-size: .9rem;
-}
-
-.examples {
-    margin-top: 55px;
-    border-top: 1px solid var(--line);
-}
-
-.examples-head {
-    padding: 35px 0 18px;
-}
-
-.examples-head h3 {
-    font: 600 1.35rem "Space Grotesk", sans-serif;
-}
-
-.example-row {
-    display: grid;
-    grid-template-columns: 42px 1fr auto;
-    gap: 15px;
-    align-items: center;
-    padding: 20px 0;
-    border-top: 1px solid var(--line);
-}
-
-.example-row > span {
-    color: var(--muted);
-    font-size: .72rem;
-}
-
-.example-row strong {
-    display: block;
-    font-size: .9rem;
-}
-
-.example-row p {
-    color: var(--muted);
-    font-size: .76rem;
-    margin-top: 3px;
-}
-
-.example-row b {
-    color: var(--accent);
-    font: 600 .82rem "Space Grotesk", sans-serif;
-    white-space: nowrap;
-}
-
-.pricing-note {
-    margin-top: 25px;
-    padding: 20px 22px;
-    border-left: 2px solid var(--accent);
-    background: rgba(167,139,250,.045);
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    font-size: .82rem;
-}
-
-.pricing-note strong { color: var(--text); }
-.pricing-note span { color: var(--muted); }
-
-.partner-card {
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    padding: 30px;
-    background:
-        radial-gradient(circle at 85% 10%, rgba(167,139,250,.1), transparent 20rem),
-        var(--surface);
-    box-shadow: var(--shadow);
-}
-
-.partner-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.partner-label {
-    display: block;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .15em;
-    font-size: .64rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.partner-top h3 {
-    font: 600 1.65rem "Space Grotesk", sans-serif;
-}
-
-.partner-top h3 a {
-    transition: color .2s;
-}
-
-.partner-top h3 a:hover {
-    color: var(--accent);
-}
-
-.partner-index {
-    font-size: .9rem;
-}
-
-.partner-divider {
-    height: 1px;
-    background: var(--line);
-    margin: 28px 0;
-}
-
-.games-worked {
-    display: grid;
-    gap: 10px;
-}
-
-.game-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 20px;
-    padding: 18px;
-    border: 1px solid var(--line);
-    border-radius: 15px;
-    background: rgba(255,255,255,.025);
-    transition: .2s ease;
-}
-
-.game-row:hover {
-    background: rgba(255,255,255,.055);
-    border-color: rgba(167,139,250,.35);
-    transform: translateX(3px);
-}
-
-.game-row strong {
-    display: block;
-    font: 500 .95rem "Space Grotesk", sans-serif;
-}
-
-.game-row span {
-    display: block;
-    color: var(--muted);
-    font-size: .78rem;
-    margin-top: 5px;
-}
-
-.game-row b {
-    color: var(--muted);
-    font-size: .62rem;
-    letter-spacing: .12em;
-}
-
-@media (max-width: 900px) {
-    .hero-grid, .music-layout, .pad-section { grid-template-columns: 1fr; }
-    .studio-card { min-height: 400px; }
-    .player { position: static; }
-    .about-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; }
-    .genre-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 650px) {
-    .container, .nav { width: min(100% - 24px, 1160px); }
-    .nav { height: 60px; }
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 68px;
-        left: 12px;
-        right: 12px;
-        padding: 8px;
-        flex-direction: column;
-        align-items: stretch;
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        background: rgba(12,12,18,.96);
-        backdrop-filter: blur(20px);
-    }
-    .nav-links.open { display: flex; }
-    .nav-links a { text-align: center; }
-    .menu { display: grid; place-items: center; }
-    .hero { padding: 65px 0 50px; min-height: auto; }
-    .hero-grid { gap: 45px; }
-    h1 { font-size: clamp(4rem, 21vw, 6rem); }
-    section { padding: 65px 0; }
-    .section-head { display: block; }
-    .section-head p { margin-top: 12px; }
-    .genre-grid { grid-template-columns: 1fr 1fr; }
-    .track { grid-template-columns: 45px 1fr auto; gap: 11px; }
-    .track-number { width: 45px; height: 45px; }
-    .track-time { display: none; }
-    .keys { grid-template-columns: repeat(2, 1fr); }
-    .example-row { grid-template-columns: 30px 1fr; }
-    .example-row b { grid-column: 2; }
-    .partner-card { padding: 22px; }
-    .game-row { grid-template-columns: 1fr; }
-    .game-row b { display: none; }
-    .studio-card { padding: 18px; }
-    .album-art { width: 165px; }
-    .footer-inner { flex-direction: column; }
-}
-.music-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px}.music-filters{display:flex;gap:7px;flex-wrap:wrap}.filter{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:11px;padding:8px 13px;cursor:pointer;font-size:.78rem;transition:.2s ease}.filter:hover,.filter.active{color:var(--text);background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.4)}.track-count{color:var(--muted);font-size:.75rem;white-space:nowrap}@media(max-width:650px){.music-toolbar{align-items:flex-start;flex-direction:column}}
-
-.music-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 18px;
-}
-
-.music-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 14px;
-}
-
-.music-filters {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-wrap: wrap;
-}
-
-.filter {
-    height: 36px;
-    padding: 0 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--line);
-    background: var(--surface);
-    color: var(--muted);
-    border-radius: 11px;
-    cursor: pointer;
-    font-size: .78rem;
-    white-space: nowrap;
-    transition: .2s ease;
-}
-
-.filter:hover,
-.filter.active {
-    color: var(--text);
-    background: rgba(167,139,250,.12);
-    border-color: rgba(167,139,250,.4);
-}
-
-.track-count {
+footer {
+    margin-top: 30px;
     color: var(--muted);
     font-size: .75rem;
-    white-space: nowrap;
 }
-
-.player {
-    position: sticky;
-    top: 98px;
-    width: 100%;
-    padding: 22px;
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    background: linear-gradient(145deg, rgba(255,255,255,.045), var(--surface));
-}
-
-.player-main {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 20px;
-}
-
-.player-info {
-    min-width: 0;
-}
-
-.player-title {
-    font: 600 1.45rem "Space Grotesk", sans-serif;
-    margin-top: 8px;
-}
-
-.player-genre {
-    color: var(--muted);
-    font-size: .8rem;
-    margin-top: 2px;
-}
-
-.player-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 0;
-}
-
-.control {
-    width: 42px;
-    height: 42px;
-    display: grid;
-    place-items: center;
-    border: 1px solid var(--line);
-    border-radius: 50%;
-    background: #15151c;
-    cursor: pointer;
-    transition: .2s ease;
-}
-
-.control:hover {
-    transform: scale(1.05);
-    background: #20202a;
-}
-
-.control.main {
-    width: 50px;
-    height: 50px;
-    background: var(--text);
-    color: #08080b;
-    border: 0;
-    font-size: 1rem;
-}
-
-.progress-wrap {
-    margin-top: 20px;
-}
-
-.volume {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--muted);
-    margin-top: 15px;
-    max-width: 230px;
-}
-
-@media (max-width: 650px) {
-    .music-toolbar {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .music-filters {
-        width: 100%;
-    }
-
-    .filter {
-        flex: 1 1 auto;
-    }
-
-    .player-main {
-        grid-template-columns: 1fr;
-        align-items: start;
-    }
-
-    .player-controls {
-        justify-content: flex-start;
-        margin-top: 12px;
-    }
-
-    .volume {
-        max-width: none;
-    }
-}
-
 </style>
 </head>
 <body>
 
-<header>
-    <nav class="nav">
-        <a class="logo" href="#top">WAY<span>VES</span></a>
-        <div class="nav-links" id="navLinks">
-            <a href="#music">Music</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#partners">Partners</a>
-            <a href="#contact">Contact</a>
+<div class="logo">WAY<span>VES</span></div>
+
+<div class="player-wrap">
+    <div class="tracks" id="musicList">
+        <div class="track" data-title="Retro" data-genre="Retro / Game" data-src="Retro.mp3">
+            <span class="play-indicator"></span><span class="track-label">Retro</span>
         </div>
-        <button class="menu" id="menuBtn" aria-label="Open navigation">☰</button>
-    </nav>
-</header>
-
-<main id="top">
-    <section class="hero">
-        <div class="container hero-grid">
-            <div>
-                <div class="eyebrow"><i class="live-dot"></i> Independent music portfolio</div>
-                <h1>MAKE<br><span class="gradient">SOUND</span><br>MOVE.</h1>
-                <p class="hero-copy">Welcome to my portfolio. Explore original music made for games, experiences, menus, battles and everything in between.</p>
-                <div class="hero-actions">
-                    <a class="btn primary" href="#music">Listen to music</a>
-                    <a class="btn" href="#services">View services</a>
-                </div>
-            </div>
-
-            <div class="studio-card">
-                <div class="deck-top">
-                    <span>Now playing</span>
-                    <span id="deckStatus">Ready</span>
-                </div>
-                <div class="album-art" id="albumArt"></div>
-                <div class="deck-track">
-                    <strong id="deckTitle">Select a track</strong>
-                    <span id="deckGenre">WAYVES</span>
-                    <div class="waveform" id="waveform">
-                        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-                    </div>
-                </div>
-            </div>
+        <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-src="Retro%201.mp3">
+            <span class="play-indicator"></span><span class="track-label">Retro 1</span>
         </div>
-    </section>
-
-    <section id="music">
-        <div class="container">
-            <div class="section-head">
-                <div>
-                    <div class="kicker">The catalogue</div>
-                    <h2>Featured music</h2>
-                </div>
-                <p>Click any track to load it into the player. Only one track plays at a time.</p>
-            </div>
-
-            <div class="music-layout">
-                <div class="music-toolbar">
-                    <div class="music-filters" id="musicFilters">
-                        <button class="filter active" data-filter="all">All</button>
-                        <button class="filter" data-filter="Retro">Retro</button>
-                        <button class="filter" data-filter="Cinematic">Cinematic</button>
-                        <button class="filter" data-filter="Simulator">Simulator</button>
-                        <button class="filter" data-filter="Boss Fight">Boss Fight</button>
-                    </div>
-                    <span class="track-count" id="trackCount">11 tracks</span>
-                </div>
-                <div class="music-list" id="musicList">
-                    <article class="track" data-title="Retro" data-genre="Retro" data-src="Retro.mp3">
-                        <div class="track-number">01</div><div class="track-info"><strong>Retro</strong><span>Retro / Game</span></div><div class="track-time">PLAY</div>
-                    </article>
-                    <article class="track" data-title="Retro 1" data-genre="Retro" data-src="Retro%201.mp3">
-                        <div class="track-number">02</div>
-                        <div class="track-info"><strong>Retro 1</strong><span>Retro / Game</span></div>
-                        <div class="track-time">PLAY</div>
-                    </article>
-                    <article class="track" data-title="Cinematic" data-genre="Cinematic" data-src="Cinematic.mp3">
-                        <div class="track-number">04</div><div class="track-info"><strong>Cinematic</strong><span>Cinematic / Atmosphere</span></div><div class="track-time">PLAY</div>
-                    </article>
-                    <article class="track" data-title="Cinematic 1" data-genre="Cinematic" data-src="Cinematic%201.mp3">
-                        <div class="track-number">05</div>
-                        <div class="track-info"><strong>Cinematic 1</strong><span>Cinematic / Atmosphere</span></div>
-                        <div class="track-time">PLAY</div>
-                    </article>
-                    <article class="track" data-title="Simulator" data-genre="Simulator" data-src="Simulator.mp3">
-                        <div class="track-number">06</div><div class="track-info"><strong>Simulator</strong><span>Simulator / Gameplay</span></div><div class="track-time">PLAY</div>
-                    </article>
-                    <article class="track" data-title="Simulator 1" data-genre="Simulator" data-src="Simulator%201.mp3">
-                        <div class="track-number">07</div>
-                        <div class="track-info"><strong>Simulator 1</strong><span>Simulator / Gameplay</span></div>
-                        <div class="track-time">PLAY</div>
-                    </article>
-                    <article class="track" data-title="Boss Fight" data-genre="Boss Fight" data-src="Boss%20Fight.mp3">
-                        <div class="track-number">09</div><div class="track-info"><strong>Boss Fight</strong><span>Boss Fight / Action</span></div><div class="track-time">PLAY</div>
-                    </article>
-                    <article class="track" data-title="Boss Fight 1" data-genre="Boss Fight" data-src="Boss%20Fight%201.mp3">
-                        <div class="track-number">10</div>
-                        <div class="track-info"><strong>Boss Fight 1</strong><span>Boss Fight / Action</span></div>
-                        <div class="track-time">PLAY</div>
-                    </article>
-                    <article class="track" data-title="Retro 2" data-genre="Retro" data-src="Retro%202.mp3"><div class="track-number">03</div><div class="track-info"><strong>Retro 2</strong><span>Retro / Game</span></div><div class="track-time">PLAY</div></article>
-                    <article class="track" data-title="Simulator 2" data-genre="Simulator" data-src="Simulator%202.mp3"><div class="track-number">08</div><div class="track-info"><strong>Simulator 2</strong><span>Simulator / Gameplay</span></div><div class="track-time">PLAY</div></article>
-                    <article class="track" data-title="Boss Fight 2" data-genre="Boss Fight" data-src="Boss%20Fight%202.mp3"><div class="track-number">11</div><div class="track-info"><strong>Boss Fight 2</strong><span>Boss Fight / Action</span></div><div class="track-time">PLAY</div></article>
-                </div>
-
-                <aside class="player">
-                        <div class="player-label"><span>Now playing</span><span id="playerState">Paused</span></div>
-                        <div class="player-main">
-                            <div class="player-info">
-                                <div class="player-title" id="playerTitle">Nothing selected</div>
-                                <div class="player-genre" id="playerGenre">Choose a track from the catalogue</div>
-                            </div>
-                            <div class="player-controls">
-                                <button class="control" id="prevBtn" aria-label="Previous track">↶</button>
-                                <button class="control main" id="playBtn" aria-label="Play">▶</button>
-                                <button class="control" id="nextBtn" aria-label="Next track">↷</button>
-                            </div>
-                        </div>
-                        <div class="progress-wrap">
-                            <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
-                            <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
-                        </div>
-                        <div class="volume">
-                            <span>VOL</span>
-                            <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
-                        </div>
-                        <audio id="audio" preload="metadata"></audio>
-                    </aside>
-            </div>
+        <div class="track" data-title="Retro 2" data-genre="Retro / Game" data-src="Retro%202.mp3">
+            <span class="play-indicator"></span><span class="track-label">Retro 2</span>
         </div>
-    </section>
-
-    <section id="pricing">
-        <div class="container">
-            <div class="section-head">
-                <div>
-                    <div class="kicker">Commission rates</div>
-                    <h2>Pricing</h2>
-                </div>
-                <p>Simple, transparent pricing based on the complexity and scope of your music.</p>
-            </div>
-
-            <div class="pricing-intro panel">
-                <h3>Hey there! Here’s a quick rundown of my pricing:</h3>
-                <p>Every track is different, so the final price depends on how complex the song is, how long it is, and how many instruments are involved.</p>
-            </div>
-
-            <div class="pricing-grid">
-                <article class="price-card">
-                    <span class="price-range">300 R$</span>
-                    <h3>Simple</h3>
-                    <p>For simple or short tunes with just a few instruments.</p>
-                    <div class="price-example">Example: a chill ambient track or lobby music.</div>
-                </article>
-
-                <article class="price-card featured">
-                    <span class="price-range">500–700 R$</span>
-                    <h3>Medium</h3>
-                    <p>For medium complexity songs with a bunch of instruments, longer sections, and more detailed production.</p>
-                    <div class="price-example">Example: a moderate song featuring several instruments.</div>
-                </article>
-
-                <article class="price-card">
-                    <span class="price-range">800–1,000 R$</span>
-                    <h3>Complex</h3>
-                    <p>For complex 2 to 3 minute songs packed with lots of instruments, intense sections, and intricate production.</p>
-                    <div class="price-example">Example: an intricate full song loaded with instruments and sections.</div>
-                </article>
-            </div>
-
-            <div class="pricing-detail panel">
-                <div class="detail-mark">01</div>
-                <div>
-                    <h3>How the price is decided</h3>
-                    <p>Basically, the price depends on how complex the song is, how long it is, and how many instruments are involved. A simple 1 to 2 minute track with a few instruments will be on the lower end. A full 2 to 3 minute track with lots of layers and detailed work will be on the higher side.</p>
-                </div>
-            </div>
-
-            <div class="examples">
-                <div class="examples-head">
-                    <div class="kicker">Examples</div>
-                    <h3>What different requests might cost</h3>
-                </div>
-
-                <div class="example-row">
-                    <span>01</span>
-                    <div>
-                        <strong>Chill ambient track or lobby music</strong>
-                        <p>Simple, atmospheric music with a smaller arrangement.</p>
-                    </div>
-                    <b>about 300 R$</b>
-                </div>
-
-                <div class="example-row">
-                    <span>02</span>
-                    <div>
-                        <strong>Moderate song with several instruments</strong>
-                        <p>More developed arrangement with additional sections and production.</p>
-                    </div>
-                    <b>500–700 R$</b>
-                </div>
-
-                <div class="example-row">
-                    <span>03</span>
-                    <div>
-                        <strong>Intricate 2 to 3 minute song</strong>
-                        <p>Lots of instruments, sections, layers and detailed production.</p>
-                    </div>
-                    <b>800–1,000 R$</b>
-                </div>
-
-                <div class="example-row">
-                    <span>04</span>
-                    <div>
-                        <strong>Intense and highly complex piece</strong>
-                        <p>Tons of layering, intense sections and detailed production throughout.</p>
-                    </div>
-                    <b>about 1,000 R$</b>
-                </div>
-            </div>
-
-            <div class="pricing-note">
-                <strong>Final price is discussed beforehand.</strong>
-                <span>We’ll chat about your request first, then I’ll give you a price tailored to what you need. Feel free to reach out if you have any questions.</span>
-            </div>
+        <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-src="Cinematic.mp3">
+            <span class="play-indicator"></span><span class="track-label">Cinematic</span>
         </div>
-    </section>
-
-    <section id="partners">
-        <div class="container">
-            <div class="section-head">
-                <div>
-                    <div class="kicker">Collaborations</div>
-                    <h2>Partners</h2>
-                </div>
-                <p>People and studios I have partnered with. You can view them here.</p>
-            </div>
-
-            <div class="partner-card">
-                <div class="partner-top">
-                    <div>
-                        <span class="partner-label">Studio worked for</span>
-                        <h3><a href="https://www.roblox.com/communities/875590140/Null-X-Studio#!/about" target="_blank" rel="noopener noreferrer">Null_X Studio ↗</a></h3>
-                    </div>
-                    <div class="partner-index">01</div>
-                </div>
-
-                <div class="partner-divider"></div>
-
-                <div class="games-worked">
-                    <span class="partner-label">Game(s) worked on</span>
-
-                    <a class="game-row" href="https://www.roblox.com/games/124083111510656/Survive-Anton-Chigurhs-Tractor" target="_blank" rel="noopener noreferrer">
-                        <div>
-                            <strong>Survive Anton Chigurhs Tractor ↗</strong>
-                            <span>I created all the lobby tracks and in-game tracks.</span>
-                        </div>
-                        <b>GAME</b>
-                    </a>
-
-                    <a class="game-row" href="https://www.roblox.com/games/100019358980347/Survive-7-Days-In-A-Cave" target="_blank" rel="noopener noreferrer">
-                        <div>
-                            <strong>Survive 7 Days In A Cave ↗</strong>
-                            <span>I created the cave ambiance.</span>
-                        </div>
-                        <b>GAME</b>
-                    </a>
-                </div>
-            </div>
+        <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-src="Cinematic%201.mp3">
+            <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
         </div>
-    </section>
-
-    <section id="genres">
-        <div class="container">
-            <div class="section-head">
-                <div>
-                    <div class="kicker">Sound palette</div>
-                    <h2>Genres & moods</h2>
-                </div>
-                <p>A flexible range of styles for different types of games and experiences.</p>
-            </div>
-
-            <div class="genre-grid">
-                <div class="genre"><small>01 / nostalgic</small><strong>Retro</strong></div>
-                <div class="genre"><small>02 / energetic</small><strong>Simulator</strong></div>
-                <div class="genre"><small>03 / intense</small><strong>Boss Fight</strong></div>
-                <div class="genre"><small>04 / expansive</small><strong>Cinematic</strong></div>
-            </div>
+        <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-src="Simulator.mp3">
+            <span class="play-indicator"></span><span class="track-label">Simulator</span>
         </div>
-    </section>
-
-    <section>
-        <div class="container pad-section">
-            <div class="pad-copy">
-                <div class="kicker">Interactive</div>
-                <h2>Play the keys.</h2>
-                <p>Try the little synth below. You can also use your keyboard: A, S, D, F, J, K, L and ;.</p>
-            </div>
-            <div class="launchpad">
-                <div class="keys" id="keys">
-                    <button class="key" data-key="a" data-note="261.63"><span>A</span><strong>C</strong></button>
-                    <button class="key" data-key="s" data-note="293.66"><span>S</span><strong>D</strong></button>
-                    <button class="key" data-key="d" data-note="329.63"><span>D</span><strong>E</strong></button>
-                    <button class="key" data-key="f" data-note="349.23"><span>F</span><strong>F</strong></button>
-                    <button class="key" data-key="j" data-note="392.00"><span>J</span><strong>G</strong></button>
-                    <button class="key" data-key="k" data-note="440.00"><span>K</span><strong>A</strong></button>
-                    <button class="key" data-key="l" data-note="493.88"><span>L</span><strong>B</strong></button>
-                    <button class="key" data-key=";" data-note="523.25"><span>;</span><strong>C</strong></button>
-                </div>
-            </div>
+        <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-src="Simulator%201.mp3">
+            <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
         </div>
-    </section>
-
-    <section class="contact" id="contact">
-        <div class="container">
-            <div class="kicker">Start a project</div>
-            <h2>Let's make something sound good.</h2>
-            <p>Have a game, project or idea that needs music? Get in touch and tell me what you're making.</p>
-            <a class="btn primary" href="https://discord.com/users/wayvesmusic" target="_blank" rel="noopener noreferrer">contact me</a>
+        <div class="track" data-title="Simulator 2" data-genre="Simulator / Gameplay" data-src="Simulator%202.mp3">
+            <span class="play-indicator"></span><span class="track-label">Simulator 2</span>
         </div>
-    </section>
-</main>
-
-<footer>
-    <div class="container footer-inner">
-        <span>© 2026 WAYVES</span>
-        <span>Music portfolio</span>
+        <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-src="Boss%20Fight.mp3">
+            <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
+        </div>
+        <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-src="Boss%20Fight%201.mp3">
+            <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
+        </div>
+        <div class="track" data-title="Boss Fight 2" data-genre="Boss Fight / Action" data-src="Boss%20Fight%202.mp3">
+            <span class="play-indicator"></span><span class="track-label">Boss Fight 2</span>
+        </div>
     </div>
-</footer>
+
+    <div class="player">
+        <div class="player-title" id="playerTitle">Nothing selected</div>
+        <div class="player-genre" id="playerGenre">Choose a track above</div>
+
+        <div class="progress-wrap">
+            <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
+            <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+        </div>
+
+        <div class="controls">
+            <button class="control" id="prevBtn" aria-label="Previous track">↶</button>
+            <button class="control main" id="playBtn" aria-label="Play">▶</button>
+            <button class="control" id="nextBtn" aria-label="Next track">↷</button>
+        </div>
+
+        <div class="volume">
+            <span>Vol</span>
+            <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
+        </div>
+
+        <audio id="audio" preload="metadata"></audio>
+    </div>
+</div>
+
+<footer>© 2026 WAYVES</footer>
 
 <div class="toast" id="toast"></div>
 
@@ -1482,40 +292,11 @@ const progress = document.getElementById("progress");
 const volume = document.getElementById("volume");
 const playerTitle = document.getElementById("playerTitle");
 const playerGenre = document.getElementById("playerGenre");
-const playerState = document.getElementById("playerState");
 const currentTime = document.getElementById("currentTime");
 const duration = document.getElementById("duration");
-const deckTitle = document.getElementById("deckTitle");
-const deckGenre = document.getElementById("deckGenre");
-const deckStatus = document.getElementById("deckStatus");
-const albumArt = document.getElementById("albumArt");
-const waveform = document.getElementById("waveform");
 const toast = document.getElementById("toast");
-const navLinks = document.getElementById("navLinks");
-const menuBtn = document.getElementById("menuBtn");
-const filterButtons = [...document.querySelectorAll(".filter")];
-const trackCount = document.getElementById("trackCount");
-
-function filterTracks(filter){
-    let visible=0;
-    tracks.forEach(track=>{
-        const matches=filter==="all"||track.dataset.genre===filter;
-        track.style.display=matches?"":"none";
-        if(matches) visible++;
-    });
-    trackCount.textContent=`${visible} track${visible===1?"":"s"}`;
-}
-
-filterButtons.forEach(button=>button.addEventListener("click",()=>{
-    filterButtons.forEach(item=>item.classList.remove("active"));
-    button.classList.add("active");
-    filterTracks(button.dataset.filter);
-}));
-
-filterTracks("all");
 
 let currentIndex = -1;
-let audioContext;
 let toastTimer;
 
 audio.volume = Number(volume.value);
@@ -1537,10 +318,7 @@ function showToast(message) {
 function setPlayingVisuals(playing) {
     playBtn.textContent = playing ? "Ⅱ" : "▶";
     playBtn.setAttribute("aria-label", playing ? "Pause" : "Play");
-    playerState.textContent = playing ? "Playing" : "Paused";
-    deckStatus.textContent = playing ? "Playing" : "Paused";
-    albumArt.classList.toggle("playing", playing);
-    waveform.classList.toggle("playing", playing);
+    tracks.forEach(t => t.classList.toggle("playing", playing && t.classList.contains("active")));
 }
 
 function selectTrack(index, autoplay = false) {
@@ -1552,13 +330,11 @@ function selectTrack(index, autoplay = false) {
     const genre = track.dataset.genre;
     const src = track.dataset.src;
 
-    tracks.forEach(item => item.classList.remove("active"));
+    tracks.forEach(item => item.classList.remove("active", "playing"));
     track.classList.add("active");
 
     playerTitle.textContent = title;
     playerGenre.textContent = genre;
-    deckTitle.textContent = title;
-    deckGenre.textContent = genre;
 
     if (audio.src !== new URL(src, window.location.href).href) {
         audio.src = src;
@@ -1644,75 +420,6 @@ progress.addEventListener("input", () => {
 volume.addEventListener("input", () => {
     audio.volume = Number(volume.value);
 });
-
-menuBtn.addEventListener("click", () => {
-    navLinks.classList.toggle("open");
-});
-
-navLinks.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => navLinks.classList.remove("open"));
-});
-
-document.querySelectorAll(".key").forEach(key => {
-    key.addEventListener("pointerdown", () => playSynth(key));
-});
-
-function playSynth(key) {
-    const frequency = Number(key.dataset.note);
-
-    try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!audioContext) audioContext = new AudioCtx();
-        if (audioContext.state === "suspended") audioContext.resume();
-
-        const oscillator = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        const filter = audioContext.createBiquadFilter();
-
-        oscillator.type = "triangle";
-        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-        filter.type = "lowpass";
-        filter.frequency.setValueAtTime(2600, audioContext.currentTime);
-
-        gain.gain.setValueAtTime(.0001, audioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(.18, audioContext.currentTime + .015);
-        gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + .42);
-
-        oscillator.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioContext.destination);
-
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + .45);
-
-        key.classList.add("hit");
-        setTimeout(() => key.classList.remove("hit"), 110);
-    } catch {
-        showToast("Your browser does not support the synth.");
-    }
-}
-
-document.addEventListener("keydown", event => {
-    if (event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
-    const key = document.querySelector(`.key[data-key="${CSS.escape(event.key.toLowerCase())}"]`);
-    if (!key) return;
-    event.preventDefault();
-    playSynth(key);
-});
-
-const sections = [...document.querySelectorAll("main section[id]")];
-const navAnchors = [...document.querySelectorAll(".nav-links a")];
-
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        navAnchors.forEach(anchor => {
-            anchor.classList.toggle("active", anchor.getAttribute("href") === `#${entry.target.id}`);
-        });
-    });
-}, { rootMargin: "-35% 0px -55% 0px" });
-
-sections.forEach(section => observer.observe(section));
 </script>
 </body>
 </html>
