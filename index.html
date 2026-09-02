@@ -32,14 +32,6 @@ body {
     padding: 48px 16px 32px;
 }
 
-.logo {
-    font: 800 1.4rem "Baloo 2", sans-serif;
-    letter-spacing: .02em;
-    margin-bottom: 30px;
-}
-
-.logo span { color: var(--green); }
-
 .player-wrap {
     width: 100%;
     max-width: 440px;
@@ -205,17 +197,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
-
-footer {
-    margin-top: 30px;
-    color: var(--muted);
-    font-size: .75rem;
-}
 </style>
 </head>
 <body>
-
-<div class="logo">WAY<span>VES</span></div>
 
 <div class="player-wrap">
     <div class="tracks" id="musicList">
@@ -277,8 +261,6 @@ footer {
         <audio id="audio" preload="metadata"></audio>
     </div>
 </div>
-
-<footer>© 2026 WAYVES</footer>
 
 <div class="toast" id="toast"></div>
 
