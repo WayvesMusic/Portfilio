@@ -1085,6 +1085,8 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 
 <audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
 <audio id="errorSound" src="ErrorSound.mp3" preload="auto"></audio>
+<audio id="startupSound" src="Startup.mp3" preload="auto"></audio>
+<audio id="notificationSound" src="Notification.mp3" preload="auto"></audio>
 <div class="toast" id="toast"></div>
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
@@ -1136,6 +1138,7 @@ setTimeout(() => {
 
 function showBalloon() {
     welcomeBalloon.classList.add("show");
+    playNotificationSound();
     clearTimeout(showBalloon._t);
     showBalloon._t = setTimeout(hideBalloon, 8000);
 }
@@ -1150,6 +1153,7 @@ function signIn() {
     loginScreen.classList.add("fade-out");
     document.getElementById("desktop").classList.remove("app-hidden");
     document.getElementById("taskbar").classList.remove("app-hidden");
+    playStartupSound();
     setTimeout(() => {
         loginScreen.remove();
     }, 400);
@@ -1167,6 +1171,8 @@ const clockEl = document.getElementById("clock");
 const toast = document.getElementById("toast");
 const clickSound = document.getElementById("clickSound");
 const errorSound = document.getElementById("errorSound");
+const startupSound = document.getElementById("startupSound");
+const notificationSound = document.getElementById("notificationSound");
 
 let zTop = 100;
 let openOffset = 0;
@@ -1188,6 +1194,22 @@ function playClickSound() {
 function playErrorSound() {
     try {
         const sound = errorSound.cloneNode(true);
+        sound.volume = 0.6;
+        sound.play().catch(() => {});
+    } catch {}
+}
+
+function playStartupSound() {
+    try {
+        startupSound.volume = 0.7;
+        startupSound.currentTime = 0;
+        startupSound.play().catch(() => {});
+    } catch {}
+}
+
+function playNotificationSound() {
+    try {
+        const sound = notificationSound.cloneNode(true);
         sound.volume = 0.6;
         sound.play().catch(() => {});
     } catch {}
