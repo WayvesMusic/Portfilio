@@ -241,6 +241,30 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- custom cursor (desktop / mouse only) ---------- */
+@media (pointer: fine) and (hover: hover) {
+    body.custom-cursor-ready { cursor: none; }
+    body.custom-cursor-ready a,
+    body.custom-cursor-ready button,
+    body.custom-cursor-ready .track,
+    body.custom-cursor-ready input[type="range"] { cursor: none; }
+}
+
+.custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-1000px, -1000px);
+    will-change: transform;
+    display: none;
+}
+
+body.custom-cursor-ready .custom-cursor { display: block; }
 </style>
 </head>
 <body>
@@ -307,6 +331,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 <audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
 <div class="toast" id="toast"></div>
+<img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
 <script>
 const audio = document.getElementById("audio");
@@ -435,7 +460,7 @@ function changeTrack(direction) {
 tracks.forEach((track, index) => {
     track.addEventListener("click", () => {
         if (currentIndex === index) togglePlay();
-        else selectTrack(index, true);
+        else selectTrack(index, false);
     });
 });
 
@@ -475,6 +500,28 @@ progress.addEventListener("input", () => {
 volume.addEventListener("input", () => {
     audio.volume = Number(volume.value);
 });
+
+/* Custom cursor — only for devices with a real mouse (pointer: fine,
+   hover: hover). Touch devices keep their normal on-screen cursor. */
+const cursorQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
+const customCursor = document.getElementById("customCursor");
+
+function enableCustomCursor() {
+    document.body.classList.add("custom-cursor-ready");
+    document.addEventListener("mousemove", moveCustomCursor);
+}
+
+function disableCustomCursor() {
+    document.body.classList.remove("custom-cursor-ready");
+    document.removeEventListener("mousemove", moveCustomCursor);
+}
+
+function moveCustomCursor(event) {
+    customCursor.style.transform = `translate(${event.clientX - 4}px, ${event.clientY - 2}px)`;
+}
+
+if (cursorQuery.matches) enableCustomCursor();
+cursorQuery.addEventListener("change", e => e.matches ? enableCustomCursor() : disableCustomCursor());
 </script>
 </body>
 </html>
