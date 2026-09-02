@@ -678,11 +678,224 @@ input[type="range"]::-moz-range-thumb {
 }
 
 body.custom-cursor-ready .custom-cursor { display: block; }
+
+#loginScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 50000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 20%, #2a6fb0, #0a1f4d 70%);
+    opacity: 0;
+    transition: opacity .5s ease;
+}
+
+#loginScreen.visible { opacity: 1; }
+
+#loginScreen.fade-out { opacity: 0; pointer-events: none; }
+
+#bootScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 60000;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    transition: opacity .5s ease;
+}
+
+#bootScreen.fade-out { opacity: 0; pointer-events: none; }
+
+.boot-logo-row { display: flex; align-items: center; gap: 18px; }
+
+.boot-flag {
+    width: 54px;
+    height: 54px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    transform: skewX(-8deg);
+}
+
+.boot-flag span { display: block; }
+.boot-flag span:nth-child(1) { background: #ff3b30; }
+.boot-flag span:nth-child(2) { background: #34c759; }
+.boot-flag span:nth-child(3) { background: #0a84ff; }
+.boot-flag span:nth-child(4) { background: #ffcc00; }
+
+.boot-text {
+    color: #fff;
+    font-family: Tahoma, Arial, sans-serif;
+    font-size: 40px;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.boot-text b { font-weight: 700; }
+.boot-text sup { font-size: 18px; color: #ffcc00; }
+
+.boot-progress {
+    display: flex;
+    gap: 3px;
+}
+
+.boot-segment {
+    width: 9px;
+    height: 16px;
+    background: #1a1a2e;
+    border: 1px solid #333;
+}
+
+.boot-segment.lit { background: #0a84ff; border-color: #4fa8ff; }
+
+.boot-caption {
+    color: #c0c0c0;
+    font-family: Tahoma, Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: .5px;
+}
+
+.login-box {
+    width: 320px;
+    padding: 3px;
+}
+
+.login-box .title-bar { cursor: default; }
+
+.login-body {
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+}
+
+.login-avatar {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    font-size: 40px;
+}
+
+.login-name { font-weight: 700; font-size: 14px; }
+.login-hint { color: var(--muted); font-size: 11px; }
+
+.login-signin-btn {
+    margin-top: 4px;
+    height: 30px;
+    padding: 0 22px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 0;
+    background: var(--face);
+    cursor: default;
+    box-shadow:
+        inset -1px -1px 0 var(--dark-shadow),
+        inset 1px 1px 0 var(--highlight),
+        inset -2px -2px 0 var(--shadow),
+        inset 2px 2px 0 var(--light);
+}
+
+.login-signin-btn:active {
+    box-shadow:
+        inset -1px -1px 0 var(--highlight),
+        inset 1px 1px 0 var(--dark-shadow),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--shadow);
+    transform: translate(1px, 1px);
+}
+
+.app-hidden { display: none !important; }
+
+.balloon {
+    position: fixed;
+    right: 10px;
+    bottom: 40px;
+    width: 260px;
+    padding: 3px;
+    z-index: 40500;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity .25s ease, transform .25s ease;
+    pointer-events: none;
+}
+
+.balloon.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+.balloon-inner { background: #ffffe1; box-shadow: inset -1px -1px 0 var(--dark-shadow), inset 1px 1px 0 var(--highlight); }
+
+.balloon-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 6px;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+.balloon-header .balloon-close {
+    width: 14px;
+    height: 14px;
+    display: grid;
+    place-items: center;
+    background: var(--face);
+    color: #000;
+    border: 0;
+    font-size: 9px;
+    cursor: default;
+}
+
+.balloon-body {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #000;
+}
+
+.balloon-body .balloon-icon { font-size: 22px; }
 </style>
 </head>
 <body>
 
-<div id="desktop">
+<div id="bootScreen">
+    <div class="boot-logo-row">
+        <div class="boot-flag"><span></span><span></span><span></span><span></span></div>
+        <div class="boot-text"><b>Windows</b><sup>98</sup></div>
+    </div>
+    <div class="boot-progress" id="bootProgress"></div>
+    <div class="boot-caption">Starting up&hellip;</div>
+</div>
+
+<div id="loginScreen">
+    <div class="login-box raised">
+        <div class="title-bar active">
+            <div class="title-bar-text"><span>🔒</span><span>Welcome</span></div>
+            <div class="title-bar-controls">
+                <button class="title-btn" tabindex="-1">✕</button>
+            </div>
+        </div>
+        <div class="window-body login-body">
+            <div class="login-avatar raised">👤</div>
+            <div class="login-name">Guest</div>
+            <div class="login-hint">No password needed. Click below to continue.</div>
+            <button class="login-signin-btn" id="signInBtn">Sign In</button>
+        </div>
+    </div>
+</div>
+
+<div id="desktop" class="app-hidden">
     <div class="desktop-icons">
         <div class="desktop-icon" data-app="computer">
             <div class="icon-glyph">🖥️</div>
@@ -850,7 +1063,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
     </div>
 </div>
 
-<div id="taskbar" class="raised">
+<div id="taskbar" class="raised app-hidden">
     <button id="startButton" class="raised">
         <span>🪟</span><span>Start</span>
     </button>
@@ -875,7 +1088,76 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 <div class="toast" id="toast"></div>
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
+<div class="balloon" id="welcomeBalloon">
+    <div class="balloon-inner raised">
+        <div class="balloon-header">
+            <span>Portfolio</span>
+            <button class="balloon-close" id="balloonCloseBtn">✕</button>
+        </div>
+        <div class="balloon-body">
+            <span class="balloon-icon">🎵</span>
+            <span>Welcome to my portfolio, you can see the music I've created by opening up the media player.</span>
+        </div>
+    </div>
+</div>
+
 <script>
+const loginScreen = document.getElementById("loginScreen");
+const bootScreen = document.getElementById("bootScreen");
+const bootProgress = document.getElementById("bootProgress");
+const signInBtn = document.getElementById("signInBtn");
+const welcomeBalloon = document.getElementById("welcomeBalloon");
+const balloonCloseBtn = document.getElementById("balloonCloseBtn");
+
+const bootSegmentCount = 20;
+const bootSegments = [];
+for (let i = 0; i < bootSegmentCount; i++) {
+    const seg = document.createElement("div");
+    seg.className = "boot-segment";
+    bootProgress.appendChild(seg);
+    bootSegments.push(seg);
+}
+
+let bootLit = 0;
+const bootInterval = setInterval(() => {
+    bootSegments[bootLit % bootSegmentCount].classList.add("lit");
+    bootLit++;
+    if (bootLit % bootSegmentCount === 0) {
+        setTimeout(() => bootSegments.forEach(seg => seg.classList.remove("lit")), 200);
+    }
+}, 90);
+
+setTimeout(() => {
+    clearInterval(bootInterval);
+    bootScreen.classList.add("fade-out");
+    loginScreen.classList.add("visible");
+    setTimeout(() => bootScreen.remove(), 500);
+}, 3200);
+
+function showBalloon() {
+    welcomeBalloon.classList.add("show");
+    clearTimeout(showBalloon._t);
+    showBalloon._t = setTimeout(hideBalloon, 8000);
+}
+
+function hideBalloon() {
+    welcomeBalloon.classList.remove("show");
+}
+
+balloonCloseBtn.addEventListener("click", hideBalloon);
+
+function signIn() {
+    loginScreen.classList.add("fade-out");
+    document.getElementById("desktop").classList.remove("app-hidden");
+    document.getElementById("taskbar").classList.remove("app-hidden");
+    setTimeout(() => {
+        loginScreen.remove();
+    }, 400);
+    setTimeout(showBalloon, 700);
+}
+
+signInBtn.addEventListener("click", signIn);
+
 const desktop = document.getElementById("desktop");
 const windows = [...document.querySelectorAll(".window")];
 const taskButtonsBar = document.getElementById("taskButtons");
@@ -920,7 +1202,7 @@ function showToast(message) {
 }
 
 document.addEventListener("click", event => {
-    if (event.target.closest(".track, .filter, .control, .ms-smiley, .desktop-icon, .start-item, .task-button, #startButton, .title-btn, .ms-menu-option, .ms-menu-item")) {
+    if (event.target.closest(".track, .filter, .control, .ms-smiley, .desktop-icon, .start-item, .task-button, #startButton, .title-btn, .ms-menu-option, .ms-menu-item, #signInBtn, .balloon-close")) {
         playClickSound();
     }
 }, true);
