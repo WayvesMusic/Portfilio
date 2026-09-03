@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#008080">
-<title>Windows 98</title>
+<title>Media Player</title>
 <style>
 :root {
     --face: #c0c0c0;
@@ -23,20 +23,19 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
-    height: 100%;
-    overflow: hidden;
-}
-
 body {
+    min-height: 100vh;
     background: var(--desktop);
     color: var(--text);
     font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
     font-size: 12px;
-    -webkit-user-select: none;
-    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 12px;
 }
 
+/* ---------- bevel helpers (classic Win98 3D borders) ---------- */
 .raised {
     background: var(--face);
     box-shadow:
@@ -55,77 +54,14 @@ body {
         inset 2px 2px 0 var(--shadow);
 }
 
-#desktop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 32px;
-    overflow: hidden;
-}
-
-.desktop-icons {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    bottom: 8px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: 4px;
-    opacity: 0;
-    transition: opacity .5s ease;
-}
-
-.desktop-icons.show { opacity: 1; }
-
-.desktop-icon {
-    width: 78px;
-    padding: 4px 2px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: default;
-}
-
-.desktop-icon .icon-glyph {
-    width: 40px;
-    height: 40px;
-    display: grid;
-    place-items: center;
-    font-size: 28px;
-    filter: drop-shadow(1px 1px 0 rgba(0,0,0,.4));
-}
-
-.desktop-icon .icon-label {
-    color: #fff;
-    text-align: center;
-    line-height: 1.2;
-    text-shadow: 1px 1px 1px #000;
-    padding: 1px 3px;
-}
-
-.desktop-icon.selected .icon-glyph {
-    background: rgba(0,0,128,.5);
-    filter: none;
-}
-
-.desktop-icon.selected .icon-label {
-    background: var(--navy);
-    text-shadow: none;
-}
-
-.window {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    min-width: 220px;
+/* ---------- window chrome ---------- */
+.player-wrap {
+    width: 100%;
+    max-width: 420px;
     padding: 3px;
 }
 
-.window[hidden] { display: none !important; }
+.player-wrap.raised { }
 
 .title-bar {
     display: flex;
@@ -134,12 +70,6 @@ body {
     height: 22px;
     padding: 2px 3px 2px 5px;
     margin-bottom: 3px;
-    background: linear-gradient(90deg, var(--shadow), var(--face) 140%);
-    color: #000;
-    cursor: default;
-}
-
-.title-bar.active {
     background: linear-gradient(90deg, var(--navy), var(--navy-2));
     color: #fff;
 }
@@ -148,21 +78,15 @@ body {
     font-weight: 700;
     font-size: 12px;
     letter-spacing: .01em;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 .title-bar-controls {
     display: flex;
-    gap: 2px;
-    flex: 0 0 auto;
+    gap: 3px;
+    pointer-events: none;
 }
 
-.title-btn {
+.title-bar-controls span {
     width: 16px;
     height: 14px;
     display: grid;
@@ -170,21 +94,11 @@ body {
     font-size: 10px;
     line-height: 1;
     color: #000;
-    border: 0;
-    background: var(--face);
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight);
-    cursor: default;
 }
 
-.title-btn:active {
-    box-shadow: inset 1px 1px 0 var(--dark-shadow);
-    transform: translate(1px, 1px);
-}
+.window-body { padding: 8px; }
 
-.window-body { padding: 8px; overflow: auto; }
-
+/* ---------- genre filters ---------- */
 .filters {
     display: flex;
     flex-wrap: nowrap;
@@ -221,12 +135,13 @@ body {
     color: #fff;
 }
 
+/* ---------- track listbox ---------- */
 .tracks {
     display: flex;
     flex-direction: column;
     background: #fff;
     padding: 2px;
-    max-height: 220px;
+    max-height: 260px;
     overflow-y: auto;
 }
 
@@ -265,7 +180,11 @@ body {
 
 .track.active.playing .play-indicator { visibility: visible; }
 
-.player { margin-top: 8px; padding: 8px; }
+/* ---------- player panel ---------- */
+.player {
+    margin-top: 8px;
+    padding: 8px;
+}
 
 .lcd {
     padding: 8px 10px;
@@ -284,7 +203,11 @@ body {
     text-overflow: ellipsis;
 }
 
-.player-genre { font-size: 10px; margin-top: 2px; opacity: .85; }
+.player-genre {
+    font-size: 10px;
+    margin-top: 2px;
+    opacity: .85;
+}
 
 .progress-wrap { margin-top: 10px; padding: 0 2px; }
 
@@ -373,7 +296,11 @@ input[type="range"]::-moz-range-thumb {
     transform: translate(1px, 1px);
 }
 
-.control.main { width: 46px; height: 34px; font-size: 14px; }
+.control.main {
+    width: 46px;
+    height: 34px;
+    font-size: 14px;
+}
 
 .volume {
     display: flex;
@@ -387,12 +314,17 @@ input[type="range"]::-moz-range-thumb {
 
 .volume input { flex: 1; }
 
-.status-bar { margin-top: 8px; padding: 2px 6px; font-size: 11px; color: var(--muted); }
+.status-bar {
+    margin-top: 8px;
+    padding: 2px 6px;
+    font-size: 11px;
+    color: var(--muted);
+}
 
 .toast {
     position: fixed;
     left: 50%;
-    bottom: 40px;
+    bottom: 24px;
     transform: translate(-50%, 20px);
     opacity: 0;
     pointer-events: none;
@@ -407,264 +339,16 @@ input[type="range"]::-moz-range-thumb {
     color: var(--text);
     transition: .15s ease;
     max-width: 320px;
-    z-index: 20000;
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-.explorer-toolbar { display: flex; gap: 3px; margin-bottom: 6px; }
-.explorer-toolbar .control { width: auto; padding: 0 8px; height: 26px; }
-.explorer-body { min-height: 140px; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; color: var(--muted); }
-.explorer-body .big-icon { font-size: 42px; }
-
-.ms-app { display: flex; flex-direction: column; gap: 4px; }
-.ms-menu { display: flex; gap: 2px; }
-.ms-menu-item { padding: 2px 8px; cursor: default; }
-.ms-menu-item:hover { background: var(--navy); color: #fff; }
-.ms-menu-dropdown {
-    position: absolute;
-    top: 40px;
-    left: 33px;
-    min-width: 130px;
-    padding: 2px;
-    z-index: 5;
-}
-.ms-menu-option { padding: 4px 10px; white-space: nowrap; }
-.ms-menu-option:hover { background: var(--navy); color: #fff; }
-.ms-menu-sep { height: 1px; margin: 3px 2px; box-shadow: inset 0 -1px 0 var(--highlight), inset 0 1px 0 var(--shadow); }
-
-.ms-frame { padding: 6px; display: inline-flex; flex-direction: column; gap: 6px; }
-
-.ms-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px;
-}
-
-.ms-lcd {
-    background: #000;
-    color: #ff2222;
-    font-family: "Courier New", monospace;
-    font-weight: 700;
-    font-size: 22px;
-    letter-spacing: 2px;
-    padding: 2px 6px;
-    min-width: 54px;
-    text-align: center;
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow);
-}
-
-.ms-smiley {
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-    display: grid;
-    place-items: center;
-    border: 0;
-    background: var(--face);
-    cursor: default;
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
-}
-
-.ms-smiley:active {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow);
-    transform: translate(1px, 1px);
-}
-
-.ms-board {
-    display: grid;
-    padding: 4px;
-    gap: 0;
-}
-
-.ms-cell {
-    width: 24px;
-    height: 24px;
-    display: grid;
-    place-items: center;
-    font-size: 13px;
-    font-weight: 700;
-    font-family: Tahoma, Arial, sans-serif;
-    border: 0;
-    background: var(--face);
-    cursor: default;
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
-}
-
-.ms-cell.revealed {
-    box-shadow: inset 0 0 0 1px var(--shadow);
-    cursor: default;
-}
-
-.ms-cell.mine.boom { background: #ff0000; }
-
-.ms-cell.n1 { color: #0000ff; }
-.ms-cell.n2 { color: #008000; }
-.ms-cell.n3 { color: #ff0000; }
-.ms-cell.n4 { color: #000080; }
-.ms-cell.n5 { color: #800000; }
-.ms-cell.n6 { color: #008080; }
-.ms-cell.n7 { color: #000000; }
-.ms-cell.n8 { color: #808080; }
-
-#taskbar {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 4px;
-    z-index: 30000;
-}
-
-#startButton {
-    height: 24px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 0 8px;
-    font-weight: 700;
-    font-size: 12px;
-    border: 0;
-    background: var(--face);
-    cursor: default;
-}
-
-#startButton.pressed {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow);
-}
-
-.taskbar-sep {
-    width: 2px;
-    align-self: stretch;
-    box-shadow: inset -1px 0 0 var(--highlight), inset 1px 0 0 var(--shadow);
-    margin: 2px 1px;
-}
-
-#taskButtons {
-    flex: 1 1 auto;
-    display: flex;
-    gap: 3px;
-    overflow: hidden;
-    height: 24px;
-}
-
-.task-button {
-    height: 24px;
-    max-width: 160px;
-    min-width: 120px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 0 6px;
-    font-size: 12px;
-    border: 0;
-    background: var(--face);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    cursor: default;
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
-}
-
-.task-button.active {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow);
-}
-
-#clock {
-    height: 24px;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    font-size: 12px;
-}
-
-#startMenu {
-    position: fixed;
-    left: 3px;
-    bottom: 35px;
-    width: 190px;
-    display: flex;
-    padding: 3px;
-    z-index: 30001;
-}
-
-#startMenu[hidden] { display: none; }
-
-.start-side {
-    width: 22px;
-    background: linear-gradient(180deg, var(--navy), var(--navy-2));
-    color: #fff;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding: 6px 0;
-}
-
-.start-side span {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 1px;
-}
-
-.start-items { flex: 1; display: flex; flex-direction: column; padding: 2px; }
-
-.start-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 8px;
-    font-size: 12px;
-    cursor: default;
-}
-
-.start-item span.glyph { font-size: 16px; width: 18px; text-align: center; }
-
-.start-item:hover { background: var(--navy); color: #fff; }
-
-.start-sep {
-    height: 1px;
-    margin: 3px 6px;
-    box-shadow: inset 0 -1px 0 var(--highlight), inset 0 1px 0 var(--shadow);
-}
-
+/* ---------- custom cursor (desktop / mouse only) ---------- */
 @media (pointer: fine) and (hover: hover) {
     body.custom-cursor-ready { cursor: none; }
     body.custom-cursor-ready a,
     body.custom-cursor-ready button,
     body.custom-cursor-ready .track,
-    body.custom-cursor-ready .desktop-icon,
-    body.custom-cursor-ready .ms-cell,
     body.custom-cursor-ready input[type="range"] { cursor: none; }
 }
 
@@ -675,1004 +359,101 @@ input[type="range"]::-moz-range-thumb {
     width: 20px;
     height: 20px;
     pointer-events: none;
-    z-index: 70000;
+    z-index: 9999;
     transform: translate(-1000px, -1000px);
     will-change: transform;
     display: none;
 }
 
 body.custom-cursor-ready .custom-cursor { display: block; }
-
-#loginScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 50000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at 30% 20%, #2a6fb0, #0a1f4d 70%);
-    opacity: 0;
-    transition: opacity .5s ease;
-}
-
-#loginScreen.visible { opacity: 1; }
-
-#loginScreen.fade-out { opacity: 0; pointer-events: none; }
-
-#bootScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 60000;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 26px;
-    transition: opacity .5s ease;
-}
-
-#bootScreen.fade-out { opacity: 0; pointer-events: none; }
-
-.boot-logo-row { display: flex; align-items: center; gap: 18px; }
-
-.boot-logo-img { max-height: 70px; max-width: 280px; object-fit: contain; }
-
-.boot-flag {
-    width: 54px;
-    height: 54px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 3px;
-    transform: skewX(-8deg);
-}
-
-.boot-flag span { display: block; }
-.boot-flag span:nth-child(1) { background: #ff3b30; }
-.boot-flag span:nth-child(2) { background: #34c759; }
-.boot-flag span:nth-child(3) { background: #0a84ff; }
-.boot-flag span:nth-child(4) { background: #ffcc00; }
-
-.boot-text {
-    color: #fff;
-    font-family: Tahoma, Arial, sans-serif;
-    font-size: 40px;
-    font-weight: 400;
-    letter-spacing: 1px;
-}
-
-.boot-text b { font-weight: 700; }
-.boot-text sup { font-size: 18px; color: #ffcc00; }
-
-.boot-progress {
-    display: flex;
-    gap: 3px;
-}
-
-.boot-segment {
-    width: 9px;
-    height: 16px;
-    background: #1a1a2e;
-    border: 1px solid #333;
-}
-
-.boot-segment.lit { background: #0a84ff; border-color: #4fa8ff; }
-
-.boot-caption {
-    color: #c0c0c0;
-    font-family: Tahoma, Arial, sans-serif;
-    font-size: 12px;
-    letter-spacing: .5px;
-}
-
-.login-box {
-    width: 320px;
-    padding: 3px;
-}
-
-.login-box .title-bar { cursor: default; }
-
-.login-body {
-    padding: 22px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    text-align: center;
-}
-
-.login-avatar {
-    width: 64px;
-    height: 64px;
-    display: grid;
-    place-items: center;
-    font-size: 40px;
-}
-
-.login-name { font-weight: 700; font-size: 14px; }
-.login-hint { color: var(--muted); font-size: 11px; }
-
-.login-signin-btn {
-    margin-top: 4px;
-    height: 30px;
-    padding: 0 22px;
-    font-size: 12px;
-    font-weight: 700;
-    border: 0;
-    background: var(--face);
-    cursor: default;
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
-}
-
-.login-signin-btn:active {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow);
-    transform: translate(1px, 1px);
-}
-
-.app-hidden { display: none !important; }
-
-.balloon {
-    position: fixed;
-    right: 10px;
-    bottom: 40px;
-    width: 260px;
-    padding: 3px;
-    z-index: 40500;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity .25s ease, transform .25s ease;
-    pointer-events: none;
-}
-
-.balloon.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-
-.balloon-inner { background: #ffffe1; box-shadow: inset -1px -1px 0 var(--dark-shadow), inset 1px 1px 0 var(--highlight); }
-
-.balloon-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px 6px;
-    background: var(--navy);
-    color: #fff;
-    font-weight: 700;
-    font-size: 11px;
-}
-
-.balloon-header .balloon-close {
-    width: 14px;
-    height: 14px;
-    display: grid;
-    place-items: center;
-    background: var(--face);
-    color: #000;
-    border: 0;
-    font-size: 9px;
-    cursor: default;
-}
-
-.balloon-body {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    padding: 8px;
-    font-size: 12px;
-    line-height: 1.4;
-    color: #000;
-}
-
-.balloon-body .balloon-icon { font-size: 22px; }
-
-.clippy-wrap {
-    position: fixed;
-    left: 16px;
-    bottom: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    z-index: 32000;
-}
-
-.clippy-bubble {
-    position: relative;
-    width: 240px;
-    background: #ffffff;
-    border: 2px solid #000;
-    border-radius: 12px;
-    padding: 10px 12px;
-    font-family: "Comic Sans MS", "Chalkboard SE", cursive, Tahoma, sans-serif;
-    font-size: 12.5px;
-    line-height: 1.4;
-    color: #000;
-    box-shadow: 3px 3px 0 rgba(0,0,0,.25);
-}
-
-.clippy-bubble[hidden] { display: none; }
-
-.clippy-bubble::after {
-    content: "";
-    position: absolute;
-    left: 28px;
-    bottom: -14px;
-    width: 0;
-    height: 0;
-    border: 8px solid transparent;
-    border-top-color: #000;
-}
-
-.clippy-bubble::before {
-    content: "";
-    position: absolute;
-    left: 30px;
-    bottom: -10px;
-    width: 0;
-    height: 0;
-    border: 6px solid transparent;
-    border-top-color: #fff;
-    z-index: 1;
-}
-
-.clippy-close {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 16px;
-    height: 16px;
-    border: 1px solid #000;
-    background: var(--face);
-    font-size: 9px;
-    line-height: 1;
-    display: grid;
-    place-items: center;
-    cursor: default;
-}
-
-.clippy-text { padding-right: 14px; margin-bottom: 8px; }
-
-.clippy-buttons { display: flex; gap: 6px; justify-content: flex-end; }
-
-.clippy-buttons[hidden] { display: none; }
-
-.clippy-btn {
-    font-family: "Comic Sans MS", "Chalkboard SE", cursive, Tahoma, sans-serif;
-    font-size: 11.5px;
-    padding: 4px 10px;
-    border: 0;
-    background: var(--face);
-    cursor: default;
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
-}
-
-.clippy-btn:active {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow);
-    transform: translate(1px, 1px);
-}
-
-.clippy-btn:disabled { opacity: .45; }
-
-.clippy-char {
-    width: 54px;
-    height: 68px;
-    border: 0;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    animation: clippy-bob 2.6s ease-in-out infinite;
-}
-
-.clippy-img { width: 54px; height: 68px; object-fit: contain; display: block; }
-
-@keyframes clippy-bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-}
 </style>
 </head>
 <body>
 
-<div id="bootScreen">
-    <div class="boot-logo-row">
-        <img id="bootLogoImg" class="boot-logo-img" src="Windows98Logo.png" alt="Windows 98"
-             onerror="this.style.display='none'; document.getElementById('bootLogoFallback').style.display='flex';">
-        <div id="bootLogoFallback" class="boot-logo-row" style="display:none;">
-            <div class="boot-flag"><span></span><span></span><span></span><span></span></div>
-            <div class="boot-text"><b>Windows</b><sup>98</sup></div>
-        </div>
-    </div>
-    <div class="boot-progress" id="bootProgress"></div>
-    <div class="boot-caption">Starting up&hellip;</div>
-</div>
-
-<div id="loginScreen">
-    <div class="login-box raised">
-        <div class="title-bar active">
-            <div class="title-bar-text"><span>🔒</span><span>Welcome</span></div>
-            <div class="title-bar-controls">
-                <button class="title-btn" tabindex="-1">✕</button>
-            </div>
-        </div>
-        <div class="window-body login-body">
-            <div class="login-avatar raised">👤</div>
-            <div class="login-name">Guest</div>
-            <div class="login-hint">No password needed. Click below to continue.</div>
-            <button class="login-signin-btn" id="signInBtn">Sign In</button>
-        </div>
-    </div>
-</div>
-
-<div id="desktop" class="app-hidden">
-    <div class="desktop-icons">
-        <div class="desktop-icon" data-app="computer">
-            <div class="icon-glyph">🖥️</div>
-            <div class="icon-label">My Computer</div>
-        </div>
-        <div class="desktop-icon" data-app="recycle">
-            <div class="icon-glyph">🗑️</div>
-            <div class="icon-label">Recycle Bin</div>
-        </div>
-        <div class="desktop-icon" data-app="mediaplayer">
-            <div class="icon-glyph">🎵</div>
-            <div class="icon-label">Media Player</div>
-        </div>
-        <div class="desktop-icon" data-app="minesweeper">
-            <div class="icon-glyph">💣</div>
-            <div class="icon-label">Minesweeper</div>
+<div class="player-wrap raised">
+    <div class="title-bar">
+        <span class="title-bar-text">Media Player</span>
+        <div class="title-bar-controls">
+            <span class="raised">_</span>
+            <span class="raised">□</span>
+            <span class="raised">✕</span>
         </div>
     </div>
 
-    <div class="window raised" id="win-computer" data-title="My Computer" data-icon="🖥️" hidden>
-        <div class="title-bar">
-            <div class="title-bar-text"><span>🖥️</span><span>My Computer</span></div>
-            <div class="title-bar-controls">
-                <button class="title-btn" data-action="minimize">_</button>
-                <button class="title-btn" data-action="maximize">□</button>
-                <button class="title-btn" data-action="close">✕</button>
+    <div class="window-body">
+        <div class="filters raised" id="musicFilters">
+            <button class="filter active" data-filter="all">All</button>
+            <button class="filter" data-filter="Retro">Retro</button>
+            <button class="filter" data-filter="Cinematic">Cinematic</button>
+            <button class="filter" data-filter="Simulator">Simulator</button>
+            <button class="filter" data-filter="Boss Fight">Boss Fight</button>
+        </div>
+
+        <div class="tracks sunken" id="musicList">
+            <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
+                <span class="play-indicator"></span><span class="track-label">Retro</span>
+            </div>
+            <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-cat="Retro" data-src="Retro%201.mp3">
+                <span class="play-indicator"></span><span class="track-label">Retro 1</span>
+            </div>
+            <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic.mp3">
+                <span class="play-indicator"></span><span class="track-label">Cinematic</span>
+            </div>
+            <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic%201.mp3">
+                <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
+            </div>
+            <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator.mp3">
+                <span class="play-indicator"></span><span class="track-label">Simulator</span>
+            </div>
+            <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
+                <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
+            </div>
+            <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
+                <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
+            </div>
+            <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight%201.mp3">
+                <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
             </div>
         </div>
-        <div class="window-body">
-            <div class="explorer-toolbar raised" style="padding:3px;">
-                <button class="control">Back</button>
-                <button class="control">Up</button>
+
+        <div class="player raised">
+            <div class="lcd sunken">
+                <div class="player-title" id="playerTitle">NO TRACK LOADED</div>
+                <div class="player-genre" id="playerGenre">SELECT A TRACK ABOVE</div>
             </div>
-            <div class="explorer-body sunken">
-                <div class="big-icon">💾</div>
-                <div>3½ Floppy (A:) &nbsp; Local Disk (C:) &nbsp; CD-ROM (D:)</div>
+
+            <div class="progress-wrap">
+                <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
+                <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
             </div>
-            <div class="status-bar sunken">3 object(s)</div>
+
+            <div class="controls">
+                <button class="control" id="prevBtn" aria-label="Previous track">◀◀</button>
+                <button class="control main" id="playBtn" aria-label="Play">▶</button>
+                <button class="control" id="nextBtn" aria-label="Next track">▶▶</button>
+            </div>
+
+            <div class="volume">
+                <span>Vol</span>
+                <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
+            </div>
+
+            <audio id="audio" preload="metadata"></audio>
         </div>
-    </div>
 
-    <div class="window raised" id="win-recycle" data-title="Recycle Bin" data-icon="🗑️" hidden>
-        <div class="title-bar">
-            <div class="title-bar-text"><span>🗑️</span><span>Recycle Bin</span></div>
-            <div class="title-bar-controls">
-                <button class="title-btn" data-action="minimize">_</button>
-                <button class="title-btn" data-action="maximize">□</button>
-                <button class="title-btn" data-action="close">✕</button>
-            </div>
-        </div>
-        <div class="window-body">
-            <div class="explorer-body sunken">
-                <div class="big-icon">🗑️</div>
-                <div>The Recycle Bin is empty</div>
-            </div>
-            <div class="status-bar sunken">0 object(s)</div>
-        </div>
-    </div>
-
-    <div class="window raised" id="win-mediaplayer" data-title="Media Player" data-icon="🎵" hidden>
-        <div class="title-bar">
-            <div class="title-bar-text"><span>🎵</span><span>Media Player</span></div>
-            <div class="title-bar-controls">
-                <button class="title-btn" data-action="minimize">_</button>
-                <button class="title-btn" data-action="maximize">□</button>
-                <button class="title-btn" data-action="close">✕</button>
-            </div>
-        </div>
-        <div class="window-body" style="width:420px;">
-            <div class="filters raised" id="musicFilters">
-                <button class="filter active" data-filter="all">All</button>
-                <button class="filter" data-filter="Retro">Retro</button>
-                <button class="filter" data-filter="Cinematic">Cinematic</button>
-                <button class="filter" data-filter="Simulator">Simulator</button>
-                <button class="filter" data-filter="Boss Fight">Boss Fight</button>
-            </div>
-
-            <div class="tracks sunken" id="musicList">
-                <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Retro</span>
-                </div>
-                <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-cat="Retro" data-src="Retro%201.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Retro 1</span>
-                </div>
-                <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Cinematic</span>
-                </div>
-                <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic%201.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
-                </div>
-                <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Simulator</span>
-                </div>
-                <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
-                </div>
-                <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
-                </div>
-                <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight%201.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
-                </div>
-            </div>
-
-            <div class="player raised">
-                <div class="lcd sunken">
-                    <div class="player-title" id="playerTitle">NO TRACK LOADED</div>
-                    <div class="player-genre" id="playerGenre">SELECT A TRACK ABOVE</div>
-                </div>
-
-                <div class="progress-wrap">
-                    <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
-                    <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
-                </div>
-
-                <div class="controls">
-                    <button class="control" id="prevBtn" aria-label="Previous track">◀◀</button>
-                    <button class="control main" id="playBtn" aria-label="Play">▶</button>
-                    <button class="control" id="nextBtn" aria-label="Next track">▶▶</button>
-                </div>
-
-                <div class="volume">
-                    <span>Vol</span>
-                    <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
-                </div>
-
-                <audio id="audio" preload="metadata"></audio>
-            </div>
-
-            <div class="status-bar sunken">Ready</div>
-        </div>
-    </div>
-
-    <div class="window raised" id="win-minesweeper" data-title="Minesweeper" data-icon="💣" hidden>
-        <div class="title-bar">
-            <div class="title-bar-text"><span>💣</span><span>Minesweeper</span></div>
-            <div class="title-bar-controls">
-                <button class="title-btn" data-action="minimize">_</button>
-                <button class="title-btn" data-action="maximize">□</button>
-                <button class="title-btn" data-action="close">✕</button>
-            </div>
-        </div>
-        <div class="window-body">
-            <div class="ms-app">
-                <div class="ms-menu">
-                    <span class="ms-menu-item" id="msGameMenuBtn">Game</span>
-                </div>
-                <div class="ms-menu-dropdown raised" id="msGameMenu" hidden>
-                    <div class="ms-menu-option" data-action="new">New</div>
-                    <div class="ms-menu-sep"></div>
-                    <div class="ms-menu-option" data-level="beginner">Beginner</div>
-                    <div class="ms-menu-option" data-level="intermediate">Intermediate</div>
-                    <div class="ms-menu-option" data-level="expert">Expert</div>
-                </div>
-                <div class="ms-frame sunken">
-                    <div class="ms-header sunken">
-                        <div class="ms-lcd" id="msMineCount">010</div>
-                        <button class="ms-smiley" id="msSmiley">🙂</button>
-                        <div class="ms-lcd" id="msTimer">000</div>
-                    </div>
-                    <div class="ms-board sunken" id="msBoard"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="taskbar" class="raised app-hidden">
-    <button id="startButton" class="raised">
-        <span>🪟</span><span>Start</span>
-    </button>
-    <div class="taskbar-sep"></div>
-    <div id="taskButtons"></div>
-    <div id="clock" class="sunken"></div>
-</div>
-
-<div id="startMenu" class="raised" hidden>
-    <div class="start-side"><span>Windows 98</span></div>
-    <div class="start-items">
-        <div class="start-item" data-app="mediaplayer"><span class="glyph">🎵</span><span>Media Player</span></div>
-        <div class="start-item" data-app="minesweeper"><span class="glyph">💣</span><span>Minesweeper</span></div>
-        <div class="start-item" data-app="computer"><span class="glyph">🖥️</span><span>My Computer</span></div>
-        <div class="start-sep"></div>
-        <div class="start-item" data-action="shutdown"><span class="glyph">⏻</span><span>Shut Down...</span></div>
+        <div class="status-bar sunken">Ready</div>
     </div>
 </div>
 
 <audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
 <audio id="errorSound" src="ErrorSound.mp3" preload="auto"></audio>
-<audio id="startupSound" src="Startup.mp3" preload="auto"></audio>
-<audio id="notificationSound" src="Notification.mp3" preload="auto"></audio>
 <div class="toast" id="toast"></div>
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
-<div class="balloon" id="welcomeBalloon">
-    <div class="balloon-inner raised">
-        <div class="balloon-header">
-            <span>Portfolio</span>
-            <button class="balloon-close" id="balloonCloseBtn">✕</button>
-        </div>
-        <div class="balloon-body">
-            <span class="balloon-icon">🎵</span>
-            <span>Welcome to my portfolio, you can see the music I've created by opening up the media player.</span>
-        </div>
-    </div>
-</div>
-
-<div class="clippy-wrap app-hidden" id="clippyWrap">
-    <div class="clippy-bubble" id="clippyBubble" hidden>
-        <button class="clippy-close" id="clippyCloseBtn">✕</button>
-        <div class="clippy-text" id="clippyText"></div>
-        <div class="clippy-buttons" id="clippyIntroButtons">
-            <button class="clippy-btn" id="clippyNoBtn">No thanks</button>
-            <button class="clippy-btn" id="clippyYesBtn">Sure!</button>
-        </div>
-        <div class="clippy-buttons" id="clippyTourButtons" hidden>
-            <button class="clippy-btn" id="clippyBackBtn">Back</button>
-            <button class="clippy-btn" id="clippyNextBtn">Next</button>
-        </div>
-    </div>
-    <button class="clippy-char" id="clippyChar" title="Need help?">
-        <img id="clippyImg" class="clippy-img" src="Clippy.png" alt="Clippy"
-             onerror="this.style.display='none'; document.getElementById('clippySvgFallback').style.display='block';">
-        <svg id="clippySvgFallback" style="display:none;" viewBox="0 0 60 80" width="54" height="68">
-            <path d="M22,14 C22,8 30,6 36,10 C42,14 42,22 42,28 L42,56 C42,64 33,66 28,60 C24,55 25,50 25,46 L25,24 C25,20 30,19 31,23 L31,44" fill="none" stroke="#8a8a8a" stroke-width="5" stroke-linecap="round"/>
-            <path d="M22,14 C22,8 30,6 36,10 C42,14 42,22 42,28 L42,56 C42,64 33,66 28,60 C24,55 25,50 25,46 L25,24 C25,20 30,19 31,23 L31,44" fill="none" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round"/>
-            <g class="clippy-eye">
-                <ellipse cx="24" cy="20" rx="5" ry="6" fill="#fff" stroke="#000" stroke-width="1"/>
-                <circle cx="25" cy="21" r="2" fill="#000"/>
-            </g>
-            <g class="clippy-eye">
-                <ellipse cx="37" cy="20" rx="5" ry="6" fill="#fff" stroke="#000" stroke-width="1"/>
-                <circle cx="38" cy="21" r="2" fill="#000"/>
-            </g>
-        </svg>
-    </button>
-</div>
-
 <script>
-const loginScreen = document.getElementById("loginScreen");
-const bootScreen = document.getElementById("bootScreen");
-const bootProgress = document.getElementById("bootProgress");
-const signInBtn = document.getElementById("signInBtn");
-const welcomeBalloon = document.getElementById("welcomeBalloon");
-const balloonCloseBtn = document.getElementById("balloonCloseBtn");
-
-const bootSegmentCount = 20;
-const bootSegments = [];
-for (let i = 0; i < bootSegmentCount; i++) {
-    const seg = document.createElement("div");
-    seg.className = "boot-segment";
-    bootProgress.appendChild(seg);
-    bootSegments.push(seg);
-}
-
-let bootLit = 0;
-const bootInterval = setInterval(() => {
-    bootSegments[bootLit % bootSegmentCount].classList.add("lit");
-    bootLit++;
-    if (bootLit % bootSegmentCount === 0) {
-        setTimeout(() => bootSegments.forEach(seg => seg.classList.remove("lit")), 200);
-    }
-}, 90);
-
-setTimeout(() => {
-    clearInterval(bootInterval);
-    bootScreen.classList.add("fade-out");
-    loginScreen.classList.add("visible");
-    setTimeout(() => bootScreen.remove(), 500);
-}, 3200);
-
-function showBalloon() {
-    welcomeBalloon.classList.add("show");
-    playNotificationSound();
-    clearTimeout(showBalloon._t);
-    showBalloon._t = setTimeout(hideBalloon, 8000);
-}
-
-function hideBalloon() {
-    welcomeBalloon.classList.remove("show");
-}
-
-balloonCloseBtn.addEventListener("click", hideBalloon);
-
-const clippyWrap = document.getElementById("clippyWrap");
-const clippyBubble = document.getElementById("clippyBubble");
-const clippyText = document.getElementById("clippyText");
-const clippyChar = document.getElementById("clippyChar");
-const clippyCloseBtn = document.getElementById("clippyCloseBtn");
-const clippyIntroButtons = document.getElementById("clippyIntroButtons");
-const clippyTourButtons = document.getElementById("clippyTourButtons");
-const clippyYesBtn = document.getElementById("clippyYesBtn");
-const clippyNoBtn = document.getElementById("clippyNoBtn");
-const clippyBackBtn = document.getElementById("clippyBackBtn");
-const clippyNextBtn = document.getElementById("clippyNextBtn");
-
-const clippyIntroText = "Hi, I'm Clippy! Want a quick tour of this computer?";
-const clippySteps = [
-    "Double-click any icon on the desktop to open a program.",
-    "Give \"Media Player\" a try \u2014 I've got some tunes waiting for you in there! \ud83c\udfb5",
-    "Drag a window around by its title bar, and use the buttons in the corner to minimize, maximize, or close it.",
-    "The taskbar down here shows every open program. Click Start to browse the full program menu.",
-    "Don't forget Minesweeper \u2014 open its Game menu to pick a difficulty. Have fun exploring!"
-];
-
-let clippyStepIndex = 0;
-
-function showClippyIntro() {
-    clippyIntroButtons.hidden = false;
-    clippyTourButtons.hidden = true;
-    clippyText.textContent = clippyIntroText;
-    clippyBubble.hidden = false;
-}
-
-function renderClippyStep() {
-    clippyText.textContent = clippySteps[clippyStepIndex];
-    clippyBackBtn.disabled = clippyStepIndex === 0;
-    clippyNextBtn.textContent = clippyStepIndex === clippySteps.length - 1 ? "Finish" : "Next";
-}
-
-function startClippyTour() {
-    clippyStepIndex = 0;
-    clippyIntroButtons.hidden = true;
-    clippyTourButtons.hidden = false;
-    renderClippyStep();
-}
-
-function hideClippyBubble() {
-    clippyBubble.hidden = true;
-}
-
-clippyYesBtn.addEventListener("click", startClippyTour);
-clippyNoBtn.addEventListener("click", hideClippyBubble);
-clippyCloseBtn.addEventListener("click", hideClippyBubble);
-
-clippyBackBtn.addEventListener("click", () => {
-    if (clippyStepIndex > 0) {
-        clippyStepIndex--;
-        renderClippyStep();
-    }
-});
-
-clippyNextBtn.addEventListener("click", () => {
-    if (clippyStepIndex === clippySteps.length - 1) {
-        hideClippyBubble();
-        return;
-    }
-    clippyStepIndex++;
-    renderClippyStep();
-});
-
-clippyChar.addEventListener("click", () => {
-    if (clippyBubble.hidden) showClippyIntro();
-    else hideClippyBubble();
-});
-
-function signIn() {
-    loginScreen.classList.add("fade-out");
-    document.getElementById("desktop").classList.remove("app-hidden");
-    document.getElementById("taskbar").classList.remove("app-hidden");
-    setTimeout(() => {
-        loginScreen.remove();
-    }, 400);
-
-    let revealed = false;
-    function revealDesktopContents() {
-        if (revealed) return;
-        revealed = true;
-        document.querySelector(".desktop-icons").classList.add("show");
-        showBalloon();
-        clippyWrap.classList.remove("app-hidden");
-        setTimeout(showClippyIntro, 2200);
-        setInterval(() => {
-            if (clippyBubble.hidden) showClippyIntro();
-        }, 45000);
-    }
-
-    startupSound.addEventListener("ended", revealDesktopContents, { once: true });
-    playStartupSound();
-    setTimeout(revealDesktopContents, 3000);
-}
-
-signInBtn.addEventListener("click", signIn);
-
-const desktop = document.getElementById("desktop");
-const windows = [...document.querySelectorAll(".window")];
-const taskButtonsBar = document.getElementById("taskButtons");
-const startButton = document.getElementById("startButton");
-const startMenu = document.getElementById("startMenu");
-const clockEl = document.getElementById("clock");
-const toast = document.getElementById("toast");
+const audio = document.getElementById("audio");
 const clickSound = document.getElementById("clickSound");
 const errorSound = document.getElementById("errorSound");
-const startupSound = document.getElementById("startupSound");
-const notificationSound = document.getElementById("notificationSound");
-
-let zTop = 100;
-let openOffset = 0;
-const state = {};
-
-windows.forEach(win => {
-    const app = win.id.replace("win-", "");
-    state[app] = { open: false, minimized: false, maximized: false, taskButton: null, prevRect: null };
-});
-
-function playClickSound() {
-    try {
-        const sound = clickSound.cloneNode(true);
-        sound.volume = 0.5;
-        sound.play().catch(() => {});
-    } catch {}
-}
-
-function playErrorSound() {
-    try {
-        const sound = errorSound.cloneNode(true);
-        sound.volume = 0.6;
-        sound.play().catch(() => {});
-    } catch {}
-}
-
-function playStartupSound() {
-    try {
-        startupSound.volume = 0.7;
-        startupSound.currentTime = 0;
-        startupSound.play().catch(() => {});
-    } catch {}
-}
-
-function playNotificationSound() {
-    try {
-        const sound = notificationSound.cloneNode(true);
-        sound.volume = 0.6;
-        sound.play().catch(() => {});
-    } catch {}
-}
-
-function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add("show");
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toast.classList.remove("show"), 2200);
-    playErrorSound();
-}
-
-document.addEventListener("click", event => {
-    if (event.target.closest(".track, .filter, .control, .ms-smiley, .desktop-icon, .start-item, .task-button, #startButton, .title-btn, .ms-menu-option, .ms-menu-item, #signInBtn, .balloon-close, .clippy-btn, .clippy-close, #clippyChar")) {
-        playClickSound();
-    }
-}, true);
-
-function getWin(app) { return document.getElementById("win-" + app); }
-
-function setActive(app) {
-    windows.forEach(win => {
-        const id = win.id.replace("win-", "");
-        const bar = win.querySelector(".title-bar");
-        bar.classList.toggle("active", id === app && !state[id].minimized);
-    });
-    Object.keys(state).forEach(id => {
-        if (state[id].taskButton) state[id].taskButton.classList.toggle("active", id === app && !state[id].minimized);
-    });
-}
-
-function bringToFront(app) {
-    zTop += 1;
-    getWin(app).style.zIndex = zTop;
-    setActive(app);
-}
-
-function addTaskButton(app) {
-    if (state[app].taskButton) return;
-    const win = getWin(app);
-    const btn = document.createElement("button");
-    btn.className = "task-button raised";
-    btn.innerHTML = `<span>${win.dataset.icon}</span><span>${win.dataset.title}</span>`;
-    btn.addEventListener("click", () => toggleMinimize(app));
-    taskButtonsBar.appendChild(btn);
-    state[app].taskButton = btn;
-}
-
-function removeTaskButton(app) {
-    if (state[app].taskButton) {
-        state[app].taskButton.remove();
-        state[app].taskButton = null;
-    }
-}
-
-function positionWindow(win) {
-    const rect = win.getBoundingClientRect();
-    const left = 40 + (openOffset % 8) * 26;
-    const top = 30 + (openOffset % 8) * 26;
-    openOffset += 1;
-    win.style.left = left + "px";
-    win.style.top = top + "px";
-}
-
-function openApp(app) {
-    const win = getWin(app);
-    if (!win) return;
-    if (!state[app].open) {
-        win.hidden = false;
-        if (!win.style.left) positionWindow(win);
-        state[app].open = true;
-        addTaskButton(app);
-        if (app === "minesweeper" && !msInitialized) initMinesweeper();
-    }
-    win.hidden = false;
-    win.classList.remove("minimized");
-    state[app].minimized = false;
-    bringToFront(app);
-}
-
-function toggleMinimize(app) {
-    const win = getWin(app);
-    if (state[app].minimized) {
-        win.hidden = false;
-        state[app].minimized = false;
-        bringToFront(app);
-    } else if (getWin(app).style.zIndex == zTop && !win.hidden) {
-        win.hidden = true;
-        state[app].minimized = true;
-        setActive(null);
-    } else {
-        win.hidden = false;
-        state[app].minimized = false;
-        bringToFront(app);
-    }
-}
-
-function closeApp(app) {
-    const win = getWin(app);
-    win.hidden = true;
-    state[app].open = false;
-    state[app].minimized = false;
-    removeTaskButton(app);
-}
-
-function toggleMaximize(app) {
-    const win = getWin(app);
-    if (!state[app].maximized) {
-        state[app].prevRect = {
-            left: win.style.left,
-            top: win.style.top,
-            width: win.style.width,
-            height: win.style.height
-        };
-        win.style.left = "0px";
-        win.style.top = "0px";
-        win.style.width = "100%";
-        win.style.height = "100%";
-        state[app].maximized = true;
-    } else {
-        const r = state[app].prevRect;
-        win.style.left = r.left;
-        win.style.top = r.top;
-        win.style.width = r.width;
-        win.style.height = r.height;
-        state[app].maximized = false;
-    }
-}
-
-windows.forEach(win => {
-    const app = win.id.replace("win-", "");
-    const titleBar = win.querySelector(".title-bar");
-
-    win.addEventListener("mousedown", () => bringToFront(app));
-
-    win.querySelector('[data-action="minimize"]').addEventListener("click", () => toggleMinimize(app));
-    win.querySelector('[data-action="maximize"]').addEventListener("click", () => toggleMaximize(app));
-    win.querySelector('[data-action="close"]').addEventListener("click", () => closeApp(app));
-
-    let dragging = false, offsetX = 0, offsetY = 0;
-
-    titleBar.addEventListener("pointerdown", event => {
-        if (event.target.closest(".title-btn")) return;
-        if (state[app].maximized) return;
-        dragging = true;
-        bringToFront(app);
-        const rect = win.getBoundingClientRect();
-        offsetX = event.clientX - rect.left;
-        offsetY = event.clientY - rect.top;
-        titleBar.setPointerCapture(event.pointerId);
-    });
-
-    titleBar.addEventListener("pointermove", event => {
-        if (!dragging) return;
-        const deskRect = desktop.getBoundingClientRect();
-        let left = event.clientX - offsetX;
-        let top = event.clientY - offsetY;
-        left = Math.max(0, Math.min(left, deskRect.width - 60));
-        top = Math.max(0, Math.min(top, deskRect.height - 22));
-        win.style.left = left + "px";
-        win.style.top = top + "px";
-    });
-
-    titleBar.addEventListener("pointerup", event => {
-        dragging = false;
-        try { titleBar.releasePointerCapture(event.pointerId); } catch {}
-    });
-
-    titleBar.addEventListener("dblclick", () => toggleMaximize(app));
-});
-
-document.querySelectorAll(".desktop-icon").forEach(icon => {
-    icon.addEventListener("click", () => {
-        document.querySelectorAll(".desktop-icon").forEach(i => i.classList.remove("selected"));
-        icon.classList.add("selected");
-    });
-    icon.addEventListener("dblclick", () => openApp(icon.dataset.app));
-});
-
-desktop.addEventListener("click", event => {
-    if (!event.target.closest(".desktop-icon")) {
-        document.querySelectorAll(".desktop-icon").forEach(i => i.classList.remove("selected"));
-    }
-});
-
-startButton.addEventListener("click", event => {
-    event.stopPropagation();
-    const willOpen = startMenu.hidden;
-    startMenu.hidden = !willOpen;
-    startButton.classList.toggle("pressed", willOpen);
-});
-
-document.querySelectorAll(".start-item").forEach(item => {
-    item.addEventListener("click", () => {
-        if (item.dataset.app) openApp(item.dataset.app);
-        if (item.dataset.action === "shutdown") showToast("It is now safe to close this browser tab.");
-        startMenu.hidden = true;
-        startButton.classList.remove("pressed");
-    });
-});
-
-document.addEventListener("click", event => {
-    if (!event.target.closest("#startMenu, #startButton")) {
-        startMenu.hidden = true;
-        startButton.classList.remove("pressed");
-    }
-});
-
-function updateClock() {
-    const now = new Date();
-    let h = now.getHours();
-    const m = now.getMinutes().toString().padStart(2, "0");
-    const ampm = h >= 12 ? "PM" : "AM";
-    h = h % 12;
-    if (h === 0) h = 12;
-    clockEl.textContent = `${h}:${m} ${ampm}`;
-}
-updateClock();
-setInterval(updateClock, 1000);
-
-const audio = document.getElementById("audio");
 const tracks = [...document.querySelectorAll(".track")];
 const filterButtons = [...document.querySelectorAll(".filter")];
 const playBtn = document.getElementById("playBtn");
@@ -1684,10 +465,27 @@ const playerTitle = document.getElementById("playerTitle");
 const playerGenre = document.getElementById("playerGenre");
 const currentTime = document.getElementById("currentTime");
 const duration = document.getElementById("duration");
+const toast = document.getElementById("toast");
 
 let currentIndex = -1;
+let toastTimer;
 
 audio.volume = Number(volume.value);
+
+/* Click sound — cloning the node lets rapid taps overlap instead of
+   cutting each other off, and calling play() synchronously inside the
+   event handler is what makes this reliable on iOS/Android too. */
+function playClickSound() {
+    try {
+        const sound = clickSound.cloneNode(true);
+        sound.volume = 0.5;
+        sound.play().catch(() => {});
+    } catch {}
+}
+
+document.addEventListener("click", event => {
+    if (event.target.closest(".track, .filter, .control")) playClickSound();
+}, true);
 
 function filterTracks(filter) {
     tracks.forEach(track => {
@@ -1706,6 +504,22 @@ function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
     return `${mins}:${secs}`;
+}
+
+function playErrorSound() {
+    try {
+        const sound = errorSound.cloneNode(true);
+        sound.volume = 0.6;
+        sound.play().catch(() => {});
+    } catch {}
+}
+
+function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    playErrorSound();
 }
 
 function setPlayingVisuals(playing) {
@@ -1814,294 +628,8 @@ volume.addEventListener("input", () => {
     audio.volume = Number(volume.value);
 });
 
-let msInitialized = false;
-const msLevels = {
-    beginner: { rows: 9, cols: 9, mines: 10 },
-    intermediate: { rows: 16, cols: 16, mines: 40 },
-    expert: { rows: 16, cols: 30, mines: 99 }
-};
-
-let msLevel = "beginner";
-let msRows = 9, msCols = 9, msMines = 10;
-let msBoardData = [];
-let msFirstClick = true;
-let msGameOver = false;
-let msRevealedCount = 0;
-let msFlagCount = 0;
-let msTimerHandle = null;
-let msSeconds = 0;
-
-const msBoardEl = document.getElementById("msBoard");
-const msMineCountEl = document.getElementById("msMineCount");
-const msTimerEl = document.getElementById("msTimer");
-const msSmileyEl = document.getElementById("msSmiley");
-const msGameMenuBtn = document.getElementById("msGameMenuBtn");
-const msGameMenu = document.getElementById("msGameMenu");
-
-function initMinesweeper() {
-    msInitialized = true;
-    msGameMenuBtn.addEventListener("click", event => {
-        event.stopPropagation();
-        msGameMenu.hidden = !msGameMenu.hidden;
-    });
-    document.addEventListener("click", event => {
-        if (!event.target.closest("#msGameMenu, #msGameMenuBtn")) msGameMenu.hidden = true;
-    });
-    msGameMenu.querySelectorAll(".ms-menu-option").forEach(option => {
-        option.addEventListener("click", () => {
-            msGameMenu.hidden = true;
-            if (option.dataset.level) msLevel = option.dataset.level;
-            newMinesweeperGame();
-        });
-    });
-    msSmileyEl.addEventListener("click", newMinesweeperGame);
-    newMinesweeperGame();
-}
-
-function formatCounter(n) {
-    const clamped = Math.max(-99, Math.min(999, n));
-    if (clamped < 0) return "-" + String(Math.abs(clamped)).padStart(2, "0");
-    return String(clamped).padStart(3, "0");
-}
-
-function newMinesweeperGame() {
-    const level = msLevels[msLevel];
-    msRows = level.rows;
-    msCols = level.cols;
-    msMines = level.mines;
-    msFirstClick = true;
-    msGameOver = false;
-    msRevealedCount = 0;
-    msFlagCount = 0;
-    msSeconds = 0;
-    clearInterval(msTimerHandle);
-    msTimerHandle = null;
-    msTimerEl.textContent = formatCounter(0);
-    msMineCountEl.textContent = formatCounter(msMines);
-    msSmileyEl.textContent = "🙂";
-
-    msBoardData = [];
-    for (let r = 0; r < msRows; r++) {
-        const row = [];
-        for (let c = 0; c < msCols; c++) {
-            row.push({ mine: false, revealed: false, flagged: false, count: 0 });
-        }
-        msBoardData.push(row);
-    }
-
-    msBoardEl.innerHTML = "";
-    msBoardEl.style.gridTemplateColumns = `repeat(${msCols}, 24px)`;
-    for (let r = 0; r < msRows; r++) {
-        for (let c = 0; c < msCols; c++) {
-            const cell = document.createElement("button");
-            cell.className = "ms-cell";
-            cell.dataset.row = r;
-            cell.dataset.col = c;
-            msBoardEl.appendChild(cell);
-        }
-    }
-
-    msBoardEl.onmousedown = event => {
-        if (msGameOver) return;
-        const target = event.target.closest(".ms-cell");
-        if (target && !target.classList.contains("revealed")) msSmileyEl.textContent = "😮";
-    };
-    document.addEventListener("mouseup", () => {
-        if (!msGameOver) msSmileyEl.textContent = "🙂";
-    });
-
-    msBoardEl.addEventListener("click", onMsCellClick);
-    msBoardEl.addEventListener("contextmenu", onMsCellRightClick);
-    msBoardEl.addEventListener("dblclick", onMsCellChord);
-}
-
-function msCellEl(r, c) {
-    return msBoardEl.children[r * msCols + c];
-}
-
-function forEachMsNeighbor(r, c, fn) {
-    for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-            if (dr === 0 && dc === 0) continue;
-            const nr = r + dr, nc = c + dc;
-            if (nr >= 0 && nr < msRows && nc >= 0 && nc < msCols) fn(nr, nc);
-        }
-    }
-}
-
-function placeMines(safeR, safeC) {
-    const excluded = new Set();
-    forEachMsNeighbor(safeR, safeC, (r, c) => excluded.add(r + "," + c));
-    excluded.add(safeR + "," + safeC);
-
-    let placed = 0;
-    while (placed < msMines) {
-        const r = Math.floor(Math.random() * msRows);
-        const c = Math.floor(Math.random() * msCols);
-        const key = r + "," + c;
-        if (excluded.has(key) || msBoardData[r][c].mine) continue;
-        msBoardData[r][c].mine = true;
-        placed++;
-    }
-
-    for (let r = 0; r < msRows; r++) {
-        for (let c = 0; c < msCols; c++) {
-            if (msBoardData[r][c].mine) continue;
-            let count = 0;
-            forEachMsNeighbor(r, c, (nr, nc) => { if (msBoardData[nr][nc].mine) count++; });
-            msBoardData[r][c].count = count;
-        }
-    }
-}
-
-function startMsTimer() {
-    if (msTimerHandle) return;
-    msTimerHandle = setInterval(() => {
-        msSeconds++;
-        msTimerEl.textContent = formatCounter(msSeconds);
-    }, 1000);
-}
-
-function updateMsCellView(r, c) {
-    const cell = msBoardData[r][c];
-    const el = msCellEl(r, c);
-    el.classList.add("revealed");
-    if (cell.mine) {
-        el.textContent = "💣";
-        el.classList.add("mine");
-    } else if (cell.count > 0) {
-        el.textContent = cell.count;
-        el.classList.add("n" + cell.count);
-    } else {
-        el.textContent = "";
-    }
-}
-
-function revealMsCell(startR, startC) {
-    const stack = [[startR, startC]];
-    while (stack.length) {
-        const [r, c] = stack.pop();
-        const cell = msBoardData[r][c];
-        if (cell.revealed || cell.flagged) continue;
-        cell.revealed = true;
-        msRevealedCount++;
-        updateMsCellView(r, c);
-        if (cell.count === 0) {
-            forEachMsNeighbor(r, c, (nr, nc) => {
-                if (!msBoardData[nr][nc].revealed && !msBoardData[nr][nc].flagged) stack.push([nr, nc]);
-            });
-        }
-    }
-}
-
-function endMinesweeperGame(won, bombR, bombC) {
-    msGameOver = true;
-    clearInterval(msTimerHandle);
-    msTimerHandle = null;
-    for (let r = 0; r < msRows; r++) {
-        for (let c = 0; c < msCols; c++) {
-            const cell = msBoardData[r][c];
-            const el = msCellEl(r, c);
-            if (won) continue;
-            if (cell.mine && !cell.flagged) {
-                el.classList.add("revealed", "mine");
-                el.textContent = "💣";
-            }
-            if (cell.flagged && !cell.mine) {
-                el.textContent = "❌";
-            }
-        }
-    }
-    if (!won && bombR !== undefined) {
-        const el = msCellEl(bombR, bombC);
-        el.classList.add("boom");
-        el.textContent = "💣";
-    }
-    if (won) {
-        for (let r = 0; r < msRows; r++) {
-            for (let c = 0; c < msCols; c++) {
-                if (msBoardData[r][c].mine && !msBoardData[r][c].flagged) {
-                    msBoardData[r][c].flagged = true;
-                    msCellEl(r, c).textContent = "🚩";
-                }
-            }
-        }
-        msMineCountEl.textContent = formatCounter(0);
-    }
-    msSmileyEl.textContent = won ? "😎" : "😵";
-}
-
-function checkMsWin() {
-    if (msRevealedCount === msRows * msCols - msMines) {
-        endMinesweeperGame(true);
-    }
-}
-
-function onMsCellClick(event) {
-    if (msGameOver) return;
-    const target = event.target.closest(".ms-cell");
-    if (!target) return;
-    const r = Number(target.dataset.row);
-    const c = Number(target.dataset.col);
-    const cell = msBoardData[r][c];
-    if (cell.flagged || cell.revealed) return;
-
-    if (msFirstClick) {
-        placeMines(r, c);
-        msFirstClick = false;
-        startMsTimer();
-    }
-
-    if (cell.mine) {
-        endMinesweeperGame(false, r, c);
-        return;
-    }
-
-    revealMsCell(r, c);
-    checkMsWin();
-}
-
-function onMsCellRightClick(event) {
-    event.preventDefault();
-    if (msGameOver) return;
-    const target = event.target.closest(".ms-cell");
-    if (!target) return;
-    const r = Number(target.dataset.row);
-    const c = Number(target.dataset.col);
-    const cell = msBoardData[r][c];
-    if (cell.revealed) return;
-    cell.flagged = !cell.flagged;
-    msFlagCount += cell.flagged ? 1 : -1;
-    target.textContent = cell.flagged ? "🚩" : "";
-    msMineCountEl.textContent = formatCounter(msMines - msFlagCount);
-}
-
-function onMsCellChord(event) {
-    if (msGameOver) return;
-    const target = event.target.closest(".ms-cell");
-    if (!target) return;
-    const r = Number(target.dataset.row);
-    const c = Number(target.dataset.col);
-    const cell = msBoardData[r][c];
-    if (!cell.revealed || cell.count === 0) return;
-
-    let flaggedNeighbors = 0;
-    forEachMsNeighbor(r, c, (nr, nc) => { if (msBoardData[nr][nc].flagged) flaggedNeighbors++; });
-    if (flaggedNeighbors !== cell.count) return;
-
-    let hitMine = false, mineR, mineC;
-    forEachMsNeighbor(r, c, (nr, nc) => {
-        const neighbor = msBoardData[nr][nc];
-        if (!neighbor.flagged && !neighbor.revealed) {
-            if (neighbor.mine) { hitMine = true; mineR = nr; mineC = nc; }
-            else revealMsCell(nr, nc);
-        }
-    });
-
-    if (hitMine) endMinesweeperGame(false, mineR, mineC);
-    else checkMsWin();
-}
-
+/* Custom cursor — only for devices with a real mouse (pointer: fine,
+   hover: hover). Touch devices keep their normal on-screen cursor. */
 const cursorQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
 const customCursor = document.getElementById("customCursor");
 
