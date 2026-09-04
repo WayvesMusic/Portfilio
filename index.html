@@ -35,7 +35,6 @@ body {
     padding: 40px 12px;
 }
 
-/* ---------- bevel helpers (classic Win98 3D borders) ---------- */
 .raised {
     background: var(--face);
     box-shadow:
@@ -54,7 +53,6 @@ body {
         inset 2px 2px 0 var(--shadow);
 }
 
-/* ---------- window chrome ---------- */
 .player-wrap {
     width: 100%;
     max-width: 420px;
@@ -98,7 +96,6 @@ body {
 
 .window-body { padding: 8px; }
 
-/* ---------- genre filters ---------- */
 .filters {
     display: flex;
     flex-wrap: nowrap;
@@ -135,7 +132,6 @@ body {
     color: #fff;
 }
 
-/* ---------- track listbox ---------- */
 .tracks {
     display: flex;
     flex-direction: column;
@@ -180,7 +176,6 @@ body {
 
 .track.active.playing .play-indicator { visibility: visible; }
 
-/* ---------- player panel ---------- */
 .player {
     margin-top: 8px;
     padding: 8px;
@@ -343,7 +338,6 @@ input[type="range"]::-moz-range-thumb {
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-/* ---------- custom cursor (desktop / mouse only) ---------- */
 @media (pointer: fine) and (hover: hover) {
     body.custom-cursor-ready { cursor: none; }
     body.custom-cursor-ready a,
@@ -407,6 +401,9 @@ body.custom-cursor-ready .custom-cursor { display: block; }
             </div>
             <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
                 <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
+            </div>
+            <div class="track" data-title="Simulator 2" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%202.mp3">
+                <span class="play-indicator"></span><span class="track-label">Simulator 2</span>
             </div>
             <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
                 <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
@@ -472,9 +469,6 @@ let toastTimer;
 
 audio.volume = Number(volume.value);
 
-/* Click sound — cloning the node lets rapid taps overlap instead of
-   cutting each other off, and calling play() synchronously inside the
-   event handler is what makes this reliable on iOS/Android too. */
 function playClickSound() {
     try {
         const sound = clickSound.cloneNode(true);
@@ -628,8 +622,6 @@ volume.addEventListener("input", () => {
     audio.volume = Number(volume.value);
 });
 
-/* Custom cursor — only for devices with a real mouse (pointer: fine,
-   hover: hover). Touch devices keep their normal on-screen cursor. */
 const cursorQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
 const customCursor = document.getElementById("customCursor");
 
