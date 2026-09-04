@@ -19,6 +19,7 @@
     --lcd-text: #39ff6a;
     --text: #000000;
     --muted: #4b4b4b;
+    --felt: #076324;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,6 +34,15 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 40px 12px;
+}
+
+.app-stack {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
 }
 
 .raised {
@@ -55,11 +65,8 @@ body {
 
 .player-wrap {
     width: 100%;
-    max-width: 420px;
     padding: 3px;
 }
-
-.player-wrap.raised { }
 
 .title-bar {
     display: flex;
@@ -311,7 +318,7 @@ input[type="range"]::-moz-range-thumb {
 
 .status-bar {
     margin-top: 8px;
-    padding: 2px 6px;
+    padding: 4px 6px;
     font-size: 11px;
     color: var(--muted);
 }
@@ -334,15 +341,165 @@ input[type="range"]::-moz-range-thumb {
     color: var(--text);
     transition: .15s ease;
     max-width: 320px;
+    z-index: 500;
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.toggle-btn {
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    width: 100%;
+    height: 34px;
+    border: 0;
+    font: 700 13px Tahoma, "MS Sans Serif", sans-serif;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.toggle-btn:active {
+    box-shadow:
+        inset -1px -1px 0 var(--highlight),
+        inset 1px 1px 0 var(--dark-shadow),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--shadow) !important;
+    transform: translate(1px, 1px);
+}
+
+.solitaire-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.mini-btn {
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    border: 0;
+    height: 24px;
+    padding: 0 10px;
+    font: 700 11px Tahoma, "MS Sans Serif", sans-serif;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.mini-btn:active {
+    box-shadow:
+        inset -1px -1px 0 var(--highlight),
+        inset 1px 1px 0 var(--dark-shadow),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--shadow) !important;
+    transform: translate(1px, 1px);
+}
+
+.solitaire-felt {
+    background: var(--felt);
+    padding: 8px;
+}
+
+.solitaire-toprow {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.toprow-spacer { flex: 1; }
+
+.pile {
+    position: relative;
+    width: 44px;
+    height: 64px;
+    border-radius: 3px;
+}
+
+.pile.foundation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ffffff55;
+    cursor: pointer;
+}
+
+.pile.foundation.red { color: #ff8a8a55; }
+
+.pile.stock { cursor: pointer; }
+
+.empty-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffffaa;
+    font-size: 16px;
+}
+
+.solitaire-tableau {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+.tableau-col {
+    position: relative;
+    width: 44px;
+    min-height: 200px;
+    flex: 0 0 auto;
+}
+
+.card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 44px;
+    height: 64px;
+    border-radius: 3px;
+    background: #fff;
+    border: 1px solid #444;
+    box-shadow: 0 1px 3px rgba(0,0,0,.5);
+    font-family: Tahoma, "MS Sans Serif", sans-serif;
+    display: flex;
+    flex-direction: column;
+    padding: 2px 3px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.card.red { color: #c00000; }
+.card.black { color: #000000; }
+
+.card .rank {
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 1;
+}
+
+.card .suit-big {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.card.back {
+    background: repeating-linear-gradient(45deg, #1084d0, #1084d0 4px, #000080 4px, #000080 8px);
+    border: 1px solid #000;
+}
+
+.card.selected {
+    outline: 3px solid #ffd700;
+    outline-offset: -2px;
+    z-index: 50;
+}
 
 @media (pointer: fine) and (hover: hover) {
     body.custom-cursor-ready { cursor: none; }
     body.custom-cursor-ready a,
     body.custom-cursor-ready button,
     body.custom-cursor-ready .track,
+    body.custom-cursor-ready .card,
     body.custom-cursor-ready input[type="range"] { cursor: none; }
 }
 
@@ -364,82 +521,127 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 </head>
 <body>
 
-<div class="player-wrap raised">
-    <div class="title-bar">
-        <span class="title-bar-text">Media Player</span>
-        <div class="title-bar-controls">
-            <span class="raised">_</span>
-            <span class="raised">□</span>
-            <span class="raised">✕</span>
+<div class="app-stack">
+
+    <div class="player-wrap raised" id="playerWindow">
+        <div class="title-bar">
+            <span class="title-bar-text">Media Player</span>
+            <div class="title-bar-controls">
+                <span class="raised">_</span>
+                <span class="raised">□</span>
+                <span class="raised">✕</span>
+            </div>
+        </div>
+
+        <div class="window-body">
+            <div class="filters raised" id="musicFilters">
+                <button class="filter active" data-filter="all">All</button>
+                <button class="filter" data-filter="Retro">Retro</button>
+                <button class="filter" data-filter="Cinematic">Cinematic</button>
+                <button class="filter" data-filter="Simulator">Simulator</button>
+                <button class="filter" data-filter="Boss Fight">Boss Fight</button>
+            </div>
+
+            <div class="tracks sunken" id="musicList">
+                <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Retro</span>
+                </div>
+                <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-cat="Retro" data-src="Retro%201.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Retro 1</span>
+                </div>
+                <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Cinematic</span>
+                </div>
+                <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic%201.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
+                </div>
+                <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Simulator</span>
+                </div>
+                <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
+                </div>
+                <div class="track" data-title="Simulator 2" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%202.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Simulator 2</span>
+                </div>
+                <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
+                </div>
+                <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight%201.mp3">
+                    <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
+                </div>
+            </div>
+
+            <div class="player raised">
+                <div class="lcd sunken">
+                    <div class="player-title" id="playerTitle">NO TRACK LOADED</div>
+                    <div class="player-genre" id="playerGenre">SELECT A TRACK ABOVE</div>
+                </div>
+
+                <div class="progress-wrap">
+                    <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
+                    <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+                </div>
+
+                <div class="controls">
+                    <button class="control" id="prevBtn" aria-label="Previous track">◀◀</button>
+                    <button class="control main" id="playBtn" aria-label="Play">▶</button>
+                    <button class="control" id="nextBtn" aria-label="Next track">▶▶</button>
+                </div>
+
+                <div class="volume">
+                    <span>Vol</span>
+                    <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
+                </div>
+
+                <audio id="audio" preload="metadata"></audio>
+            </div>
+
+            <div class="status-bar sunken">Ready</div>
         </div>
     </div>
 
-    <div class="window-body">
-        <div class="filters raised" id="musicFilters">
-            <button class="filter active" data-filter="all">All</button>
-            <button class="filter" data-filter="Retro">Retro</button>
-            <button class="filter" data-filter="Cinematic">Cinematic</button>
-            <button class="filter" data-filter="Simulator">Simulator</button>
-            <button class="filter" data-filter="Boss Fight">Boss Fight</button>
-        </div>
-
-        <div class="tracks sunken" id="musicList">
-            <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
-                <span class="play-indicator"></span><span class="track-label">Retro</span>
-            </div>
-            <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-cat="Retro" data-src="Retro%201.mp3">
-                <span class="play-indicator"></span><span class="track-label">Retro 1</span>
-            </div>
-            <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic.mp3">
-                <span class="play-indicator"></span><span class="track-label">Cinematic</span>
-            </div>
-            <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic%201.mp3">
-                <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
-            </div>
-            <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator.mp3">
-                <span class="play-indicator"></span><span class="track-label">Simulator</span>
-            </div>
-            <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
-                <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
-            </div>
-            <div class="track" data-title="Simulator 2" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%202.mp3">
-                <span class="play-indicator"></span><span class="track-label">Simulator 2</span>
-            </div>
-            <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
-                <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
-            </div>
-            <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight%201.mp3">
-                <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
+    <div class="player-wrap raised" id="gameWindow" style="display:none">
+        <div class="title-bar">
+            <span class="title-bar-text">Solitaire</span>
+            <div class="title-bar-controls">
+                <span class="raised">_</span>
+                <span class="raised">□</span>
+                <span class="raised">✕</span>
             </div>
         </div>
 
-        <div class="player raised">
-            <div class="lcd sunken">
-                <div class="player-title" id="playerTitle">NO TRACK LOADED</div>
-                <div class="player-genre" id="playerGenre">SELECT A TRACK ABOVE</div>
+        <div class="window-body solitaire-felt">
+            <div class="solitaire-header">
+                <button class="mini-btn raised" id="newGameBtn">New Game</button>
             </div>
 
-            <div class="progress-wrap">
-                <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
-                <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+            <div class="solitaire-toprow">
+                <div class="pile stock sunken" id="stockPile"></div>
+                <div class="pile waste" id="wastePile"></div>
+                <div class="toprow-spacer"></div>
+                <div class="pile foundation black sunken" id="foundationSpade">♠</div>
+                <div class="pile foundation red sunken" id="foundationHeart">♥</div>
+                <div class="pile foundation red sunken" id="foundationDiamond">♦</div>
+                <div class="pile foundation black sunken" id="foundationClub">♣</div>
             </div>
 
-            <div class="controls">
-                <button class="control" id="prevBtn" aria-label="Previous track">◀◀</button>
-                <button class="control main" id="playBtn" aria-label="Play">▶</button>
-                <button class="control" id="nextBtn" aria-label="Next track">▶▶</button>
+            <div class="solitaire-tableau" id="tableauRow">
+                <div class="tableau-col" data-col="0"></div>
+                <div class="tableau-col" data-col="1"></div>
+                <div class="tableau-col" data-col="2"></div>
+                <div class="tableau-col" data-col="3"></div>
+                <div class="tableau-col" data-col="4"></div>
+                <div class="tableau-col" data-col="5"></div>
+                <div class="tableau-col" data-col="6"></div>
             </div>
-
-            <div class="volume">
-                <span>Vol</span>
-                <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
-            </div>
-
-            <audio id="audio" preload="metadata"></audio>
         </div>
 
-        <div class="status-bar sunken">Ready</div>
+        <div class="status-bar sunken" id="gameStatus">Draw from the deck. Build the four suit piles Ace to King to win.</div>
     </div>
+
+    <button class="toggle-btn raised" id="toggleBtn">Play Game</button>
+
 </div>
 
 <audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
@@ -478,7 +680,7 @@ function playClickSound() {
 }
 
 document.addEventListener("click", event => {
-    if (event.target.closest(".track, .filter, .control")) playClickSound();
+    if (event.target.closest(".track, .filter, .control, .toggle-btn, .mini-btn, .card, .pile")) playClickSound();
 }, true);
 
 function filterTracks(filter) {
@@ -641,6 +843,305 @@ function moveCustomCursor(event) {
 
 if (cursorQuery.matches) enableCustomCursor();
 cursorQuery.addEventListener("change", e => e.matches ? enableCustomCursor() : disableCustomCursor());
+
+const playerWindow = document.getElementById("playerWindow");
+const gameWindow = document.getElementById("gameWindow");
+const toggleBtn = document.getElementById("toggleBtn");
+let gameStarted = false;
+let showingGame = false;
+
+toggleBtn.addEventListener("click", () => {
+    showingGame = !showingGame;
+    playerWindow.style.display = showingGame ? "none" : "";
+    gameWindow.style.display = showingGame ? "" : "none";
+    toggleBtn.textContent = showingGame ? "Back" : "Play Game";
+    if (showingGame && !gameStarted) {
+        gameStarted = true;
+        newGame();
+    }
+});
+
+const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const SUITS = ["♠", "♥", "♦", "♣"];
+
+const stockPile = document.getElementById("stockPile");
+const wastePile = document.getElementById("wastePile");
+const gameStatus = document.getElementById("gameStatus");
+const newGameBtn = document.getElementById("newGameBtn");
+const foundationEls = {
+    "♠": document.getElementById("foundationSpade"),
+    "♥": document.getElementById("foundationHeart"),
+    "♦": document.getElementById("foundationDiamond"),
+    "♣": document.getElementById("foundationClub")
+};
+const tableauEls = [...document.querySelectorAll(".tableau-col")];
+
+let stock = [];
+let waste = [];
+let foundations = { "♠": [], "♥": [], "♦": [], "♣": [] };
+let tableauCols = [[], [], [], [], [], [], []];
+let selection = null;
+
+function isRed(suit) {
+    return suit === "♥" || suit === "♦";
+}
+
+function buildDeck() {
+    const cards = [];
+    SUITS.forEach(suit => {
+        for (let r = 0; r < 13; r++) cards.push({ suit, rankIndex: r, faceUp: false });
+    });
+    return cards;
+}
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function newGame() {
+    const deck = shuffle(buildDeck());
+    tableauCols = [[], [], [], [], [], [], []];
+    foundations = { "♠": [], "♥": [], "♦": [], "♣": [] };
+    waste = [];
+    selection = null;
+
+    let idx = 0;
+    for (let c = 0; c < 7; c++) {
+        for (let r = 0; r <= c; r++) {
+            const card = deck[idx++];
+            card.faceUp = r === c;
+            tableauCols[c].push(card);
+        }
+    }
+    stock = deck.slice(idx);
+    gameStatus.textContent = "Draw from the deck. Build the four suit piles Ace to King to win.";
+    render();
+}
+
+function createCardEl(card) {
+    const el = document.createElement("div");
+    el.className = "card " + (card.faceUp ? (isRed(card.suit) ? "red" : "black") : "back");
+    if (card.faceUp) {
+        el.innerHTML = `<span class="rank">${RANKS[card.rankIndex]}${card.suit}</span><span class="suit-big">${card.suit}</span>`;
+    }
+    return el;
+}
+
+function render() {
+    renderStock();
+    renderWaste();
+    renderFoundations();
+    renderTableau();
+    checkWin();
+}
+
+function renderStock() {
+    stockPile.innerHTML = "";
+    if (stock.length) {
+        stockPile.appendChild(createCardEl({ suit: "♠", rankIndex: 0, faceUp: false }));
+    } else {
+        const hint = document.createElement("div");
+        hint.className = "empty-hint";
+        hint.textContent = "↺";
+        stockPile.appendChild(hint);
+    }
+}
+
+stockPile.addEventListener("click", () => {
+    if (stock.length) {
+        const card = stock.pop();
+        card.faceUp = true;
+        waste.push(card);
+    } else if (waste.length) {
+        while (waste.length) {
+            const card = waste.pop();
+            card.faceUp = false;
+            stock.push(card);
+        }
+    }
+    render();
+});
+
+function renderWaste() {
+    wastePile.innerHTML = "";
+    if (waste.length) {
+        const top = waste[waste.length - 1];
+        const el = createCardEl(top);
+        if (selection && selection.source === "waste") el.classList.add("selected");
+        el.addEventListener("click", event => {
+            event.stopPropagation();
+            handleCardClick("waste", 0, 0);
+        });
+        wastePile.appendChild(el);
+    }
+}
+
+function renderFoundations() {
+    SUITS.forEach(suit => {
+        const el = foundationEls[suit];
+        el.innerHTML = "";
+        const pile = foundations[suit];
+        if (pile.length) {
+            const cardEl = createCardEl(pile[pile.length - 1]);
+            cardEl.addEventListener("click", event => {
+                event.stopPropagation();
+                attemptMoveToFoundation(suit);
+            });
+            el.appendChild(cardEl);
+        } else {
+            el.textContent = suit;
+        }
+    });
+}
+
+Object.entries(foundationEls).forEach(([suit, el]) => {
+    el.addEventListener("click", () => attemptMoveToFoundation(suit));
+});
+
+function renderTableau() {
+    for (let c = 0; c < 7; c++) {
+        const colEl = tableauEls[c];
+        colEl.innerHTML = "";
+        const col = tableauCols[c];
+        let offset = 0;
+        col.forEach((card, i) => {
+            const el = createCardEl(card);
+            el.style.top = offset + "px";
+            offset += card.faceUp ? 18 : 8;
+            if (selection && selection.source === "tableau" && selection.colIndex === c && i >= selection.cardIndex) {
+                el.classList.add("selected");
+            }
+            el.addEventListener("click", event => {
+                event.stopPropagation();
+                handleCardClick("tableau", c, i);
+            });
+            colEl.appendChild(el);
+        });
+        colEl.style.minHeight = Math.max(200, offset + 64) + "px";
+    }
+}
+
+tableauEls.forEach((colEl, c) => {
+    colEl.addEventListener("click", () => {
+        if (selection) attemptMoveToTableau(c);
+    });
+});
+
+function handleCardClick(source, colIndex, cardIndex) {
+    if (source === "waste") {
+        if (selection && selection.source === "waste") {
+            selection = null;
+            render();
+            return;
+        }
+        if (selection) {
+            const moved = attemptMoveOnSelection(colIndex);
+            if (moved) return;
+        }
+        selection = { source: "waste", colIndex: 0, cardIndex: 0, run: [waste[waste.length - 1]] };
+        render();
+        return;
+    }
+
+    const card = tableauCols[colIndex][cardIndex];
+    if (!card.faceUp) return;
+
+    if (selection && selection.source === "tableau" && selection.colIndex === colIndex && selection.cardIndex === cardIndex) {
+        selection = null;
+        render();
+        return;
+    }
+
+    if (selection) {
+        const moved = attemptMoveToTableau(colIndex);
+        if (moved) return;
+    }
+
+    selection = { source: "tableau", colIndex, cardIndex, run: tableauCols[colIndex].slice(cardIndex) };
+    render();
+}
+
+function attemptMoveOnSelection() {
+    return false;
+}
+
+function finishMove(destArray, isFoundation) {
+    const run = selection.run;
+    if (selection.source === "waste") {
+        waste.pop();
+    } else {
+        tableauCols[selection.colIndex].splice(selection.cardIndex, run.length);
+        const src = tableauCols[selection.colIndex];
+        if (src.length && !src[src.length - 1].faceUp) src[src.length - 1].faceUp = true;
+    }
+    destArray.push(...run);
+    selection = null;
+    render();
+}
+
+function attemptMoveToTableau(destIndex) {
+    if (!selection) return false;
+    const run = selection.run;
+    const destCol = tableauCols[destIndex];
+    const moving = run[0];
+    let valid;
+    if (destCol.length === 0) {
+        valid = moving.rankIndex === 12;
+    } else {
+        const top = destCol[destCol.length - 1];
+        valid = top.faceUp && isRed(moving.suit) !== isRed(top.suit) && moving.rankIndex === top.rankIndex - 1;
+    }
+    if (!valid) {
+        if (selection.source === "tableau" && selection.colIndex === destIndex) {
+            selection = null;
+            render();
+            return true;
+        }
+        showToast("That card can't go there.");
+        return false;
+    }
+    finishMove(destCol, false);
+    return true;
+}
+
+function attemptMoveToFoundation(suit) {
+    if (!selection) return false;
+    const run = selection.run;
+    if (run.length !== 1) {
+        showToast("Only one card at a time to a suit pile.");
+        return false;
+    }
+    const moving = run[0];
+    if (moving.suit !== suit) {
+        showToast("Wrong suit for that pile.");
+        return false;
+    }
+    const pile = foundations[suit];
+    const valid = pile.length === 0 ? moving.rankIndex === 0 : moving.rankIndex === pile[pile.length - 1].rankIndex + 1;
+    if (!valid) {
+        showToast("That card can't go there yet.");
+        return false;
+    }
+    finishMove(pile, true);
+    return true;
+}
+
+function checkWin() {
+    const total = Object.values(foundations).reduce((sum, pile) => sum + pile.length, 0);
+    if (total === 52) {
+        gameStatus.textContent = "You win! Start a new game any time.";
+        showToast("You win! 🎉");
+    }
+}
+
+newGameBtn.addEventListener("click", event => {
+    event.stopPropagation();
+    newGame();
+});
 </script>
 </body>
 </html>
