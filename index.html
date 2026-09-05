@@ -84,7 +84,7 @@ body {
 .filter:active { transform: translate(1px, 1px); }
 .filter.active { background: var(--navy); color: #fff; }
 
-.tracks { display: flex; flex-direction: column; background: #fff; padding: 2px; max-height: 260px; overflow-y: auto; }
+.tracks { display: flex; flex-direction: column; background: #fff; padding: 2px; max-height: 200px; overflow-y: auto; }
 .track { -webkit-tap-highlight-color: transparent; position: relative; display: flex; align-items: center; gap: 6px; min-height: 26px; padding: 3px 8px; color: var(--text); cursor: pointer; }
 .track:hover { background: #dcdcdc; }
 .track.active { background: var(--navy); color: #fff; }
@@ -213,9 +213,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <button class="filter" data-filter="Boss Fight">Boss Fight</button>
             </div>
             <div class="tracks sunken" id="musicList">
-                <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Retro</span>
-                </div>
+                <!-- Tracks dynamically injected via JS -->
             </div>
             <div class="player raised">
                 <div class="lcd sunken">
@@ -236,7 +234,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 </div>
                 <audio id="audio" preload="metadata"></audio>
             </div>
-            <div class="status-bar sunken">Ready</div>
+            <div class="status-bar sunken" id="playerStatus">Ready</div>
         </div>
     </div>
 
@@ -248,7 +246,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
         </div>
         <div class="window-body">
             <div class="ib-toolbar raised">
-                <!-- 3 BALL SHOP BUTTONS -->
                 <div class="ib-shop-row">
                     <button class="ib-shop-btn" id="btnBuyBouncer" title="Buy Bouncer Ball">
                         <span class="ib-icon-circle" style="background:#ffe135;">B</span>
@@ -312,7 +309,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
         </div>
         <div class="window-body">
             <div class="ib-upgrade-list sunken">
-                <!-- BOUNCER UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Bouncer Damage</span>
@@ -328,7 +324,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                     <button class="ib-upgrade-buy raised" id="btnUpgBouncerSpeed">Buy<span class="ib-price" id="priceBouncerSpeed">$20</span></button>
                 </div>
 
-                <!-- SPREAD UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Spread Damage</span>
@@ -344,7 +339,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                     <button class="ib-upgrade-buy raised" id="btnUpgSpreadSpeed">Buy<span class="ib-price" id="priceSpreadSpeed">$80</span></button>
                 </div>
 
-                <!-- SNIPER UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Sniper Damage</span>
@@ -360,7 +354,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                     <button class="ib-upgrade-buy raised" id="btnUpgSniperSpeed">Buy<span class="ib-price" id="priceSniperSpeed">$300</span></button>
                 </div>
 
-                <!-- GLOBAL UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Click Damage</span>
@@ -393,7 +386,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
 <script>
-// --- UTILS & MEDIA PLAYER ---
+// --- UTILS & TOASTS ---
 const toast = document.getElementById("toast");
 let toastTimer;
 let ib_muted = false; 
@@ -415,8 +408,136 @@ function showToast(message) {
 }
 
 document.addEventListener("click", event => {
-    if (event.target.closest(".track, .filter, .control, .toggle-btn, .mini-btn, .ib-shop-btn, .ib-mini-toggle, .ib-prestige-icon, .ib-icon-btn, .ib-upgrade-buy")) playClickSound();
+    if (event.target.closest(".track, .filter, .control, .toggle-btn, .ib-shop-btn, .ib-mini-toggle, .ib-prestige-icon, .ib-icon-btn, .ib-upgrade-buy")) playClickSound();
 }, true);
+
+// --- MEDIA PLAYER SYSTEM ---
+const trackData = [
+    { title: "8-Bit Dreams", genre: "Retro / Chiptune", cat: "Retro", src: "Retro.mp3" },
+    { title: "Pixel Quest", genre: "Arcade Theme", cat: "Retro", src: "Retro2.mp3" },
+    { title: "Epic Odyssey", genre: "Orchestral Sweep", cat: "Cinematic", src: "Cinematic.mp3" },
+    { title: "Rising Hope", genre: "Dramatic Strings", cat: "Cinematic", src: "Cinematic2.mp3" },
+    { title: "Cozy Farming", genre: "Lo-Fi Acoustic", cat: "Simulator", src: "Simulator.mp3" },
+    { title: "City Builder", genre: "Chill Ambient", cat: "Simulator", src: "Simulator2.mp3" },
+    { title: "Final Showdown", genre: "Heavy Rock Electro", cat: "Boss Fight", src: "BossFight.mp3" },
+    { title: "Dark Awakening", genre: "Aggressive Synth", cat: "Boss Fight", src: "BossFight2.mp3" }
+];
+
+const musicList = document.getElementById('musicList');
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const playerTitle = document.getElementById('playerTitle');
+const playerGenre = document.getElementById('playerGenre');
+const progress = document.getElementById('progress');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+const volumeEl = document.getElementById('volume');
+const playerStatus = document.getElementById('playerStatus');
+
+let currentTrackIndex = -1;
+let currentFilteredList = [...trackData];
+
+function renderTracks(filterCategory = 'all') {
+    musicList.innerHTML = '';
+    currentFilteredList = filterCategory === 'all' 
+        ? trackData 
+        : trackData.filter(t => t.cat === filterCategory);
+
+    currentFilteredList.forEach((track, index) => {
+        const div = document.createElement('div');
+        div.className = 'track';
+        if (currentTrackIndex !== -1 && trackData[currentTrackIndex].title === track.title) {
+            div.classList.add('active');
+            if (!audio.paused) div.classList.add('playing');
+        }
+        div.innerHTML = `<span class="play-indicator"></span><span class="track-label">${track.title}</span>`;
+        div.addEventListener('click', () => loadAndPlayTrack(trackData.indexOf(track)));
+        musicList.appendChild(div);
+    });
+}
+
+function loadAndPlayTrack(index) {
+    if (index < 0 || index >= trackData.length) return;
+    currentTrackIndex = index;
+    const track = trackData[currentTrackIndex];
+    
+    audio.src = track.src;
+    playerTitle.textContent = track.title;
+    playerGenre.textContent = `${track.cat} • ${track.genre}`;
+    playerStatus.textContent = `Playing: ${track.title}`;
+    
+    audio.play().then(() => {
+        playBtn.textContent = '⏸';
+    }).catch(() => {
+        playerStatus.textContent = `Error loading: ${track.title}`;
+        playBtn.textContent = '▶';
+    });
+
+    renderTracks(document.querySelector('.filter.active').dataset.filter);
+}
+
+playBtn.addEventListener('click', () => {
+    if (currentTrackIndex === -1) {
+        if (trackData.length > 0) loadAndPlayTrack(0);
+        return;
+    }
+    if (audio.paused) {
+        audio.play();
+        playBtn.textContent = '⏸';
+        playerStatus.textContent = `Playing: ${trackData[currentTrackIndex].title}`;
+    } else {
+        audio.pause();
+        playBtn.textContent = '▶';
+        playerStatus.textContent = 'Paused';
+    }
+    renderTracks(document.querySelector('.filter.active').dataset.filter);
+});
+
+prevBtn.addEventListener('click', () => {
+    if (currentTrackIndex > 0) loadAndPlayTrack(currentTrackIndex - 1);
+    else loadAndPlayTrack(trackData.length - 1);
+});
+
+nextBtn.addEventListener('click', () => {
+    if (currentTrackIndex < trackData.length - 1) loadAndPlayTrack(currentTrackIndex + 1);
+    else loadAndPlayTrack(0);
+});
+
+audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    progress.value = (audio.currentTime / audio.duration) * 100;
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+    durationEl.textContent = formatTime(audio.duration);
+});
+
+progress.addEventListener('input', () => {
+    if (audio.duration) audio.currentTime = (progress.value / 100) * audio.duration;
+});
+
+volumeEl.addEventListener('input', () => {
+    audio.volume = volumeEl.value;
+});
+
+audio.addEventListener('ended', () => {
+    nextBtn.click();
+});
+
+function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+document.getElementById('musicFilters').addEventListener('click', e => {
+    if (!e.target.classList.contains('filter')) return;
+    document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
+    e.target.classList.add('active');
+    renderTracks(e.target.dataset.filter);
+});
+
+renderTracks('all');
 
 // --- VIEW TOGGLE LOGIC ---
 const playerWin = document.getElementById('playerWindow');
@@ -516,7 +637,6 @@ function spawnBricks() {
 function addBall(type) {
     if (ib_balls.length >= IB_MAX_BALLS) return;
     
-    // Default angles for Bouncer and Spread
     let dx = (Math.random() > 0.5 ? 1 : -1) * (100 + Math.random() * 50);
     let dy = -150 - Math.random() * 50;
 
@@ -546,7 +666,6 @@ function updateUI() {
     document.getElementById("levelDisplay").textContent = ib_level;
     document.getElementById("ballsCount").textContent = ib_balls.length;
     
-    // Top Bar Buttons
     document.getElementById('btnBuyBouncer').disabled = ib_money < ib_costs.bouncer;
     document.getElementById('btnBuySpread').disabled = ib_money < ib_costs.spread;
     document.getElementById('btnBuySniper').disabled = ib_money < ib_costs.sniper;
@@ -558,7 +677,6 @@ function updateUI() {
     document.getElementById("btnPrestige").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
     document.getElementById("btnPrestigeIcon").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
 
-    // Upgrades Modal
     document.getElementById('btnUpgBouncerDmg').disabled = ib_money < ib_costs.bouncerDmg;
     document.getElementById('btnUpgBouncerSpeed').disabled = ib_money < ib_costs.bouncerSpeed;
     document.getElementById('valBouncerDmg').textContent = ib_stats.bouncer.dmg;
@@ -591,7 +709,6 @@ function updateUI() {
     document.getElementById("valPrestige").textContent = ib_prestigeMult.toFixed(1);
 }
 
-// Upgrade Listeners
 document.getElementById('btnBuyBouncer').addEventListener('click', () => buyBall('bouncer'));
 document.getElementById('btnBuySpread').addEventListener('click', () => buyBall('spread'));
 document.getElementById('btnBuySniper').addEventListener('click', () => buyBall('sniper'));
@@ -630,7 +747,6 @@ document.getElementById("btnBuyCrit").addEventListener("click", () => {
     }
 });
 
-// Modals and Settings
 document.getElementById('btnUpgradesInfo').addEventListener('click', () => document.getElementById('upgradesOverlay').style.display = 'flex');
 document.getElementById('closeUpgrades').addEventListener('click', () => document.getElementById('upgradesOverlay').style.display = 'none');
 document.getElementById("btnSettings").addEventListener("click", () => showToast("Settings coming soon!"));
@@ -653,7 +769,6 @@ function doPrestige() {
 document.getElementById("btnPrestige").addEventListener("click", doPrestige);
 document.getElementById("btnPrestigeIcon").addEventListener("click", doPrestige);
 
-// Click Damage
 canvas.addEventListener("mousedown", (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -718,13 +833,11 @@ function ib_update(dt) {
         ball.x += ball.dx * (ball.type === 'sniper' ? 1 : speedMult) * dt;
         ball.y += ball.dy * (ball.type === 'sniper' ? 1 : speedMult) * dt;
 
-        // Walls
         if (ball.x - ball.r < 0) { ball.x = ball.r; ball.dx *= -1; }
         if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.dx *= -1; }
         if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy *= -1; }
         if (ball.y + ball.r > canvas.height) { ball.y = canvas.height - ball.r; ball.dy *= -1; }
 
-        // Bricks
         for (let i = 0; i < ib_bricks.length; i++) {
             let b = ib_bricks[i];
             
@@ -736,16 +849,15 @@ function ib_update(dt) {
             
             if (Math.sqrt((distX*distX) + (distY*distY)) <= ball.r) {
                 if (ball.type === 'sniper') {
-                    ball.dx *= -1.5; // bounce back aggressively
+                    ball.dx *= -1.5;
                     ball.dy *= -1.5;
-                    ball.cooldown = 0.3; // short delay before locking next target
+                    ball.cooldown = 0.3;
                     b.hp -= baseDmg;
                 } else {
                     if (Math.abs(distX) > Math.abs(distY)) ball.dx *= -1; else ball.dy *= -1;
                     b.hp -= baseDmg;
                     
                     if (ball.type === 'spread') {
-                        // Apply 30% damage to nearby bricks (within ~65px distance to center)
                         for (let j = 0; j < ib_bricks.length; j++) {
                             if (i !== j && Math.abs(ib_bricks[j].x - b.x) <= 60 && Math.abs(ib_bricks[j].y - b.y) <= 30) {
                                 ib_bricks[j].hp -= Math.max(1, Math.floor(baseDmg * 0.3));
@@ -755,7 +867,7 @@ function ib_update(dt) {
                     }
                 }
                 if (b.hp <= 0) b.dead = true;
-                break; // One collision per frame
+                break;
             }
         }
     }
