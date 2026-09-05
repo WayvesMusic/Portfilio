@@ -394,251 +394,58 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* Idle Breakout Styles */
-.canvas-container {
-    width: 100%;
-    background: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 8px;
-}
+.canvas-container { width: 100%; background: #000; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
+canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: crosshair; }
 
-canvas {
-    display: block;
-    width: 100%;
-    max-width: 380px;
-    height: auto;
-    cursor: crosshair;
-}
-
-/* --- Idle Breakout HUD / Shop --- */
 .ib-toolbar { padding: 6px; margin-bottom: 8px; }
-
-.ib-shop-row {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 6px;
-}
-
+.ib-shop-row { display: flex; gap: 5px; margin-bottom: 6px; }
 .ib-shop-btn {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    flex: 1 1 0;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    padding: 5px 2px;
-    border: 0;
-    color: var(--text);
-    cursor: pointer;
+    -webkit-appearance: none; -webkit-tap-highlight-color: transparent; flex: 1 1 0; min-width: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    padding: 5px 2px; border: 0; color: var(--text); cursor: pointer;
 }
-
 .ib-shop-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ib-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #000; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #000; line-height: 1; }
+.ib-price { font: 700 10px "Courier New", monospace; padding: 1px 5px; background: var(--lcd-bg); color: var(--lcd-text); white-space: nowrap; }
 
-.ib-icon-circle {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 2px solid #000;
-    display: grid;
-    place-items: center;
-    font-size: 10px;
-    font-weight: 700;
-    color: #000;
-    line-height: 1;
-}
-
-.ib-price {
-    font: 700 10px "Courier New", monospace;
-    padding: 1px 5px;
-    background: var(--lcd-bg);
-    color: var(--lcd-text);
-    white-space: nowrap;
-}
-
-.ib-balls-box {
-    flex: 0 0 62px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 2px;
-    gap: 1px;
-}
-
+.ib-balls-box { flex: 0 0 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3px 2px; gap: 1px; }
 .ib-balls-box span:first-child { font: 700 13px "Courier New", monospace; }
 .ib-balls-label { font-size: 8px; letter-spacing: .04em; color: var(--muted); }
 
-.ib-status-row {
-    display: flex;
-    align-items: stretch;
-    gap: 5px;
-    flex-wrap: wrap;
-}
-
-.ib-box {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2px 10px;
-    gap: 1px;
-}
-
+.ib-status-row { display: flex; align-items: stretch; gap: 5px; flex-wrap: wrap; }
+.ib-box { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px 10px; gap: 1px; }
 .ib-box-label { font-size: 8px; letter-spacing: .04em; color: var(--muted); }
 .ib-box-value { font-size: 15px; font-weight: 700; line-height: 1; }
-
-.ib-stack {
-    flex: 1 1 90px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    justify-content: center;
-}
-
-.ib-mini-toggle {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    height: 16px;
-    font: 700 9px Tahoma, sans-serif;
-    border: 0;
-    color: var(--text);
-    cursor: pointer;
-    letter-spacing: .02em;
-}
-
+.ib-stack { flex: 1 1 90px; display: flex; flex-direction: column; gap: 3px; justify-content: center; }
+.ib-mini-toggle { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; height: 16px; font: 700 9px Tahoma, sans-serif; border: 0; color: var(--text); cursor: pointer; letter-spacing: .02em; }
 .ib-mini-toggle:disabled { color: var(--shadow); cursor: not-allowed; }
-
-.ib-prestige-icon {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    flex: 0 0 30px;
-    border: 0;
-    font-size: 12px;
-    color: var(--text);
-    cursor: pointer;
-}
-
+.ib-prestige-icon { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; flex: 0 0 30px; border: 0; font-size: 12px; color: var(--text); cursor: pointer; }
 .ib-prestige-icon:disabled { opacity: .5; cursor: not-allowed; }
 
-.ib-money-box {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    padding: 2px 8px;
-}
-
+.ib-money-box { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 3px; padding: 2px 8px; }
 .ib-money-box span { color: var(--lcd-text); font-family: "Courier New", monospace; font-weight: 700; font-size: 14px; }
-
-.ib-effects-box {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-
+.ib-effects-box { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .ib-effects-label { font-size: 8px; letter-spacing: .04em; color: var(--muted); }
 .ib-effects-icons { display: flex; gap: 2px; }
+.ib-icon-btn { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; width: 20px; height: 17px; border: 0; font-size: 10px; color: var(--text); cursor: pointer; }
 
-.ib-icon-btn {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    width: 20px;
-    height: 17px;
-    border: 0;
-    font-size: 10px;
-    color: var(--text);
-    cursor: pointer;
+.ib-shop-btn:active:not(:disabled), .ib-mini-toggle:active:not(:disabled), .ib-prestige-icon:active:not(:disabled), .ib-icon-btn:active {
+    box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px);
 }
 
-.ib-shop-btn:active:not(:disabled),
-.ib-mini-toggle:active:not(:disabled),
-.ib-prestige-icon:active:not(:disabled),
-.ib-icon-btn:active {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow) !important;
-    transform: translate(1px, 1px);
-}
-
-/* --- Upgrades Dialog --- */
-.ib-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 12px;
-    z-index: 600;
-}
-
-.ib-modal {
-    width: 100%;
-    max-width: 340px;
-    padding: 3px;
-}
-
+.ib-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .4); display: flex; align-items: center; justify-content: center; padding: 20px 12px; z-index: 600; }
+.ib-modal { width: 100%; max-width: 340px; padding: 3px; }
 .ib-modal .title-bar-controls span { cursor: pointer; pointer-events: auto; }
-
-.ib-upgrade-list {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    padding: 2px;
-}
-
-.ib-upgrade-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 7px 8px;
-    border-bottom: 1px solid var(--shadow);
-}
-
+.ib-upgrade-list { display: flex; flex-direction: column; background: #fff; padding: 2px; max-height: 250px; overflow-y: auto; }
+.ib-upgrade-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 8px; border-bottom: 1px solid var(--shadow); }
 .ib-upgrade-row:last-child { border-bottom: 0; }
-
 .ib-upgrade-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ib-upgrade-name { font-weight: 700; font-size: 11px; }
 .ib-upgrade-val { font-size: 10px; color: var(--muted); }
-
-.ib-upgrade-buy {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    border: 0;
-    padding: 4px 8px;
-    font: 700 10px Tahoma, sans-serif;
-    color: var(--text);
-    cursor: pointer;
-}
-
+.ib-upgrade-buy { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 0; padding: 4px 8px; font: 700 10px Tahoma, sans-serif; color: var(--text); cursor: pointer; }
 .ib-upgrade-buy:disabled { color: var(--shadow); cursor: not-allowed; }
-
 .ib-upgrade-buy .ib-price { display: block; margin-top: 1px; }
-
-.ib-upgrade-buy:active:not(:disabled) {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow) !important;
-    transform: translate(1px, 1px);
-}
+.ib-upgrade-buy:active:not(:disabled) { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 
 @media (pointer: fine) and (hover: hover) {
     body.custom-cursor-ready { cursor: none; }
@@ -749,27 +556,23 @@ body.custom-cursor-ready .custom-cursor { display: block; }
     <div class="player-wrap raised" id="gameWindow" style="display:none">
         <div class="title-bar">
             <span class="title-bar-text">Idle Breakout</span>
-            <div class="title-bar-controls">
-                <span class="raised">_</span>
-                <span class="raised">□</span>
-                <span class="raised">✕</span>
-            </div>
+            <div class="title-bar-controls"><span class="raised">_</span><span class="raised">□</span><span class="raised">✕</span></div>
         </div>
-
         <div class="window-body">
             <div class="ib-toolbar raised">
+                <!-- 3 BALL SHOP BUTTONS -->
                 <div class="ib-shop-row">
-                    <button class="ib-shop-btn" id="btnBuyBall" title="Buy Ball">
-                        <span class="ib-icon-circle" style="background:#ffe135;">●</span>
-                        <span class="ib-price" id="priceBall">$10</span>
+                    <button class="ib-shop-btn" id="btnBuyBouncer" title="Buy Bouncer Ball">
+                        <span class="ib-icon-circle" style="background:#ffe135;">B</span>
+                        <span class="ib-price" id="priceBouncer">$10</span>
                     </button>
-                    <button class="ib-shop-btn" id="btnUpgradeDmg" title="Ball Damage">
-                        <span class="ib-icon-circle" style="background:#ff8c42;">◆</span>
-                        <span class="ib-price" id="priceDmg">$25</span>
+                    <button class="ib-shop-btn" id="btnBuySpread" title="Buy Spread Ball">
+                        <span class="ib-icon-circle" style="background:#35ff8c;">S</span>
+                        <span class="ib-price" id="priceSpread">$50</span>
                     </button>
-                    <button class="ib-shop-btn" id="btnUpgradeClick" title="Click Damage">
-                        <span class="ib-icon-circle" style="background:#ff4d6d;">✚</span>
-                        <span class="ib-price" id="priceClick">$15</span>
+                    <button class="ib-shop-btn" id="btnBuySniper" title="Buy Sniper Ball">
+                        <span class="ib-icon-circle" style="background:#ff3535;">X</span>
+                        <span class="ib-price" id="priceSniper">$200</span>
                     </button>
                     <div class="ib-balls-box sunken">
                         <span><span id="ballsCount">0</span>/<span id="ballsMax">50</span></span>
@@ -804,56 +607,90 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <canvas id="gameCanvas" width="380" height="240"></canvas>
             </div>
         </div>
-
-        <div class="status-bar sunken" id="gameStatus">Click bricks to deal damage. Buy balls & upgrades to automate!</div>
+        <div class="status-bar sunken" id="gameStatus">Click bricks to deal damage. Buy balls & upgrades!</div>
     </div>
 
     <button class="toggle-btn raised" id="toggleBtn">Play Game</button>
-
 </div>
 
+<!-- UPGRADES MODAL -->
 <div class="ib-modal-overlay" id="upgradesOverlay" style="display:none">
     <div class="ib-modal raised">
         <div class="title-bar">
-            <span class="title-bar-text">Upgrades</span>
+            <span class="title-bar-text">Upgrades Shop</span>
             <div class="title-bar-controls">
                 <span class="raised" id="closeUpgrades">✕</span>
             </div>
         </div>
         <div class="window-body">
             <div class="ib-upgrade-list sunken">
+                <!-- BOUNCER UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
-                        <span class="ib-upgrade-name">Ball Speed</span>
-                        <span class="ib-upgrade-val">Multiplier: x<span id="valSpeed">1.00</span></span>
+                        <span class="ib-upgrade-name">Bouncer Damage</span>
+                        <span class="ib-upgrade-val">Level <span id="valBouncerDmg">1</span></span>
                     </div>
-                    <button class="ib-upgrade-buy raised" id="btnBuySpeed">Buy<span class="ib-price" id="priceSpeed">$20</span></button>
+                    <button class="ib-upgrade-buy raised" id="btnUpgBouncerDmg">Buy<span class="ib-price" id="priceBouncerDmg">$25</span></button>
                 </div>
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
-                        <span class="ib-upgrade-name">Ball Damage</span>
-                        <span class="ib-upgrade-val">Level <span id="valBallDmg">1</span></span>
+                        <span class="ib-upgrade-name">Bouncer Speed</span>
+                        <span class="ib-upgrade-val">Multiplier: x<span id="valBouncerSpeed">1.00</span></span>
                     </div>
-                    <button class="ib-upgrade-buy raised" id="btnModalBallDmg">Buy<span class="ib-price" id="priceBallDmgModal">$25</span></button>
+                    <button class="ib-upgrade-buy raised" id="btnUpgBouncerSpeed">Buy<span class="ib-price" id="priceBouncerSpeed">$20</span></button>
                 </div>
+
+                <!-- SPREAD UPGRADES -->
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Spread Damage</span>
+                        <span class="ib-upgrade-val">Level <span id="valSpreadDmg">2</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgSpreadDmg">Buy<span class="ib-price" id="priceSpreadDmg">$100</span></button>
+                </div>
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Spread Speed</span>
+                        <span class="ib-upgrade-val">Multiplier: x<span id="valSpreadSpeed">1.00</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgSpreadSpeed">Buy<span class="ib-price" id="priceSpreadSpeed">$80</span></button>
+                </div>
+
+                <!-- SNIPER UPGRADES -->
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Sniper Damage</span>
+                        <span class="ib-upgrade-val">Level <span id="valSniperDmg">5</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgSniperDmg">Buy<span class="ib-price" id="priceSniperDmg">$400</span></button>
+                </div>
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Sniper Speed</span>
+                        <span class="ib-upgrade-val">Multiplier: x<span id="valSniperSpeed">1.00</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgSniperSpeed">Buy<span class="ib-price" id="priceSniperSpeed">$300</span></button>
+                </div>
+
+                <!-- GLOBAL UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Click Damage</span>
                         <span class="ib-upgrade-val">Level <span id="valClickDmg">1</span></span>
                     </div>
-                    <button class="ib-upgrade-buy raised" id="btnModalClickDmg">Buy<span class="ib-price" id="priceClickDmgModal">$15</span></button>
+                    <button class="ib-upgrade-buy raised" id="btnUpgClick">Buy<span class="ib-price" id="priceClickDmg">$15</span></button>
                 </div>
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Critical Click Chance</span>
-                        <span class="ib-upgrade-val"><span id="valCrit">0</span>% chance for 3x click damage</span>
+                        <span class="ib-upgrade-val"><span id="valCrit">0</span>% chance for 3x damage</span>
                     </div>
                     <button class="ib-upgrade-buy raised" id="btnBuyCrit">Buy<span class="ib-price" id="priceCrit">$30</span></button>
                 </div>
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Prestige Multiplier</span>
-                        <span class="ib-upgrade-val">x<span id="valPrestige">1.0</span> money from all sources</span>
+                        <span class="ib-upgrade-val">x<span id="valPrestige">1.0</span> from all sources</span>
                     </div>
                     <span class="ib-upgrade-val" style="align-self:center;">Prestige to raise</span>
                 </div>
@@ -1052,6 +889,7 @@ const cursorQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
 const customCursor = document.getElementById("customCursor");
 
 function enableCustomCursor() {
+    if (!customCursor) return;
     document.body.classList.add("custom-cursor-ready");
     document.addEventListener("mousemove", moveCustomCursor);
 }
@@ -1095,6 +933,7 @@ toggleBtn.addEventListener("click", () => {
 });
 
 
+// --- IDLE BREAKOUT LOGIC ---
 // --- IDLE BREAKOUT ENGINE ---
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -1492,16 +1331,6 @@ function ib_loop(time) {
     ib_update(dt);
     ib_draw();
     ib_reqId = requestAnimationFrame(ib_loop);
-}
-
-// --- CURSOR LOGIC ---
-const cursorQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
-const customCursor = document.getElementById("customCursor");
-if (cursorQuery.matches) {
-    document.body.classList.add("custom-cursor-ready");
-    document.addEventListener("mousemove", e => {
-        customCursor.style.transform = `translate(${e.clientX - 4}px, ${e.clientY - 2}px)`;
-    });
 }
 </script>
 </body>
