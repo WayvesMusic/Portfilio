@@ -47,26 +47,15 @@ body {
 
 .raised {
     background: var(--face);
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
+    box-shadow: inset -1px -1px 0 var(--dark-shadow), inset 1px 1px 0 var(--highlight), inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--light);
 }
 
 .sunken {
     background: var(--face);
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow);
+    box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow);
 }
 
-.player-wrap {
-    width: 100%;
-    padding: 3px;
-}
+.player-wrap { width: 100%; padding: 3px; }
 
 .title-bar {
     display: flex;
@@ -79,597 +68,129 @@ body {
     color: #fff;
 }
 
-.title-bar-text {
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: .01em;
-}
-
-.title-bar-controls {
-    display: flex;
-    gap: 3px;
-    pointer-events: none;
-}
-
-.title-bar-controls span {
-    width: 16px;
-    height: 14px;
-    display: grid;
-    place-items: center;
-    font-size: 10px;
-    line-height: 1;
-    color: #000;
-}
-
+.title-bar-text { font-weight: 700; font-size: 12px; letter-spacing: .01em; }
+.title-bar-controls { display: flex; gap: 3px; pointer-events: none; }
+.title-bar-controls span { width: 16px; height: 14px; display: grid; place-items: center; font-size: 10px; line-height: 1; color: #000; }
 .window-body { padding: 8px; }
 
-/* Player Styles */
-.filters {
-    display: flex;
-    flex-wrap: nowrap;
-    width: 100%;
-    gap: 2px;
-    margin-bottom: 8px;
-}
-
+.filters { display: flex; flex-wrap: nowrap; width: 100%; gap: 2px; margin-bottom: 8px; }
 .filter {
-    -webkit-appearance: none;
-    appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    flex: 1 1 0;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    height: 24px;
-    padding: 0 4px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    font: 700 clamp(.56rem, 2.2vw, .75rem) Tahoma, "MS Sans Serif", sans-serif;
-    color: var(--text);
-    cursor: pointer;
+    -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent;
+    flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    height: 24px; padding: 0 4px; display: inline-flex; align-items: center; justify-content: center;
+    border: 0; font: 700 clamp(.56rem, 2.2vw, .75rem) Tahoma, sans-serif; color: var(--text); cursor: pointer;
 }
-
 .filter:focus { outline: none; }
 .filter:active { transform: translate(1px, 1px); }
+.filter.active { background: var(--navy); color: #fff; }
 
-.filter.active {
-    background: var(--navy);
-    color: #fff;
-}
-
-.tracks {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    padding: 2px;
-    max-height: 260px;
-    overflow-y: auto;
-}
-
-.track {
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-height: 26px;
-    padding: 3px 8px;
-    color: var(--text);
-    cursor: pointer;
-}
-
+.tracks { display: flex; flex-direction: column; background: #fff; padding: 2px; max-height: 260px; overflow-y: auto; }
+.track { -webkit-tap-highlight-color: transparent; position: relative; display: flex; align-items: center; gap: 6px; min-height: 26px; padding: 3px 8px; color: var(--text); cursor: pointer; }
 .track:hover { background: #dcdcdc; }
-
-.track.active {
-    background: var(--navy);
-    color: #fff;
-}
-
-.track-label {
-    font: 400 12px Tahoma, "MS Sans Serif", sans-serif;
-}
-
-.play-indicator {
-    width: 0;
-    height: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-left: 7px solid #fff;
-    visibility: hidden;
-    flex: 0 0 auto;
-}
-
+.track.active { background: var(--navy); color: #fff; }
+.track-label { font: 400 12px Tahoma, sans-serif; }
+.play-indicator { width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid #fff; visibility: hidden; flex: 0 0 auto; }
 .track.active.playing .play-indicator { visibility: visible; }
 
-.player {
-    margin-top: 8px;
-    padding: 8px;
-}
-
-.lcd {
-    padding: 8px 10px;
-    background: var(--lcd-bg);
-    color: var(--lcd-text);
-    font-family: "Courier New", monospace;
-    text-align: center;
-    overflow: hidden;
-}
-
-.player-title {
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.player-genre {
-    font-size: 10px;
-    margin-top: 2px;
-    opacity: .85;
-}
+.player { margin-top: 8px; padding: 8px; }
+.lcd { padding: 8px 10px; background: var(--lcd-bg); color: var(--lcd-text); font-family: "Courier New", monospace; text-align: center; overflow: hidden; }
+.player-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-genre { font-size: 10px; margin-top: 2px; opacity: .85; }
 
 .progress-wrap { margin-top: 10px; padding: 0 2px; }
-
 input[type="range"] {
-    width: 100%;
-    appearance: none;
-    -webkit-appearance: none;
-    height: 6px;
-    background: var(--face);
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow);
-    outline: none;
-    cursor: pointer;
-    margin: 6px 0;
+    width: 100%; appearance: none; -webkit-appearance: none; height: 6px; background: var(--face);
+    box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow);
+    outline: none; cursor: pointer; margin: 6px 0;
+}
+input[type="range"]::-webkit-slider-thumb, input[type="range"]::-moz-range-thumb {
+    -webkit-appearance: none; appearance: none; width: 12px; height: 16px; border: 0; background: var(--face);
+    box-shadow: inset -1px -1px 0 var(--dark-shadow), inset 1px 1px 0 var(--highlight), inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--light);
 }
 
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 12px;
-    height: 16px;
-    background: var(--face);
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
-}
-
-input[type="range"]::-moz-range-thumb {
-    width: 12px;
-    height: 16px;
-    border: 0;
-    background: var(--face);
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
-}
-
-.time-row {
-    display: flex;
-    justify-content: space-between;
-    color: var(--muted);
-    font-size: 11px;
-    padding: 0 2px;
-}
-
-.controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 10px;
-}
-
+.time-row { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; padding: 0 2px; }
+.controls { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; }
 .control {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    width: 36px;
-    height: 30px;
-    display: grid;
-    place-items: center;
-    border: 0;
-    background: var(--face);
-    color: var(--text);
-    font-size: 13px;
-    cursor: pointer;
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
+    -webkit-appearance: none; -webkit-tap-highlight-color: transparent; width: 36px; height: 30px; display: grid; place-items: center;
+    border: 0; background: var(--face); color: var(--text); font-size: 13px; cursor: pointer;
+    box-shadow: inset -1px -1px 0 var(--dark-shadow), inset 1px 1px 0 var(--highlight), inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--light);
 }
+.control:active { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow); transform: translate(1px, 1px); }
+.control.main { width: 46px; height: 34px; font-size: 14px; }
 
-.control:active {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow);
-    transform: translate(1px, 1px);
-}
-
-.control.main {
-    width: 46px;
-    height: 34px;
-    font-size: 14px;
-}
-
-.volume {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 12px;
-    padding: 0 2px;
-    color: var(--muted);
-    font-size: 11px;
-}
-
+.volume { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 0 2px; color: var(--muted); font-size: 11px; }
 .volume input { flex: 1; }
-
-.status-bar {
-    margin-top: 8px;
-    padding: 4px 6px;
-    font-size: 11px;
-    color: var(--muted);
-}
+.status-bar { margin-top: 8px; padding: 4px 6px; font-size: 11px; color: var(--muted); }
 
 .toast {
-    position: fixed;
-    left: 50%;
-    bottom: 24px;
-    transform: translate(-50%, 20px);
-    opacity: 0;
-    pointer-events: none;
-    padding: 8px 14px;
-    background: var(--face);
-    box-shadow:
-        inset -1px -1px 0 var(--dark-shadow),
-        inset 1px 1px 0 var(--highlight),
-        inset -2px -2px 0 var(--shadow),
-        inset 2px 2px 0 var(--light);
-    font-size: 12px;
-    color: var(--text);
-    transition: .15s ease;
-    max-width: 320px;
-    z-index: 500;
+    position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; padding: 8px 14px;
+    background: var(--face); box-shadow: inset -1px -1px 0 var(--dark-shadow), inset 1px 1px 0 var(--highlight), inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--light);
+    font-size: 12px; color: var(--text); transition: .15s ease; max-width: 320px; z-index: 500;
 }
-
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-.toggle-btn {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    width: 100%;
-    height: 34px;
-    border: 0;
-    font: 700 13px Tahoma, "MS Sans Serif", sans-serif;
-    color: var(--text);
-    cursor: pointer;
-}
-
-.toggle-btn:active {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow) !important;
-    transform: translate(1px, 1px);
-}
-
-.mini-btn {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    border: 0;
-    height: 24px;
-    padding: 0 10px;
-    font: 700 11px Tahoma, "MS Sans Serif", sans-serif;
-    color: var(--text);
-    cursor: pointer;
-}
-
-.mini-btn:active:not(:disabled) {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow) !important;
-    transform: translate(1px, 1px);
-}
-
-.mini-btn:disabled {
-    color: var(--shadow);
-    text-shadow: 1px 1px 0 var(--highlight);
-    cursor: not-allowed;
-}
+.toggle-btn { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; width: 100%; height: 34px; border: 0; font: 700 13px Tahoma, sans-serif; color: var(--text); cursor: pointer; }
+.toggle-btn:active { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 
 /* Idle Breakout Styles */
-.canvas-container {
-    width: 100%;
-    background: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 8px;
-}
+.canvas-container { width: 100%; background: #000; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
+canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: crosshair; }
 
-canvas {
-    display: block;
-    width: 100%;
-    max-width: 380px;
-    height: auto;
-    cursor: crosshair;
-}
-
-/* --- Idle Breakout HUD / Shop --- */
 .ib-toolbar { padding: 6px; margin-bottom: 8px; }
-
-.ib-shop-row {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 6px;
-}
-
+.ib-shop-row { display: flex; gap: 5px; margin-bottom: 6px; }
 .ib-shop-btn {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    flex: 1 1 0;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    padding: 5px 2px;
-    border: 0;
-    color: var(--text);
-    cursor: pointer;
+    -webkit-appearance: none; -webkit-tap-highlight-color: transparent; flex: 1 1 0; min-width: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    padding: 5px 2px; border: 0; color: var(--text); cursor: pointer;
 }
-
 .ib-shop-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ib-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #000; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #000; line-height: 1; }
+.ib-price { font: 700 10px "Courier New", monospace; padding: 1px 5px; background: var(--lcd-bg); color: var(--lcd-text); white-space: nowrap; }
 
-.ib-icon-circle {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 2px solid #000;
-    display: grid;
-    place-items: center;
-    font-size: 10px;
-    font-weight: 700;
-    color: #000;
-    line-height: 1;
-}
-
-.ib-price {
-    font: 700 10px "Courier New", monospace;
-    padding: 1px 5px;
-    background: var(--lcd-bg);
-    color: var(--lcd-text);
-    white-space: nowrap;
-}
-
-.ib-balls-box {
-    flex: 0 0 62px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 2px;
-    gap: 1px;
-}
-
+.ib-balls-box { flex: 0 0 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3px 2px; gap: 1px; }
 .ib-balls-box span:first-child { font: 700 13px "Courier New", monospace; }
 .ib-balls-label { font-size: 8px; letter-spacing: .04em; color: var(--muted); }
 
-.ib-status-row {
-    display: flex;
-    align-items: stretch;
-    gap: 5px;
-    flex-wrap: wrap;
-}
-
-.ib-box {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2px 10px;
-    gap: 1px;
-}
-
+.ib-status-row { display: flex; align-items: stretch; gap: 5px; flex-wrap: wrap; }
+.ib-box { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px 10px; gap: 1px; }
 .ib-box-label { font-size: 8px; letter-spacing: .04em; color: var(--muted); }
 .ib-box-value { font-size: 15px; font-weight: 700; line-height: 1; }
-
-.ib-stack {
-    flex: 1 1 90px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    justify-content: center;
-}
-
-.ib-mini-toggle {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    height: 16px;
-    font: 700 9px Tahoma, sans-serif;
-    border: 0;
-    color: var(--text);
-    cursor: pointer;
-    letter-spacing: .02em;
-}
-
+.ib-stack { flex: 1 1 90px; display: flex; flex-direction: column; gap: 3px; justify-content: center; }
+.ib-mini-toggle { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; height: 16px; font: 700 9px Tahoma, sans-serif; border: 0; color: var(--text); cursor: pointer; letter-spacing: .02em; }
 .ib-mini-toggle:disabled { color: var(--shadow); cursor: not-allowed; }
-
-.ib-prestige-icon {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    flex: 0 0 30px;
-    border: 0;
-    font-size: 12px;
-    color: var(--text);
-    cursor: pointer;
-}
-
+.ib-prestige-icon { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; flex: 0 0 30px; border: 0; font-size: 12px; color: var(--text); cursor: pointer; }
 .ib-prestige-icon:disabled { opacity: .5; cursor: not-allowed; }
 
-.ib-money-box {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    padding: 2px 8px;
-}
-
+.ib-money-box { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 3px; padding: 2px 8px; }
 .ib-money-box span { color: var(--lcd-text); font-family: "Courier New", monospace; font-weight: 700; font-size: 14px; }
-
-.ib-effects-box {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-
+.ib-effects-box { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .ib-effects-label { font-size: 8px; letter-spacing: .04em; color: var(--muted); }
 .ib-effects-icons { display: flex; gap: 2px; }
+.ib-icon-btn { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; width: 20px; height: 17px; border: 0; font-size: 10px; color: var(--text); cursor: pointer; }
 
-.ib-icon-btn {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    width: 20px;
-    height: 17px;
-    border: 0;
-    font-size: 10px;
-    color: var(--text);
-    cursor: pointer;
+.ib-shop-btn:active:not(:disabled), .ib-mini-toggle:active:not(:disabled), .ib-prestige-icon:active:not(:disabled), .ib-icon-btn:active {
+    box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px);
 }
 
-.ib-shop-btn:active:not(:disabled),
-.ib-mini-toggle:active:not(:disabled),
-.ib-prestige-icon:active:not(:disabled),
-.ib-icon-btn:active {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow) !important;
-    transform: translate(1px, 1px);
-}
-
-/* --- Upgrades Dialog --- */
-.ib-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 12px;
-    z-index: 600;
-}
-
-.ib-modal {
-    width: 100%;
-    max-width: 340px;
-    padding: 3px;
-}
-
+.ib-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .4); display: flex; align-items: center; justify-content: center; padding: 20px 12px; z-index: 600; }
+.ib-modal { width: 100%; max-width: 340px; padding: 3px; }
 .ib-modal .title-bar-controls span { cursor: pointer; pointer-events: auto; }
-
-.ib-upgrade-list {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    padding: 2px;
-    max-height: 320px;
-    overflow-y: auto;
-}
-
-.ib-upgrade-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 7px 8px;
-    border-bottom: 1px solid var(--shadow);
-}
-
+.ib-upgrade-list { display: flex; flex-direction: column; background: #fff; padding: 2px; max-height: 250px; overflow-y: auto; }
+.ib-upgrade-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 8px; border-bottom: 1px solid var(--shadow); }
 .ib-upgrade-row:last-child { border-bottom: 0; }
-
 .ib-upgrade-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ib-upgrade-name { font-weight: 700; font-size: 11px; }
 .ib-upgrade-val { font-size: 10px; color: var(--muted); }
-
-.ib-upgrade-buy {
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    border: 0;
-    padding: 4px 8px;
-    font: 700 10px Tahoma, sans-serif;
-    color: var(--text);
-    cursor: pointer;
-}
-
+.ib-upgrade-buy { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 0; padding: 4px 8px; font: 700 10px Tahoma, sans-serif; color: var(--text); cursor: pointer; }
 .ib-upgrade-buy:disabled { color: var(--shadow); cursor: not-allowed; }
-
 .ib-upgrade-buy .ib-price { display: block; margin-top: 1px; }
-
-.ib-upgrade-buy:active:not(:disabled) {
-    box-shadow:
-        inset -1px -1px 0 var(--highlight),
-        inset 1px 1px 0 var(--dark-shadow),
-        inset -2px -2px 0 var(--light),
-        inset 2px 2px 0 var(--shadow) !important;
-    transform: translate(1px, 1px);
-}
-
-.stats-section {
-    padding: 6px 8px;
-    background: var(--face);
-    font-size: 10px;
-    border-top: 1px solid var(--shadow);
-}
+.ib-upgrade-buy:active:not(:disabled) { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 
 @media (pointer: fine) and (hover: hover) {
     body.custom-cursor-ready { cursor: none; }
-    body.custom-cursor-ready a,
-    body.custom-cursor-ready button,
-    body.custom-cursor-ready .track,
-    body.custom-cursor-ready input[type="range"] { cursor: none; }
+    body.custom-cursor-ready a, body.custom-cursor-ready button, body.custom-cursor-ready .track, body.custom-cursor-ready input[type="range"] { cursor: none; }
 }
-
-.custom-cursor {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 20px;
-    height: 20px;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-1000px, -1000px);
-    will-change: transform;
-    display: none;
-}
-
+.custom-cursor { position: fixed; top: 0; left: 0; width: 20px; height: 20px; pointer-events: none; z-index: 9999; transform: translate(-1000px, -1000px); will-change: transform; display: none; }
 body.custom-cursor-ready .custom-cursor { display: block; }
 </style>
 </head>
@@ -677,16 +198,12 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 
 <div class="app-stack">
 
+    <!-- MEDIA PLAYER WINDOW -->
     <div class="player-wrap raised" id="playerWindow">
         <div class="title-bar">
             <span class="title-bar-text">Media Player</span>
-            <div class="title-bar-controls">
-                <span class="raised">_</span>
-                <span class="raised">□</span>
-                <span class="raised">✕</span>
-            </div>
+            <div class="title-bar-controls"><span class="raised">_</span><span class="raised">□</span><span class="raised">✕</span></div>
         </div>
-
         <div class="window-body">
             <div class="filters raised" id="musicFilters">
                 <button class="filter active" data-filter="all">All</button>
@@ -695,90 +212,55 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <button class="filter" data-filter="Simulator">Simulator</button>
                 <button class="filter" data-filter="Boss Fight">Boss Fight</button>
             </div>
-
             <div class="tracks sunken" id="musicList">
                 <div class="track" data-title="Retro" data-genre="Retro / Game" data-cat="Retro" data-src="Retro.mp3">
                     <span class="play-indicator"></span><span class="track-label">Retro</span>
                 </div>
-                <div class="track" data-title="Retro 1" data-genre="Retro / Game" data-cat="Retro" data-src="Retro%201.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Retro 1</span>
-                </div>
-                <div class="track" data-title="Cinematic" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Cinematic</span>
-                </div>
-                <div class="track" data-title="Cinematic 1" data-genre="Cinematic / Atmosphere" data-cat="Cinematic" data-src="Cinematic%201.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Cinematic 1</span>
-                </div>
-                <div class="track" data-title="Simulator" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Simulator</span>
-                </div>
-                <div class="track" data-title="Simulator 1" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%201.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Simulator 1</span>
-                </div>
-                <div class="track" data-title="Simulator 2" data-genre="Simulator / Gameplay" data-cat="Simulator" data-src="Simulator%202.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Simulator 2</span>
-                </div>
-                <div class="track" data-title="Boss Fight" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Boss Fight</span>
-                </div>
-                <div class="track" data-title="Boss Fight 1" data-genre="Boss Fight / Action" data-cat="Boss Fight" data-src="Boss%20Fight%201.mp3">
-                    <span class="play-indicator"></span><span class="track-label">Boss Fight 1</span>
-                </div>
             </div>
-
             <div class="player raised">
                 <div class="lcd sunken">
                     <div class="player-title" id="playerTitle">NO TRACK LOADED</div>
                     <div class="player-genre" id="playerGenre">SELECT A TRACK ABOVE</div>
                 </div>
-
                 <div class="progress-wrap">
                     <input id="progress" type="range" min="0" max="100" value="0" step=".1" aria-label="Track progress">
                     <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
                 </div>
-
                 <div class="controls">
                     <button class="control" id="prevBtn" aria-label="Previous track">◀◀</button>
                     <button class="control main" id="playBtn" aria-label="Play">▶</button>
                     <button class="control" id="nextBtn" aria-label="Next track">▶▶</button>
                 </div>
-
                 <div class="volume">
-                    <span>Vol</span>
-                    <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
+                    <span>Vol</span><input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
                 </div>
-
                 <audio id="audio" preload="metadata"></audio>
             </div>
-
             <div class="status-bar sunken">Ready</div>
         </div>
     </div>
 
+    <!-- IDLE BREAKOUT WINDOW -->
     <div class="player-wrap raised" id="gameWindow" style="display:none">
         <div class="title-bar">
             <span class="title-bar-text">Idle Breakout</span>
-            <div class="title-bar-controls">
-                <span class="raised">_</span>
-                <span class="raised">□</span>
-                <span class="raised">✕</span>
-            </div>
+            <div class="title-bar-controls"><span class="raised">_</span><span class="raised">□</span><span class="raised">✕</span></div>
         </div>
-
         <div class="window-body">
             <div class="ib-toolbar raised">
+                <!-- 3 BALL SHOP BUTTONS -->
                 <div class="ib-shop-row">
-                    <button class="ib-shop-btn raised" id="btnBuyBall" title="Buy Ball">
-                        <span class="ib-icon-circle" style="background:#ffe135;">●</span>
-                        <span class="ib-price" id="priceBall">$10</span>
+                    <button class="ib-shop-btn" id="btnBuyBouncer" title="Buy Bouncer Ball">
+                        <span class="ib-icon-circle" style="background:#ffe135;">B</span>
+                        <span class="ib-price" id="priceBouncer">$10</span>
                     </button>
-                    <button class="ib-shop-btn raised" id="btnUpgradeDmg" title="Ball Damage">
-                        <span class="ib-icon-circle" style="background:#ff8c42;">◆</span>
-                        <span class="ib-price" id="priceDmg">$25</span>
+                    <button class="ib-shop-btn" id="btnBuySpread" title="Buy Spread Ball">
+                        <span class="ib-icon-circle" style="background:#35ff8c;">S</span>
+                        <span class="ib-price" id="priceSpread">$50</span>
                     </button>
-                    <button class="ib-shop-btn raised" id="btnUpgradeClick" title="Click Damage">
-                        <span class="ib-icon-circle" style="background:#ff4d6d;">✚</span>
-                        <span class="ib-price" id="priceClick">$15</span>
+                    <button class="ib-shop-btn" id="btnBuySniper" title="Buy Sniper Ball">
+                        <span class="ib-icon-circle" style="background:#ff3535;">X</span>
+                        <span class="ib-price" id="priceSniper">$200</span>
                     </button>
                     <div class="ib-balls-box sunken">
                         <span><span id="ballsCount">0</span>/<span id="ballsMax">50</span></span>
@@ -813,71 +295,92 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <canvas id="gameCanvas" width="380" height="240"></canvas>
             </div>
         </div>
-
-        <div class="status-bar sunken" id="gameStatus">Click bricks to deal damage. Buy balls & upgrades to automate!</div>
+        <div class="status-bar sunken" id="gameStatus">Click bricks to deal damage. Buy balls & upgrades!</div>
     </div>
 
     <button class="toggle-btn raised" id="toggleBtn">Play Game</button>
-
 </div>
 
+<!-- UPGRADES MODAL -->
 <div class="ib-modal-overlay" id="upgradesOverlay" style="display:none">
     <div class="ib-modal raised">
         <div class="title-bar">
-            <span class="title-bar-text">Upgrades & Secret Stats</span>
+            <span class="title-bar-text">Upgrades Shop</span>
             <div class="title-bar-controls">
                 <span class="raised" id="closeUpgrades">✕</span>
             </div>
         </div>
         <div class="window-body">
             <div class="ib-upgrade-list sunken">
+                <!-- BOUNCER UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
-                        <span class="ib-upgrade-name">Ball Speed</span>
-                        <span class="ib-upgrade-val">Multiplier: x<span id="valSpeed">1.00</span></span>
+                        <span class="ib-upgrade-name">Bouncer Damage</span>
+                        <span class="ib-upgrade-val">Level <span id="valBouncerDmg">1</span></span>
                     </div>
-                    <button class="ib-upgrade-buy raised" id="btnBuySpeed">Buy<span class="ib-price" id="priceSpeed">$20</span></button>
+                    <button class="ib-upgrade-buy raised" id="btnUpgBouncerDmg">Buy<span class="ib-price" id="priceBouncerDmg">$25</span></button>
                 </div>
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
-                        <span class="ib-upgrade-name">Ball Damage</span>
-                        <span class="ib-upgrade-val">Level <span id="valBallDmg">1</span></span>
+                        <span class="ib-upgrade-name">Bouncer Speed</span>
+                        <span class="ib-upgrade-val">Multiplier: x<span id="valBouncerSpeed">1.00</span></span>
                     </div>
-                    <button class="ib-upgrade-buy raised" id="btnModalBallDmg">Buy<span class="ib-price" id="priceBallDmgModal">$25</span></button>
+                    <button class="ib-upgrade-buy raised" id="btnUpgBouncerSpeed">Buy<span class="ib-price" id="priceBouncerSpeed">$20</span></button>
                 </div>
+
+                <!-- SPREAD UPGRADES -->
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Spread Damage</span>
+                        <span class="ib-upgrade-val">Level <span id="valSpreadDmg">2</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgSpreadDmg">Buy<span class="ib-price" id="priceSpreadDmg">$100</span></button>
+                </div>
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Spread Speed</span>
+                        <span class="ib-upgrade-val">Multiplier: x<span id="valSpreadSpeed">1.00</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgSpreadSpeed">Buy<span class="ib-price" id="priceSpreadSpeed">$80</span></button>
+                </div>
+
+                <!-- SNIPER UPGRADES -->
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Sniper Damage</span>
+                        <span class="ib-upgrade-val">Level <span id="valSniperDmg">5</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgSniperDmg">Buy<span class="ib-price" id="priceSniperDmg">$400</span></button>
+                </div>
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Sniper Speed</span>
+                        <span class="ib-upgrade-val">Multiplier: x<span id="valSniperSpeed">1.00</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgSniperSpeed">Buy<span class="ib-price" id="priceSniperSpeed">$300</span></button>
+                </div>
+
+                <!-- GLOBAL UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Click Damage</span>
                         <span class="ib-upgrade-val">Level <span id="valClickDmg">1</span></span>
                     </div>
-                    <button class="ib-upgrade-buy raised" id="btnModalClickDmg">Buy<span class="ib-price" id="priceClickDmgModal">$15</span></button>
+                    <button class="ib-upgrade-buy raised" id="btnUpgClick">Buy<span class="ib-price" id="priceClickDmg">$15</span></button>
                 </div>
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Critical Click Chance</span>
-                        <span class="ib-upgrade-val"><span id="valCrit">0</span>% chance for 3x click damage</span>
+                        <span class="ib-upgrade-val"><span id="valCrit">0</span>% chance for 3x damage</span>
                     </div>
                     <button class="ib-upgrade-buy raised" id="btnBuyCrit">Buy<span class="ib-price" id="priceCrit">$30</span></button>
                 </div>
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
-                        <span class="ib-upgrade-name">Max Balls Limit</span>
-                        <span class="ib-upgrade-val">Max Balls: <span id="valMaxBalls">50</span></span>
-                    </div>
-                    <button class="ib-upgrade-buy raised" id="btnBuyMaxBalls">Buy<span class="ib-price" id="priceMaxBalls">$50</span></button>
-                </div>
-                <div class="ib-upgrade-row">
-                    <div class="ib-upgrade-info">
                         <span class="ib-upgrade-name">Prestige Multiplier</span>
-                        <span class="ib-upgrade-val">x<span id="valPrestige">1.0</span> money from all sources</span>
+                        <span class="ib-upgrade-val">x<span id="valPrestige">1.0</span> from all sources</span>
                     </div>
                     <span class="ib-upgrade-val" style="align-self:center;">Prestige to raise</span>
-                </div>
-                <div class="stats-section">
-                    <strong>GAME STATS</strong><br>
-                    Bricks Destroyed: <span id="statBricks">0</span><br>
-                    Total Earnings: $<span id="statEarned">0</span><br>
-                    Total Clicks: <span id="statClicks">0</span>
                 </div>
             </div>
         </div>
@@ -890,66 +393,16 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
 <script>
-// --- MEDIA PLAYER LOGIC ---
-const audio = document.getElementById("audio");
-const clickSound = document.getElementById("clickSound");
-const errorSound = document.getElementById("errorSound");
-const tracks = [...document.querySelectorAll(".track")];
-const filterButtons = [...document.querySelectorAll(".filter")];
-const playBtn = document.getElementById("playBtn");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-const progress = document.getElementById("progress");
-const volume = document.getElementById("volume");
-const playerTitle = document.getElementById("playerTitle");
-const playerGenre = document.getElementById("playerGenre");
-const currentTime = document.getElementById("currentTime");
-const duration = document.getElementById("duration");
+// --- UTILS & MEDIA PLAYER ---
 const toast = document.getElementById("toast");
-
-let currentIndex = -1;
 let toastTimer;
-let ib_muted = false;
-
-audio.volume = Number(volume.value);
+let ib_muted = false; 
 
 function playClickSound() {
     if (ib_muted) return;
     try {
-        const sound = clickSound.cloneNode(true);
+        const sound = document.getElementById("clickSound").cloneNode(true);
         sound.volume = 0.5;
-        sound.play().catch(() => {});
-    } catch {}
-}
-
-document.addEventListener("click", event => {
-    if (event.target.closest(".track, .filter, .control, .toggle-btn, .mini-btn, .ib-shop-btn, .ib-mini-toggle, .ib-prestige-icon, .ib-icon-btn, .ib-upgrade-buy")) playClickSound();
-}, true);
-
-function filterTracks(filter) {
-    tracks.forEach(track => {
-        track.style.display = (filter === "all" || track.dataset.cat === filter) ? "" : "none";
-    });
-}
-
-filterButtons.forEach(button => button.addEventListener("click", () => {
-    filterButtons.forEach(item => item.classList.remove("active"));
-    button.classList.add("active");
-    filterTracks(button.dataset.filter);
-}));
-
-function formatTime(seconds) {
-    if (!Number.isFinite(seconds)) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
-    return `${mins}:${secs}`;
-}
-
-function playErrorSound() {
-    if (ib_muted) return;
-    try {
-        const sound = errorSound.cloneNode(true);
-        sound.volume = 0.6;
         sound.play().catch(() => {});
     } catch {}
 }
@@ -959,559 +412,442 @@ function showToast(message) {
     toast.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
-    playErrorSound();
 }
 
-function setPlayingVisuals(playing) {
-    playBtn.textContent = playing ? "Ⅱ" : "▶";
-    playBtn.setAttribute("aria-label", playing ? "Pause" : "Play");
-    tracks.forEach(t => t.classList.toggle("playing", playing && t.classList.contains("active")));
-}
+document.addEventListener("click", event => {
+    if (event.target.closest(".track, .filter, .control, .toggle-btn, .mini-btn, .ib-shop-btn, .ib-mini-toggle, .ib-prestige-icon, .ib-icon-btn, .ib-upgrade-buy")) playClickSound();
+}, true);
 
-function selectTrack(index, autoplay = false) {
-    if (index < 0 || index >= tracks.length) return;
+// --- VIEW TOGGLE LOGIC ---
+const playerWin = document.getElementById('playerWindow');
+const gameWin = document.getElementById('gameWindow');
+const toggleBtn = document.getElementById('toggleBtn');
+let showingGame = false;
+let gameStarted = false;
 
-    currentIndex = index;
-    const track = tracks[index];
-    const title = track.dataset.title;
-    const genre = track.dataset.genre;
-    const src = track.dataset.src;
+toggleBtn.addEventListener('click', () => {
+    showingGame = !showingGame;
+    playerWin.style.display = showingGame ? 'none' : 'block';
+    gameWin.style.display = showingGame ? 'block' : 'none';
+    toggleBtn.textContent = showingGame ? 'Media Player' : 'Play Game';
 
-    tracks.forEach(item => item.classList.remove("active", "playing"));
-    track.classList.add("active");
-
-    playerTitle.textContent = title;
-    playerGenre.textContent = genre;
-
-    if (audio.src !== new URL(src, window.location.href).href) {
-        audio.src = src;
-        progress.value = 0;
-        currentTime.textContent = "0:00";
-        duration.textContent = "0:00";
-    }
-
-    if (autoplay) {
-        audio.play().then(() => setPlayingVisuals(true)).catch(() => {
-            setPlayingVisuals(false);
-            showToast("Audio could not start. Check that the MP3 file is beside index.html.");
-        });
+    if (showingGame) {
+        if (!gameStarted) { gameStarted = true; initIdleBreakout(); }
+        ib_lastTime = performance.now();
+        ib_reqId = requestAnimationFrame(ib_loop);
     } else {
-        setPlayingVisuals(false);
+        cancelAnimationFrame(ib_reqId);
+    }
+});
+
+// --- IDLE BREAKOUT ENGINE ---
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const IB_MAX_BALLS = 50;
+const IB_PRESTIGE_MIN_LEVEL = 5;
+const IB_CRIT_CAP = 50; 
+const IB_COLS = 6;
+const IB_ROWS = 4;
+const BRICK_W = 50;
+const BRICK_H = 20;
+const PADDING = 8;
+const OFFSET_X = 20;
+const OFFSET_Y = 20;
+
+let ib_money = 0;
+let ib_level = 1;
+let ib_clickDmg = 1;
+let ib_critChance = 0;
+let ib_prestigeMult = 1;
+let ib_balls = [];
+let ib_bricks = [];
+let ib_lastTime = 0;
+let ib_reqId = null;
+
+let ib_stats = {
+    bouncer: { dmg: 1, speed: 1 },
+    spread:  { dmg: 2, speed: 1 },
+    sniper:  { dmg: 5, speed: 1.5 }
+};
+
+let ib_costs = {
+    bouncer: 10, spread: 50, sniper: 200,
+    bouncerDmg: 25, bouncerSpeed: 20,
+    spreadDmg: 100, spreadSpeed: 80,
+    sniperDmg: 400, sniperSpeed: 300,
+    cDmg: 15, crit: 30
+};
+
+function initIdleBreakout() {
+    spawnBricks();
+    document.getElementById("ballsMax").textContent = IB_MAX_BALLS;
+    updateUI();
+}
+
+function spawnBricks() {
+    ib_bricks = [];
+    const baseHp = ib_level * 5;
+    for(let r = 0; r < IB_ROWS; r++) {
+        for(let c = 0; c < IB_COLS; c++) {
+            ib_bricks.push({
+                x: OFFSET_X + c * (BRICK_W + PADDING),
+                y: OFFSET_Y + r * (BRICK_H + PADDING),
+                w: BRICK_W, h: BRICK_H,
+                hp: baseHp + Math.floor(Math.random() * (ib_level * 5)),
+                maxHp: 0, isGold: false
+            });
+        }
+    }
+    ib_bricks.forEach(b => b.maxHp = b.hp);
+
+    if (ib_level % 10 === 0) {
+        const goldHp = ib_level * 60;
+        const gridBottom = OFFSET_Y + IB_ROWS * (BRICK_H + PADDING) - PADDING;
+        ib_bricks.push({
+            x: OFFSET_X, y: gridBottom + 16,
+            w: canvas.width - OFFSET_X * 2, h: 30,
+            hp: goldHp, maxHp: goldHp, isGold: true
+        });
+        showToast(`⭐ Gold Block appeared! HP: ${goldHp}`);
     }
 }
 
-function togglePlay() {
-    if (currentIndex === -1) {
-        selectTrack(0, true);
+function addBall(type) {
+    if (ib_balls.length >= IB_MAX_BALLS) return;
+    
+    // Default angles for Bouncer and Spread
+    let dx = (Math.random() > 0.5 ? 1 : -1) * (100 + Math.random() * 50);
+    let dy = -150 - Math.random() * 50;
+
+    ib_balls.push({
+        x: canvas.width / 2, y: canvas.height - 20,
+        dx: dx, dy: dy,
+        r: 4, type: type,
+        cooldown: 0
+    });
+}
+
+function buyBall(type) {
+    if (ib_balls.length >= IB_MAX_BALLS) {
+        showToast(`Max balls reached (${IB_MAX_BALLS}).`);
         return;
     }
-
-    if (audio.paused) {
-        audio.play().then(() => setPlayingVisuals(true)).catch(() => {
-            showToast("Audio could not start. Check the MP3 filename.");
-        });
-    } else {
-        audio.pause();
-        setPlayingVisuals(false);
+    if (ib_money >= ib_costs[type]) {
+        ib_money -= ib_costs[type];
+        addBall(type);
+        ib_costs[type] = Math.floor(ib_costs[type] * 1.5);
+        updateUI();
     }
 }
 
-function changeTrack(direction) {
-    if (!tracks.length) return;
-    const next = currentIndex === -1
-        ? 0
-        : (currentIndex + direction + tracks.length) % tracks.length;
-    selectTrack(next, true);
+function updateUI() {
+    document.getElementById("moneyDisplay").textContent = ib_money;
+    document.getElementById("levelDisplay").textContent = ib_level;
+    document.getElementById("ballsCount").textContent = ib_balls.length;
+    
+    // Top Bar Buttons
+    document.getElementById('btnBuyBouncer').disabled = ib_money < ib_costs.bouncer;
+    document.getElementById('btnBuySpread').disabled = ib_money < ib_costs.spread;
+    document.getElementById('btnBuySniper').disabled = ib_money < ib_costs.sniper;
+    
+    document.getElementById('priceBouncer').textContent = `$${ib_costs.bouncer}`;
+    document.getElementById('priceSpread').textContent = `$${ib_costs.spread}`;
+    document.getElementById('priceSniper').textContent = `$${ib_costs.sniper}`;
+
+    document.getElementById("btnPrestige").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
+    document.getElementById("btnPrestigeIcon").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
+
+    // Upgrades Modal
+    document.getElementById('btnUpgBouncerDmg').disabled = ib_money < ib_costs.bouncerDmg;
+    document.getElementById('btnUpgBouncerSpeed').disabled = ib_money < ib_costs.bouncerSpeed;
+    document.getElementById('valBouncerDmg').textContent = ib_stats.bouncer.dmg;
+    document.getElementById('valBouncerSpeed').textContent = ib_stats.bouncer.speed.toFixed(2);
+    document.getElementById('priceBouncerDmg').textContent = `$${ib_costs.bouncerDmg}`;
+    document.getElementById('priceBouncerSpeed').textContent = `$${ib_costs.bouncerSpeed}`;
+
+    document.getElementById('btnUpgSpreadDmg').disabled = ib_money < ib_costs.spreadDmg;
+    document.getElementById('btnUpgSpreadSpeed').disabled = ib_money < ib_costs.spreadSpeed;
+    document.getElementById('valSpreadDmg').textContent = ib_stats.spread.dmg;
+    document.getElementById('valSpreadSpeed').textContent = ib_stats.spread.speed.toFixed(2);
+    document.getElementById('priceSpreadDmg').textContent = `$${ib_costs.spreadDmg}`;
+    document.getElementById('priceSpreadSpeed').textContent = `$${ib_costs.spreadSpeed}`;
+
+    document.getElementById('btnUpgSniperDmg').disabled = ib_money < ib_costs.sniperDmg;
+    document.getElementById('btnUpgSniperSpeed').disabled = ib_money < ib_costs.sniperSpeed;
+    document.getElementById('valSniperDmg').textContent = ib_stats.sniper.dmg;
+    document.getElementById('valSniperSpeed').textContent = ib_stats.sniper.speed.toFixed(2);
+    document.getElementById('priceSniperDmg').textContent = `$${ib_costs.sniperDmg}`;
+    document.getElementById('priceSniperSpeed').textContent = `$${ib_costs.sniperSpeed}`;
+    
+    document.getElementById('btnUpgClick').disabled = ib_money < ib_costs.cDmg;
+    document.getElementById('valClickDmg').textContent = ib_clickDmg;
+    document.getElementById('priceClickDmg').textContent = `$${ib_costs.cDmg}`;
+
+    document.getElementById("btnBuyCrit").disabled = ib_critChance >= IB_CRIT_CAP || ib_money < ib_costs.crit;
+    document.getElementById("valCrit").textContent = ib_critChance;
+    document.getElementById("priceCrit").textContent = ib_critChance >= IB_CRIT_CAP ? "MAX" : `$${ib_costs.crit}`;
+    
+    document.getElementById("valPrestige").textContent = ib_prestigeMult.toFixed(1);
 }
 
-tracks.forEach((track, index) => {
-    track.addEventListener("click", () => {
-        if (currentIndex === index) togglePlay();
-        else selectTrack(index, false);
-    });
-});
+// Upgrade Listeners
+document.getElementById('btnBuyBouncer').addEventListener('click', () => buyBall('bouncer'));
+document.getElementById('btnBuySpread').addEventListener('click', () => buyBall('spread'));
+document.getElementById('btnBuySniper').addEventListener('click', () => buyBall('sniper'));
 
-playBtn.addEventListener("click", togglePlay);
-prevBtn.addEventListener("click", () => changeTrack(-1));
-nextBtn.addEventListener("click", () => changeTrack(1));
+function handleUpgrade(statObj, costKey, type, increment) {
+    if (ib_money >= ib_costs[costKey]) {
+        ib_money -= ib_costs[costKey];
+        statObj[type] += increment;
+        ib_costs[costKey] = Math.floor(ib_costs[costKey] * (type === 'dmg' || increment === 1 ? 1.6 : 1.5));
+        updateUI();
+    }
+}
 
-audio.addEventListener("timeupdate", () => {
-    if (audio.duration) progress.value = (audio.currentTime / audio.duration) * 100;
-    currentTime.textContent = formatTime(audio.currentTime);
-});
+document.getElementById('btnUpgBouncerDmg').addEventListener('click', () => handleUpgrade(ib_stats.bouncer, 'bouncerDmg', 'dmg', 1));
+document.getElementById('btnUpgBouncerSpeed').addEventListener('click', () => handleUpgrade(ib_stats.bouncer, 'bouncerSpeed', 'speed', 0.15));
+document.getElementById('btnUpgSpreadDmg').addEventListener('click', () => handleUpgrade(ib_stats.spread, 'spreadDmg', 'dmg', 2));
+document.getElementById('btnUpgSpreadSpeed').addEventListener('click', () => handleUpgrade(ib_stats.spread, 'spreadSpeed', 'speed', 0.15));
+document.getElementById('btnUpgSniperDmg').addEventListener('click', () => handleUpgrade(ib_stats.sniper, 'sniperDmg', 'dmg', 5));
+document.getElementById('btnUpgSniperSpeed').addEventListener('click', () => handleUpgrade(ib_stats.sniper, 'sniperSpeed', 'speed', 0.15));
 
-audio.addEventListener("loadedmetadata", () => {
-    duration.textContent = formatTime(audio.duration);
-});
-
-audio.addEventListener("play", () => setPlayingVisuals(true));
-audio.addEventListener("pause", () => setPlayingVisuals(false));
-
-audio.addEventListener("ended", () => {
-    if (currentIndex < tracks.length - 1) selectTrack(currentIndex + 1, true);
-    else {
-        audio.currentTime = 0;
-        setPlayingVisuals(false);
+document.getElementById('btnUpgClick').addEventListener('click', () => {
+    if (ib_money >= ib_costs.cDmg) {
+        ib_money -= ib_costs.cDmg;
+        ib_clickDmg++;
+        ib_costs.cDmg = Math.floor(ib_costs.cDmg * 1.4);
+        updateUI();
     }
 });
 
-audio.addEventListener("error", () => {
-    setPlayingVisuals(false);
-    showToast("Could not load this audio file.");
+document.getElementById("btnBuyCrit").addEventListener("click", () => {
+    if (ib_critChance < IB_CRIT_CAP && ib_money >= ib_costs.crit) {
+        ib_money -= ib_costs.crit;
+        ib_critChance = Math.min(IB_CRIT_CAP, ib_critChance + 5);
+        ib_costs.crit = Math.floor(ib_costs.crit * 1.6);
+        updateUI();
+    }
 });
 
-progress.addEventListener("input", () => {
-    if (audio.duration) audio.currentTime = (Number(progress.value) / 100) * audio.duration;
+// Modals and Settings
+document.getElementById('btnUpgradesInfo').addEventListener('click', () => document.getElementById('upgradesOverlay').style.display = 'flex');
+document.getElementById('closeUpgrades').addEventListener('click', () => document.getElementById('upgradesOverlay').style.display = 'none');
+document.getElementById("btnSettings").addEventListener("click", () => showToast("Settings coming soon!"));
+document.getElementById("btnMute").addEventListener("click", () => {
+    ib_muted = !ib_muted;
+    document.getElementById("btnMute").textContent = ib_muted ? "🔇" : "🔊";
+    showToast(ib_muted ? "Muted" : "Unmuted");
 });
 
-volume.addEventListener("input", () => {
-    audio.volume = Number(volume.value);
+function doPrestige() {
+    if (ib_level < IB_PRESTIGE_MIN_LEVEL) { showToast(`Reach level ${IB_PRESTIGE_MIN_LEVEL} to prestige.`); return; }
+    ib_prestigeMult = +(ib_prestigeMult + 0.1).toFixed(2);
+    ib_money = 0; ib_level = 1; ib_balls = []; ib_clickDmg = 1; ib_critChance = 0;
+    ib_stats = { bouncer: { dmg: 1, speed: 1 }, spread: { dmg: 2, speed: 1 }, sniper: { dmg: 5, speed: 1.5 } };
+    ib_costs = { bouncer: 10, spread: 50, sniper: 200, bouncerDmg: 25, bouncerSpeed: 20, spreadDmg: 100, spreadSpeed: 80, sniperDmg: 400, sniperSpeed: 300, cDmg: 15, crit: 30 };
+    spawnBricks();
+    updateUI();
+    showToast(`Prestiged! Multiplier now x${ib_prestigeMult.toFixed(1)}`);
+}
+document.getElementById("btnPrestige").addEventListener("click", doPrestige);
+document.getElementById("btnPrestigeIcon").addEventListener("click", doPrestige);
+
+// Click Damage
+canvas.addEventListener("mousedown", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+    for (let i = ib_bricks.length - 1; i >= 0; i--) {
+        let b = ib_bricks[i];
+        if (mouseX >= b.x && mouseX <= b.x + b.w && mouseY >= b.y && mouseY <= b.y + b.h) {
+            const isCrit = Math.random() * 100 < ib_critChance;
+            b.hp -= isCrit ? ib_clickDmg * 3 : ib_clickDmg;
+            playClickSound();
+            if(b.hp <= 0) b.dead = true;
+            break;
+        }
+    }
 });
 
+function processDeadBricks() {
+    let changed = false;
+    for (let i = ib_bricks.length - 1; i >= 0; i--) {
+        if (ib_bricks[i].dead) {
+            const b = ib_bricks[i];
+            const payout = b.isGold ? Math.floor(b.maxHp * ib_prestigeMult) : Math.max(1, Math.floor((b.maxHp / 2) * ib_prestigeMult));
+            ib_money += payout;
+            if (b.isGold) showToast(`⭐ Gold Block destroyed! +$${payout}`);
+            ib_bricks.splice(i, 1);
+            changed = true;
+        }
+    }
+    if (changed) {
+        updateUI();
+        if (ib_bricks.length === 0) { ib_level++; spawnBricks(); updateUI(); }
+    }
+}
+
+function ib_update(dt) {
+    for (let ball of ib_balls) {
+        let speedMult = ib_stats[ball.type].speed;
+        let baseDmg = ib_stats[ball.type].dmg;
+
+        if (ball.type === 'sniper') {
+            if (ball.cooldown > 0) {
+                ball.cooldown -= dt;
+            } else if (ib_bricks.length > 0) {
+                let nearest = ib_bricks[0];
+                let minDist = Infinity;
+                for(let b of ib_bricks) {
+                    let d = Math.hypot((b.x + b.w/2) - ball.x, (b.y + b.h/2) - ball.y);
+                    if (d < minDist) { minDist = d; nearest = b; }
+                }
+                let dx = (nearest.x + nearest.w/2) - ball.x;
+                let dy = (nearest.y + nearest.h/2) - ball.y;
+                let mag = Math.hypot(dx, dy);
+                if (mag > 0) {
+                    let speed = 180 * speedMult;
+                    ball.dx = (dx / mag) * speed;
+                    ball.dy = (dy / mag) * speed;
+                }
+            }
+        }
+
+        ball.x += ball.dx * (ball.type === 'sniper' ? 1 : speedMult) * dt;
+        ball.y += ball.dy * (ball.type === 'sniper' ? 1 : speedMult) * dt;
+
+        // Walls
+        if (ball.x - ball.r < 0) { ball.x = ball.r; ball.dx *= -1; }
+        if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.dx *= -1; }
+        if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy *= -1; }
+        if (ball.y + ball.r > canvas.height) { ball.y = canvas.height - ball.r; ball.dy *= -1; }
+
+        // Bricks
+        for (let i = 0; i < ib_bricks.length; i++) {
+            let b = ib_bricks[i];
+            
+            let testX = ball.x < b.x ? b.x : (ball.x > b.x + b.w ? b.x + b.w : ball.x);
+            let testY = ball.y < b.y ? b.y : (ball.y > b.y + b.h ? b.y + b.h : ball.y);
+            
+            let distX = ball.x - testX;
+            let distY = ball.y - testY;
+            
+            if (Math.sqrt((distX*distX) + (distY*distY)) <= ball.r) {
+                if (ball.type === 'sniper') {
+                    ball.dx *= -1.5; // bounce back aggressively
+                    ball.dy *= -1.5;
+                    ball.cooldown = 0.3; // short delay before locking next target
+                    b.hp -= baseDmg;
+                } else {
+                    if (Math.abs(distX) > Math.abs(distY)) ball.dx *= -1; else ball.dy *= -1;
+                    b.hp -= baseDmg;
+                    
+                    if (ball.type === 'spread') {
+                        // Apply 30% damage to nearby bricks (within ~65px distance to center)
+                        for (let j = 0; j < ib_bricks.length; j++) {
+                            if (i !== j && Math.abs(ib_bricks[j].x - b.x) <= 60 && Math.abs(ib_bricks[j].y - b.y) <= 30) {
+                                ib_bricks[j].hp -= Math.max(1, Math.floor(baseDmg * 0.3));
+                                if (ib_bricks[j].hp <= 0) ib_bricks[j].dead = true;
+                            }
+                        }
+                    }
+                }
+                if (b.hp <= 0) b.dead = true;
+                break; // One collision per frame
+            }
+        }
+    }
+
+    processDeadBricks();
+    ib_resolveBallCollisions();
+}
+
+function ib_resolveBallCollisions() {
+    for (let i = 0; i < ib_balls.length; i++) {
+        for (let j = i + 1; j < ib_balls.length; j++) {
+            const a = ib_balls[i], b = ib_balls[j];
+            const dx = b.x - a.x, dy = b.y - a.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const minDist = a.r + b.r;
+
+            if (dist > 0 && dist < minDist) {
+                const nx = dx / dist, ny = dy / dist;
+                const overlap = (minDist - dist) / 2;
+                a.x -= nx * overlap; a.y -= ny * overlap;
+                b.x += nx * overlap; b.y += ny * overlap;
+
+                const aDotN = a.dx * nx + a.dy * ny;
+                const bDotN = b.dx * nx + b.dy * ny;
+                const diff = bDotN - aDotN;
+                a.dx += diff * nx; a.dy += diff * ny;
+                b.dx -= diff * nx; b.dy -= diff * ny;
+            }
+        }
+    }
+}
+
+function ib_draw() {
+    ctx.fillStyle = "#008080";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let b of ib_bricks) {
+        ctx.beginPath();
+        const r = 4;
+        ctx.moveTo(b.x + r, b.y);
+        ctx.arcTo(b.x + b.w, b.y, b.x + b.w, b.y + b.h, r);
+        ctx.arcTo(b.x + b.w, b.y + b.h, b.x, b.y + b.h, r);
+        ctx.arcTo(b.x, b.y + b.h, b.x, b.y, r);
+        ctx.arcTo(b.x, b.y, b.x + b.w, b.y, r);
+        ctx.closePath();
+
+        ctx.fillStyle = b.isGold ? "#ffd700" : "#5bc8ea";
+        ctx.fill();
+        ctx.lineWidth = b.isGold ? 3 : 2;
+        ctx.strokeStyle = "#000000";
+        ctx.stroke();
+
+        ctx.fillStyle = "#000000";
+        ctx.font = b.isGold ? "bold 14px Tahoma" : "bold 11px Tahoma";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(Math.ceil(b.hp), b.x + b.w / 2, b.y + b.h / 2 + 1);
+    }
+
+    for (let ball of ib_balls) {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        if (ball.type === 'bouncer') ctx.fillStyle = "#ffe135";
+        else if (ball.type === 'spread') ctx.fillStyle = "#35ff8c";
+        else ctx.fillStyle = "#ff3535";
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#000000";
+        ctx.stroke();
+    }
+}
+
+function ib_loop(time) {
+    if (!showingGame) return;
+    let dt = (time - ib_lastTime) / 1000;
+    ib_lastTime = time;
+    if (dt > 0.1) dt = 0.1;
+
+    ib_update(dt);
+    ib_draw();
+    ib_reqId = requestAnimationFrame(ib_loop);
+}
 
 // --- CURSOR LOGIC ---
 const cursorQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
 const customCursor = document.getElementById("customCursor");
-
-function enableCustomCursor() {
+if (cursorQuery.matches) {
     document.body.classList.add("custom-cursor-ready");
-    document.addEventListener("mousemove", moveCustomCursor);
-}
-
-function disableCustomCursor() {
-    document.body.classList.remove("custom-cursor-ready");
-    document.removeEventListener("mousemove", moveCustomCursor);
-}
-
-function moveCustomCursor(event) {
-    customCursor.style.transform = `translate(${event.clientX - 4}px, ${event.clientY - 2}px)`;
-}
-
-if (cursorQuery.matches) enableCustomCursor();
-cursorQuery.addEventListener("change", e => e.matches ? enableCustomCursor() : disableCustomCursor());
-
-
-// --- VIEW TOGGLE LOGIC ---
-const playerWindow = document.getElementById("playerWindow");
-const gameWindow = document.getElementById("gameWindow");
-const toggleBtn = document.getElementById("toggleBtn");
-
-toggleBtn.addEventListener("click", () => {
-    if (gameWindow.style.display === "none") {
-        gameWindow.style.display = "block";
-        playerWindow.style.display = "none";
-        toggleBtn.textContent = "Media Player";
-    } else {
-        gameWindow.style.display = "none";
-        playerWindow.style.display = "block";
-        toggleBtn.textContent = "Play Game";
-    }
-});
-
-
-// --- IDLE BREAKOUT ENGINE ---
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-// Game State Variables
-let money = 0;
-let level = 1;
-let prestigeMult = 1.0;
-let maxBalls = 50;
-
-let costBall = 10;
-let costBallDmg = 25;
-let costClickDmg = 15;
-let costSpeed = 20;
-let costCrit = 30;
-let costMaxBalls = 50;
-
-let ballDmg = 1;
-let clickDmg = 1;
-let speedMult = 1.0;
-let critChance = 0; // percentage 0-100
-
-// Stats
-let statTotalBricks = 0;
-let statTotalEarned = 0;
-let statTotalClicks = 0;
-
-let balls = [];
-let bricks = [];
-
-// DOM Elements Game HUD
-const moneyDisplay = document.getElementById("moneyDisplay");
-const levelDisplay = document.getElementById("levelDisplay");
-const ballsCount = document.getElementById("ballsCount");
-const ballsMaxDisplay = document.getElementById("ballsMax");
-const priceBall = document.getElementById("priceBall");
-const priceDmg = document.getElementById("priceDmg");
-const priceClick = document.getElementById("priceClick");
-
-const btnBuyBall = document.getElementById("btnBuyBall");
-const btnUpgradeDmg = document.getElementById("btnUpgradeDmg");
-const btnUpgradeClick = document.getElementById("btnUpgradeClick");
-
-// DOM Upgrades Modal
-const upgradesOverlay = document.getElementById("upgradesOverlay");
-const btnUpgradesInfo = document.getElementById("btnUpgradesInfo");
-const closeUpgrades = document.getElementById("closeUpgrades");
-
-const btnBuySpeed = document.getElementById("btnBuySpeed");
-const priceSpeed = document.getElementById("priceSpeed");
-const valSpeed = document.getElementById("valSpeed");
-
-const btnModalBallDmg = document.getElementById("btnModalBallDmg");
-const priceBallDmgModal = document.getElementById("priceBallDmgModal");
-const valBallDmg = document.getElementById("valBallDmg");
-
-const btnModalClickDmg = document.getElementById("btnModalClickDmg");
-const priceClickDmgModal = document.getElementById("priceClickDmgModal");
-const valClickDmg = document.getElementById("valClickDmg");
-
-const btnBuyCrit = document.getElementById("btnBuyCrit");
-const priceCrit = document.getElementById("priceCrit");
-const valCrit = document.getElementById("valCrit");
-
-const btnBuyMaxBalls = document.getElementById("btnBuyMaxBalls");
-const priceMaxBalls = document.getElementById("priceMaxBalls");
-const valMaxBalls = document.getElementById("valMaxBalls");
-
-const valPrestige = document.getElementById("valPrestige");
-const btnPrestige = document.getElementById("btnPrestige");
-const btnPrestigeIcon = document.getElementById("btnPrestigeIcon");
-const btnMute = document.getElementById("btnMute");
-
-// Stats elements
-const statBricksEl = document.getElementById("statBricks");
-const statEarnedEl = document.getElementById("statEarned");
-const statClicksEl = document.getElementById("statClicks");
-
-function updateUI() {
-    moneyDisplay.textContent = Math.floor(money);
-    levelDisplay.textContent = level;
-    ballsCount.textContent = balls.length;
-    ballsMaxDisplay.textContent = maxBalls;
-
-    priceBall.textContent = `$${costBall}`;
-    priceDmg.textContent = `$${costBallDmg}`;
-    priceClick.textContent = `$${costClickDmg}`;
-
-    priceSpeed.textContent = `$${costSpeed}`;
-    valSpeed.textContent = speedMult.toFixed(2);
-
-    priceBallDmgModal.textContent = `$${costBallDmg}`;
-    valBallDmg.textContent = ballDmg;
-
-    priceClickDmgModal.textContent = `$${costClickDmg}`;
-    valClickDmg.textContent = clickDmg;
-
-    priceCrit.textContent = `$${costCrit}`;
-    valCrit.textContent = critChance;
-
-    priceMaxBalls.textContent = `$${costMaxBalls}`;
-    valMaxBalls.textContent = maxBalls;
-
-    valPrestige.textContent = prestigeMult.toFixed(1);
-
-    // Stats
-    statBricksEl.textContent = statTotalBricks;
-    statEarnedEl.textContent = Math.floor(statTotalEarned);
-    statClicksEl.textContent = statTotalClicks;
-
-    // Disabled states
-    btnBuyBall.disabled = money < costBall || balls.length >= maxBalls;
-    btnUpgradeDmg.disabled = money < costBallDmg;
-    btnUpgradeClick.disabled = money < costClickDmg;
-
-    btnBuySpeed.disabled = money < costSpeed;
-    btnModalBallDmg.disabled = money < costBallDmg;
-    btnModalClickDmg.disabled = money < costClickDmg;
-    btnBuyCrit.disabled = money < costCrit || critChance >= 100;
-    btnBuyMaxBalls.disabled = money < costMaxBalls;
-
-    btnPrestige.disabled = level < 10;
-    btnPrestigeIcon.disabled = level < 10;
-}
-
-// Brick Spawning
-function spawnBricks() {
-    bricks = [];
-    const cols = 6;
-    const rows = 4;
-    const padding = 6;
-    const offsetTop = 15;
-    const offsetLeft = 12;
-    const width = (canvas.width - offsetLeft * 2 - (cols - 1) * padding) / cols;
-    const height = 22;
-
-    const baseHp = Math.floor(Math.pow(1.35, level - 1) * 5);
-
-    const colors = ["#ff4d6d", "#ff8c42", "#ffe135", "#39ff6a", "#1084d0", "#b5179e"];
-
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            const hp = baseHp + (r * 2);
-            bricks.push({
-                x: offsetLeft + c * (width + padding),
-                y: offsetTop + r * (height + padding),
-                w: width,
-                h: height,
-                hp: hp,
-                maxHp: hp,
-                color: colors[(r + c) % colors.length]
-            });
-        }
-    }
-}
-
-// Add Money Helper
-function addMoney(amount) {
-    const earned = amount * prestigeMult;
-    money += earned;
-    statTotalEarned += earned;
-}
-
-// Ball Physics Constructor
-function createBall() {
-    const angle = Math.random() * Math.PI * 2;
-    const baseSpeed = 2.5;
-    balls.push({
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        vx: Math.cos(angle) * baseSpeed,
-        vy: Math.sin(angle) * baseSpeed,
-        radius: 4,
-        color: "#ffe135"
+    document.addEventListener("mousemove", e => {
+        customCursor.style.transform = `translate(${e.clientX - 4}px, ${e.clientY - 2}px)`;
     });
 }
-
-// Buy Ball
-btnBuyBall.addEventListener("click", () => {
-    if (money >= costBall && balls.length < maxBalls) {
-        money -= costBall;
-        costBall = Math.floor(costBall * 1.3);
-        createBall();
-        updateUI();
-    }
-});
-
-// Upgrade Ball Dmg
-function buyBallDmg() {
-    if (money >= costBallDmg) {
-        money -= costBallDmg;
-        ballDmg++;
-        costBallDmg = Math.floor(costBallDmg * 1.5);
-        updateUI();
-    }
-}
-btnUpgradeDmg.addEventListener("click", buyBallDmg);
-btnModalBallDmg.addEventListener("click", buyBallDmg);
-
-// Upgrade Click Dmg
-function buyClickDmg() {
-    if (money >= costClickDmg) {
-        money -= costClickDmg;
-        clickDmg++;
-        costClickDmg = Math.floor(costClickDmg * 1.4);
-        updateUI();
-    }
-}
-btnUpgradeClick.addEventListener("click", buyClickDmg);
-btnModalClickDmg.addEventListener("click", buyClickDmg);
-
-// Upgrade Speed
-btnBuySpeed.addEventListener("click", () => {
-    if (money >= costSpeed) {
-        money -= costSpeed;
-        speedMult += 0.25;
-        costSpeed = Math.floor(costSpeed * 1.6);
-        updateUI();
-    }
-});
-
-// Upgrade Crit
-btnBuyCrit.addEventListener("click", () => {
-    if (money >= costCrit && critChance < 100) {
-        money -= costCrit;
-        critChance += 5;
-        costCrit = Math.floor(costCrit * 1.8);
-        updateUI();
-    }
-});
-
-// Upgrade Max Balls
-btnBuyMaxBalls.addEventListener("click", () => {
-    if (money >= costMaxBalls) {
-        money -= costMaxBalls;
-        maxBalls += 25;
-        costMaxBalls = Math.floor(costMaxBalls * 1.7);
-        updateUI();
-    }
-});
-
-// Modal Upgrades UI handlers
-btnUpgradesInfo.addEventListener("click", () => upgradesOverlay.style.display = "flex");
-closeUpgrades.addEventListener("click", () => upgradesOverlay.style.display = "none");
-
-// Prestige Function
-function triggerPrestige() {
-    if (level >= 10) {
-        prestigeMult += 0.5;
-        level = 1;
-        money = 0;
-        balls = [];
-        costBall = 10;
-        costBallDmg = 25;
-        costClickDmg = 15;
-        costSpeed = 20;
-        costCrit = 30;
-        costMaxBalls = 50;
-        ballDmg = 1;
-        clickDmg = 1;
-        speedMult = 1.0;
-        critChance = 0;
-        maxBalls = 50;
-        spawnBricks();
-        updateUI();
-    }
-}
-btnPrestige.addEventListener("click", triggerPrestige);
-btnPrestigeIcon.addEventListener("click", triggerPrestige);
-
-// Mute sound effects toggle
-btnMute.addEventListener("click", () => {
-    ib_muted = !ib_muted;
-    btnMute.textContent = ib_muted ? "🔇" : "🔊";
-});
-
-// Canvas Click Damage
-canvas.addEventListener("click", (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const mx = (e.clientX - rect.left) * scaleX;
-    const my = (e.clientY - rect.top) * scaleY;
-
-    statTotalClicks++;
-
-    let isCrit = Math.random() * 100 < critChance;
-    let actualDmg = isCrit ? clickDmg * 3 : clickDmg;
-
-    for (let i = bricks.length - 1; i >= 0; i--) {
-        const b = bricks[i];
-        if (mx >= b.x && mx <= b.x + b.w && my >= b.y && my <= b.y + b.h) {
-            b.hp -= actualDmg;
-            addMoney(actualDmg);
-            if (b.hp <= 0) {
-                statTotalBricks++;
-                bricks.splice(i, 1);
-            }
-            break;
-        }
-    }
-    updateUI();
-});
-
-// Game Loop
-function updateGame() {
-    // Move & bounce balls from ALL sides
-    balls.forEach(b => {
-        b.x += b.vx * speedMult;
-        b.y += b.vy * speedMult;
-
-        // Bounce off left and right edges
-        if (b.x - b.radius <= 0) {
-            b.x = b.radius;
-            b.vx *= -1;
-        } else if (b.x + b.radius >= canvas.width) {
-            b.x = canvas.width - b.radius;
-            b.vx *= -1;
-        }
-
-        // Bounce off top and bottom edges (Balls bounce continuously on ALL 4 sides)
-        if (b.y - b.radius <= 0) {
-            b.y = b.radius;
-            b.vy *= -1;
-        } else if (b.y + b.radius >= canvas.height) {
-            b.y = canvas.height - b.radius;
-            b.vy *= -1;
-        }
-
-        // Brick collision
-        for (let i = bricks.length - 1; i >= 0; i--) {
-            const br = bricks[i];
-            if (b.x + b.radius > br.x && b.x - b.radius < br.x + br.w &&
-                b.y + b.radius > br.y && b.y - b.radius < br.y + br.h) {
-
-                br.hp -= ballDmg;
-                addMoney(ballDmg);
-
-                // Simple collision bounce response
-                const prevX = b.x - b.vx * speedMult;
-                if (prevX + b.radius <= br.x || prevX - b.radius >= br.x + br.w) {
-                    b.vx *= -1;
-                } else {
-                    b.vy *= -1;
-                }
-
-                if (br.hp <= 0) {
-                    statTotalBricks++;
-                    bricks.splice(i, 1);
-                }
-                updateUI();
-                break;
-            }
-        }
-    });
-
-    // Check Level Progression
-    if (bricks.length === 0) {
-        level++;
-        spawnBricks();
-        updateUI();
-    }
-}
-
-function renderGame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw Bricks
-    bricks.forEach(b => {
-        ctx.fillStyle = b.color;
-        ctx.fillRect(b.x, b.y, b.w, b.h);
-        ctx.strokeStyle = "#000";
-        ctx.strokeRect(b.x, b.y, b.w, b.h);
-
-        ctx.fillStyle = "#000";
-        ctx.font = "bold 9px Tahoma";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(b.hp, b.x + b.w / 2, b.y + b.h / 2);
-    });
-
-    // Draw Balls
-    balls.forEach(b => {
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-        ctx.fillStyle = b.color;
-        ctx.fill();
-        ctx.strokeStyle = "#000";
-        ctx.stroke();
-    });
-}
-
-function loop() {
-    updateGame();
-    renderGame();
-    requestAnimationFrame(loop);
-}
-
-// Initial Spawn & Start
-spawnBricks();
-updateUI();
-loop();
 </script>
-
 </body>
 </html>
