@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#008080">
-<title>Media Player</title>
+<title>Media Player & Idle Breakout</title>
 <style>
 :root {
     --face: #c0c0c0;
@@ -19,7 +19,7 @@
     --lcd-text: #39ff6a;
     --text: #000000;
     --muted: #4b4b4b;
-    --felt: #076324;
+    --felt: #008080; /* Matched to desktop for breakout bg */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -103,6 +103,7 @@ body {
 
 .window-body { padding: 8px; }
 
+/* Player Styles */
 .filters {
     display: flex;
     flex-wrap: nowrap;
@@ -366,12 +367,6 @@ input[type="range"]::-moz-range-thumb {
     transform: translate(1px, 1px);
 }
 
-.solitaire-header {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 8px;
-}
-
 .mini-btn {
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
@@ -383,7 +378,7 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer;
 }
 
-.mini-btn:active {
+.mini-btn:active:not(:disabled) {
     box-shadow:
         inset -1px -1px 0 var(--highlight),
         inset 1px 1px 0 var(--dark-shadow),
@@ -392,106 +387,42 @@ input[type="range"]::-moz-range-thumb {
     transform: translate(1px, 1px);
 }
 
-.solitaire-felt {
-    background: var(--felt);
-    padding: 8px;
+.mini-btn:disabled {
+    color: var(--shadow);
+    text-shadow: 1px 1px 0 var(--highlight);
+    cursor: not-allowed;
 }
 
-.solitaire-toprow {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 14px;
-}
-
-.toprow-spacer { flex: 1; }
-
-.pile {
-    position: relative;
-    width: 44px;
-    height: 64px;
-    border-radius: 3px;
-}
-
-.pile.foundation {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    color: #ffffff55;
-    cursor: pointer;
-}
-
-.pile.foundation.red { color: #ff8a8a55; }
-
-.pile.stock { cursor: pointer; }
-
-.empty-hint {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffffaa;
-    font-size: 16px;
-}
-
-.solitaire-tableau {
+/* Idle Breakout Styles */
+.breakout-header {
     display: flex;
     justify-content: space-between;
-    gap: 4px;
-}
-
-.tableau-col {
-    position: relative;
-    width: 44px;
-    min-height: 200px;
-    flex: 0 0 auto;
-}
-
-.card {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 44px;
-    height: 64px;
-    border-radius: 3px;
-    background: #fff;
-    border: 1px solid #444;
-    box-shadow: 0 1px 3px rgba(0,0,0,.5);
-    font-family: Tahoma, "MS Sans Serif", sans-serif;
-    display: flex;
-    flex-direction: column;
-    padding: 2px 3px;
-    cursor: pointer;
-    user-select: none;
-}
-
-.card.red { color: #c00000; }
-.card.black { color: #000000; }
-
-.card .rank {
+    margin-bottom: 8px;
+    font-size: 12px;
     font-weight: 700;
-    font-size: 11px;
-    line-height: 1;
 }
 
-.card .suit-big {
-    flex: 1;
+.canvas-container {
+    width: 100%;
+    background: #000;
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 20px;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
-.card.back {
-    background: repeating-linear-gradient(45deg, #1084d0, #1084d0 4px, #000080 4px, #000080 8px);
-    border: 1px solid #000;
+canvas {
+    display: block;
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    cursor: crosshair;
 }
 
-.card.selected {
-    outline: 3px solid #ffd700;
-    outline-offset: -2px;
-    z-index: 50;
+.shop-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
 }
 
 @media (pointer: fine) and (hover: hover) {
@@ -499,7 +430,6 @@ input[type="range"]::-moz-range-thumb {
     body.custom-cursor-ready a,
     body.custom-cursor-ready button,
     body.custom-cursor-ready .track,
-    body.custom-cursor-ready .card,
     body.custom-cursor-ready input[type="range"] { cursor: none; }
 }
 
@@ -603,7 +533,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 
     <div class="player-wrap raised" id="gameWindow" style="display:none">
         <div class="title-bar">
-            <span class="title-bar-text">Solitaire</span>
+            <span class="title-bar-text">Idle Breakout</span>
             <div class="title-bar-controls">
                 <span class="raised">_</span>
                 <span class="raised">□</span>
@@ -611,33 +541,24 @@ body.custom-cursor-ready .custom-cursor { display: block; }
             </div>
         </div>
 
-        <div class="window-body solitaire-felt">
-            <div class="solitaire-header">
-                <button class="mini-btn raised" id="newGameBtn">New Game</button>
+        <div class="window-body">
+            <div class="breakout-header">
+                <span id="moneyDisplay">Money: $0</span>
+                <span id="levelDisplay">Level: 1</span>
             </div>
 
-            <div class="solitaire-toprow">
-                <div class="pile stock sunken" id="stockPile"></div>
-                <div class="pile waste" id="wastePile"></div>
-                <div class="toprow-spacer"></div>
-                <div class="pile foundation black sunken" id="foundationSpade">♠</div>
-                <div class="pile foundation red sunken" id="foundationHeart">♥</div>
-                <div class="pile foundation red sunken" id="foundationDiamond">♦</div>
-                <div class="pile foundation black sunken" id="foundationClub">♣</div>
+            <div class="canvas-container sunken">
+                <canvas id="gameCanvas" width="380" height="240"></canvas>
             </div>
 
-            <div class="solitaire-tableau" id="tableauRow">
-                <div class="tableau-col" data-col="0"></div>
-                <div class="tableau-col" data-col="1"></div>
-                <div class="tableau-col" data-col="2"></div>
-                <div class="tableau-col" data-col="3"></div>
-                <div class="tableau-col" data-col="4"></div>
-                <div class="tableau-col" data-col="5"></div>
-                <div class="tableau-col" data-col="6"></div>
+            <div class="shop-controls">
+                <button class="mini-btn raised" id="btnBuyBall">Buy Ball ($10)</button>
+                <button class="mini-btn raised" id="btnUpgradeDmg">Ball Dmg ($25)</button>
+                <button class="mini-btn raised" id="btnUpgradeClick">Click Dmg ($15)</button>
             </div>
         </div>
 
-        <div class="status-bar sunken" id="gameStatus">Draw from the deck. Build the four suit piles Ace to King to win.</div>
+        <div class="status-bar sunken" id="gameStatus">Click bricks to deal damage. Buy upgrades to automate!</div>
     </div>
 
     <button class="toggle-btn raised" id="toggleBtn">Play Game</button>
@@ -650,6 +571,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
 <script>
+// --- MEDIA PLAYER LOGIC ---
 const audio = document.getElementById("audio");
 const clickSound = document.getElementById("clickSound");
 const errorSound = document.getElementById("errorSound");
@@ -680,7 +602,7 @@ function playClickSound() {
 }
 
 document.addEventListener("click", event => {
-    if (event.target.closest(".track, .filter, .control, .toggle-btn, .mini-btn, .card, .pile")) playClickSound();
+    if (event.target.closest(".track, .filter, .control, .toggle-btn, .mini-btn")) playClickSound();
 }, true);
 
 function filterTracks(filter) {
@@ -824,6 +746,8 @@ volume.addEventListener("input", () => {
     audio.volume = Number(volume.value);
 });
 
+
+// --- CURSOR LOGIC ---
 const cursorQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
 const customCursor = document.getElementById("customCursor");
 
@@ -844,6 +768,8 @@ function moveCustomCursor(event) {
 if (cursorQuery.matches) enableCustomCursor();
 cursorQuery.addEventListener("change", e => e.matches ? enableCustomCursor() : disableCustomCursor());
 
+
+// --- VIEW TOGGLE LOGIC ---
 const playerWindow = document.getElementById("playerWindow");
 const gameWindow = document.getElementById("gameWindow");
 const toggleBtn = document.getElementById("toggleBtn");
@@ -854,294 +780,255 @@ toggleBtn.addEventListener("click", () => {
     showingGame = !showingGame;
     playerWindow.style.display = showingGame ? "none" : "";
     gameWindow.style.display = showingGame ? "" : "none";
-    toggleBtn.textContent = showingGame ? "Back" : "Play Game";
-    if (showingGame && !gameStarted) {
-        gameStarted = true;
-        newGame();
-    }
-});
-
-const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-const SUITS = ["♠", "♥", "♦", "♣"];
-
-const stockPile = document.getElementById("stockPile");
-const wastePile = document.getElementById("wastePile");
-const gameStatus = document.getElementById("gameStatus");
-const newGameBtn = document.getElementById("newGameBtn");
-const foundationEls = {
-    "♠": document.getElementById("foundationSpade"),
-    "♥": document.getElementById("foundationHeart"),
-    "♦": document.getElementById("foundationDiamond"),
-    "♣": document.getElementById("foundationClub")
-};
-const tableauEls = [...document.querySelectorAll(".tableau-col")];
-
-let stock = [];
-let waste = [];
-let foundations = { "♠": [], "♥": [], "♦": [], "♣": [] };
-let tableauCols = [[], [], [], [], [], [], []];
-let selection = null;
-
-function isRed(suit) {
-    return suit === "♥" || suit === "♦";
-}
-
-function buildDeck() {
-    const cards = [];
-    SUITS.forEach(suit => {
-        for (let r = 0; r < 13; r++) cards.push({ suit, rankIndex: r, faceUp: false });
-    });
-    return cards;
-}
-
-function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-}
-
-function newGame() {
-    const deck = shuffle(buildDeck());
-    tableauCols = [[], [], [], [], [], [], []];
-    foundations = { "♠": [], "♥": [], "♦": [], "♣": [] };
-    waste = [];
-    selection = null;
-
-    let idx = 0;
-    for (let c = 0; c < 7; c++) {
-        for (let r = 0; r <= c; r++) {
-            const card = deck[idx++];
-            card.faceUp = r === c;
-            tableauCols[c].push(card);
+    toggleBtn.textContent = showingGame ? "Back to Player" : "Play Game";
+    
+    if (showingGame) {
+        if (!gameStarted) {
+            gameStarted = true;
+            initIdleBreakout();
         }
-    }
-    stock = deck.slice(idx);
-    gameStatus.textContent = "Draw from the deck. Build the four suit piles Ace to King to win.";
-    render();
-}
-
-function createCardEl(card) {
-    const el = document.createElement("div");
-    el.className = "card " + (card.faceUp ? (isRed(card.suit) ? "red" : "black") : "back");
-    if (card.faceUp) {
-        el.innerHTML = `<span class="rank">${RANKS[card.rankIndex]}${card.suit}</span><span class="suit-big">${card.suit}</span>`;
-    }
-    return el;
-}
-
-function render() {
-    renderStock();
-    renderWaste();
-    renderFoundations();
-    renderTableau();
-    checkWin();
-}
-
-function renderStock() {
-    stockPile.innerHTML = "";
-    if (stock.length) {
-        stockPile.appendChild(createCardEl({ suit: "♠", rankIndex: 0, faceUp: false }));
+        ib_lastTime = performance.now();
+        ib_reqId = requestAnimationFrame(ib_loop);
     } else {
-        const hint = document.createElement("div");
-        hint.className = "empty-hint";
-        hint.textContent = "↺";
-        stockPile.appendChild(hint);
+        cancelAnimationFrame(ib_reqId);
     }
-}
-
-stockPile.addEventListener("click", () => {
-    if (stock.length) {
-        const card = stock.pop();
-        card.faceUp = true;
-        waste.push(card);
-    } else if (waste.length) {
-        while (waste.length) {
-            const card = waste.pop();
-            card.faceUp = false;
-            stock.push(card);
-        }
-    }
-    render();
 });
 
-function renderWaste() {
-    wastePile.innerHTML = "";
-    if (waste.length) {
-        const top = waste[waste.length - 1];
-        const el = createCardEl(top);
-        if (selection && selection.source === "waste") el.classList.add("selected");
-        el.addEventListener("click", event => {
-            event.stopPropagation();
-            handleCardClick("waste", 0, 0);
-        });
-        wastePile.appendChild(el);
-    }
+
+// --- IDLE BREAKOUT LOGIC ---
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const moneyDisplay = document.getElementById("moneyDisplay");
+const levelDisplay = document.getElementById("levelDisplay");
+const btnBuyBall = document.getElementById("btnBuyBall");
+const btnUpgradeDmg = document.getElementById("btnUpgradeDmg");
+const btnUpgradeClick = document.getElementById("btnUpgradeClick");
+
+let ib_money = 0;
+let ib_level = 1;
+let ib_clickDmg = 1;
+let ib_ballDmg = 1;
+let ib_balls = [];
+let ib_bricks = [];
+let ib_costs = { ball: 10, bDmg: 25, cDmg: 15 };
+let ib_lastTime = 0;
+let ib_reqId = null;
+
+const IB_COLS = 6;
+const IB_ROWS = 4;
+const BRICK_W = 50;
+const BRICK_H = 20;
+const PADDING = 8;
+const OFFSET_X = 20;
+const OFFSET_Y = 20;
+
+function initIdleBreakout() {
+    spawnBricks();
+    updateUI();
 }
 
-function renderFoundations() {
-    SUITS.forEach(suit => {
-        const el = foundationEls[suit];
-        el.innerHTML = "";
-        const pile = foundations[suit];
-        if (pile.length) {
-            const cardEl = createCardEl(pile[pile.length - 1]);
-            cardEl.addEventListener("click", event => {
-                event.stopPropagation();
-                attemptMoveToFoundation(suit);
+function spawnBricks() {
+    ib_bricks = [];
+    const baseHp = ib_level * 5;
+    for(let r = 0; r < IB_ROWS; r++) {
+        for(let c = 0; c < IB_COLS; c++) {
+            ib_bricks.push({
+                x: OFFSET_X + c * (BRICK_W + PADDING),
+                y: OFFSET_Y + r * (BRICK_H + PADDING),
+                w: BRICK_W,
+                h: BRICK_H,
+                hp: baseHp + Math.floor(Math.random() * (ib_level * 5)),
+                maxHp: 0 
             });
-            el.appendChild(cardEl);
-        } else {
-            el.textContent = suit;
         }
+    }
+    ib_bricks.forEach(b => b.maxHp = b.hp);
+}
+
+function addBall() {
+    ib_balls.push({
+        x: canvas.width / 2,
+        y: canvas.height - 20,
+        dx: (Math.random() > 0.5 ? 1 : -1) * (100 + Math.random() * 50),
+        dy: -150 - Math.random() * 50,
+        r: 4
     });
 }
 
-Object.entries(foundationEls).forEach(([suit, el]) => {
-    el.addEventListener("click", () => attemptMoveToFoundation(suit));
+function updateUI() {
+    moneyDisplay.textContent = `Money: $${ib_money}`;
+    levelDisplay.textContent = `Level: ${ib_level}`;
+    
+    btnBuyBall.textContent = `Buy Ball ($${ib_costs.ball})`;
+    btnBuyBall.disabled = ib_money < ib_costs.ball;
+    
+    btnUpgradeDmg.textContent = `Ball Dmg ($${ib_costs.bDmg}) [${ib_ballDmg}]`;
+    btnUpgradeDmg.disabled = ib_money < ib_costs.bDmg;
+    
+    btnUpgradeClick.textContent = `Click Dmg ($${ib_costs.cDmg}) [${ib_clickDmg}]`;
+    btnUpgradeClick.disabled = ib_money < ib_costs.cDmg;
+}
+
+// Upgrades
+btnBuyBall.addEventListener("click", () => {
+    if(ib_money >= ib_costs.ball) {
+        ib_money -= ib_costs.ball;
+        addBall();
+        ib_costs.ball = Math.floor(ib_costs.ball * 1.5);
+        updateUI();
+    }
+});
+btnUpgradeDmg.addEventListener("click", () => {
+    if(ib_money >= ib_costs.bDmg) {
+        ib_money -= ib_costs.bDmg;
+        ib_ballDmg++;
+        ib_costs.bDmg = Math.floor(ib_costs.bDmg * 1.6);
+        updateUI();
+    }
+});
+btnUpgradeClick.addEventListener("click", () => {
+    if(ib_money >= ib_costs.cDmg) {
+        ib_money -= ib_costs.cDmg;
+        ib_clickDmg++;
+        ib_costs.cDmg = Math.floor(ib_costs.cDmg * 1.4);
+        updateUI();
+    }
 });
 
-function renderTableau() {
-    for (let c = 0; c < 7; c++) {
-        const colEl = tableauEls[c];
-        colEl.innerHTML = "";
-        const col = tableauCols[c];
-        let offset = 0;
-        col.forEach((card, i) => {
-            const el = createCardEl(card);
-            el.style.top = offset + "px";
-            offset += card.faceUp ? 18 : 8;
-            if (selection && selection.source === "tableau" && selection.colIndex === c && i >= selection.cardIndex) {
-                el.classList.add("selected");
+// Click Damage
+canvas.addEventListener("mousedown", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+
+    for (let i = 0; i < ib_bricks.length; i++) {
+        let b = ib_bricks[i];
+        if (mouseX >= b.x && mouseX <= b.x + b.w && mouseY >= b.y && mouseY <= b.y + b.h) {
+            b.hp -= ib_clickDmg;
+            playClickSound(); // Make click sound on hit
+            checkBrickDeath(i);
+            break;
+        }
+    }
+});
+
+function checkBrickDeath(index) {
+    if (ib_bricks[index].hp <= 0) {
+        // Gain money based on brick max health
+        ib_money += Math.max(1, Math.floor(ib_bricks[index].maxHp / 2));
+        ib_bricks.splice(index, 1);
+        updateUI();
+        
+        if (ib_bricks.length === 0) {
+            ib_level++;
+            spawnBricks();
+            updateUI();
+        }
+    }
+}
+
+function ib_update(dt) {
+    for (let ball of ib_balls) {
+        ball.x += ball.dx * dt;
+        ball.y += ball.dy * dt;
+
+        // Wall collisions
+        if (ball.x - ball.r < 0) { ball.x = ball.r; ball.dx *= -1; }
+        if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.dx *= -1; }
+        if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy *= -1; }
+        if (ball.y + ball.r > canvas.height) { ball.y = canvas.height - ball.r; ball.dy *= -1; }
+
+        // Brick collisions
+        for (let i = 0; i < ib_bricks.length; i++) {
+            let b = ib_bricks[i];
+            
+            // Simple AABB collision detection for circle and rect
+            let testX = ball.x;
+            let testY = ball.y;
+
+            if (ball.x < b.x) testX = b.x; 
+            else if (ball.x > b.x + b.w) testX = b.x + b.w; 
+            if (ball.y < b.y) testY = b.y; 
+            else if (ball.y > b.y + b.h) testY = b.y + b.h;
+
+            let distX = ball.x - testX;
+            let distY = ball.y - testY;
+            let distance = Math.sqrt((distX * distX) + (distY * distY));
+
+            if (distance <= ball.r) {
+                // Bounce
+                if (Math.abs(distX) > Math.abs(distY)) {
+                    ball.dx *= -1;
+                } else {
+                    ball.dy *= -1;
+                }
+                
+                b.hp -= ib_ballDmg;
+                checkBrickDeath(i);
+                break; // Only hit one brick per frame to prevent sticking
             }
-            el.addEventListener("click", event => {
-                event.stopPropagation();
-                handleCardClick("tableau", c, i);
-            });
-            colEl.appendChild(el);
-        });
-        colEl.style.minHeight = Math.max(200, offset + 64) + "px";
-    }
-}
-
-tableauEls.forEach((colEl, c) => {
-    colEl.addEventListener("click", () => {
-        if (selection) attemptMoveToTableau(c);
-    });
-});
-
-function handleCardClick(source, colIndex, cardIndex) {
-    if (source === "waste") {
-        if (selection && selection.source === "waste") {
-            selection = null;
-            render();
-            return;
         }
-        if (selection) {
-            const moved = attemptMoveOnSelection(colIndex);
-            if (moved) return;
-        }
-        selection = { source: "waste", colIndex: 0, cardIndex: 0, run: [waste[waste.length - 1]] };
-        render();
-        return;
-    }
-
-    const card = tableauCols[colIndex][cardIndex];
-    if (!card.faceUp) return;
-
-    if (selection && selection.source === "tableau" && selection.colIndex === colIndex && selection.cardIndex === cardIndex) {
-        selection = null;
-        render();
-        return;
-    }
-
-    if (selection) {
-        const moved = attemptMoveToTableau(colIndex);
-        if (moved) return;
-    }
-
-    selection = { source: "tableau", colIndex, cardIndex, run: tableauCols[colIndex].slice(cardIndex) };
-    render();
-}
-
-function attemptMoveOnSelection() {
-    return false;
-}
-
-function finishMove(destArray, isFoundation) {
-    const run = selection.run;
-    if (selection.source === "waste") {
-        waste.pop();
-    } else {
-        tableauCols[selection.colIndex].splice(selection.cardIndex, run.length);
-        const src = tableauCols[selection.colIndex];
-        if (src.length && !src[src.length - 1].faceUp) src[src.length - 1].faceUp = true;
-    }
-    destArray.push(...run);
-    selection = null;
-    render();
-}
-
-function attemptMoveToTableau(destIndex) {
-    if (!selection) return false;
-    const run = selection.run;
-    const destCol = tableauCols[destIndex];
-    const moving = run[0];
-    let valid;
-    if (destCol.length === 0) {
-        valid = moving.rankIndex === 12;
-    } else {
-        const top = destCol[destCol.length - 1];
-        valid = top.faceUp && isRed(moving.suit) !== isRed(top.suit) && moving.rankIndex === top.rankIndex - 1;
-    }
-    if (!valid) {
-        if (selection.source === "tableau" && selection.colIndex === destIndex) {
-            selection = null;
-            render();
-            return true;
-        }
-        showToast("That card can't go there.");
-        return false;
-    }
-    finishMove(destCol, false);
-    return true;
-}
-
-function attemptMoveToFoundation(suit) {
-    if (!selection) return false;
-    const run = selection.run;
-    if (run.length !== 1) {
-        showToast("Only one card at a time to a suit pile.");
-        return false;
-    }
-    const moving = run[0];
-    if (moving.suit !== suit) {
-        showToast("Wrong suit for that pile.");
-        return false;
-    }
-    const pile = foundations[suit];
-    const valid = pile.length === 0 ? moving.rankIndex === 0 : moving.rankIndex === pile[pile.length - 1].rankIndex + 1;
-    if (!valid) {
-        showToast("That card can't go there yet.");
-        return false;
-    }
-    finishMove(pile, true);
-    return true;
-}
-
-function checkWin() {
-    const total = Object.values(foundations).reduce((sum, pile) => sum + pile.length, 0);
-    if (total === 52) {
-        gameStatus.textContent = "You win! Start a new game any time.";
-        showToast("You win! 🎉");
     }
 }
 
-newGameBtn.addEventListener("click", event => {
-    event.stopPropagation();
-    newGame();
-});
+function ib_draw() {
+    // Clear background
+    ctx.fillStyle = "#008080";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw Bricks (Win98 Button Style)
+    for (let b of ib_bricks) {
+        ctx.fillStyle = "#c0c0c0";
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        
+        // 3D Borders
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(b.x, b.y, b.w, 2); // top
+        ctx.fillRect(b.x, b.y, 2, b.h); // left
+        
+        ctx.fillStyle = "#808080";
+        ctx.fillRect(b.x, b.y + b.h - 2, b.w, 2); // bottom
+        ctx.fillRect(b.x + b.w - 2, b.y, 2, b.h); // right
+        
+        ctx.fillStyle = "#0a0a0a";
+        ctx.fillRect(b.x, b.y + b.h - 1, b.w, 1); // bottom extreme
+        ctx.fillRect(b.x + b.w - 1, b.y, 1, b.h); // right extreme
+
+        // Health text
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 11px Tahoma";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(b.hp, b.x + b.w / 2, b.y + b.h / 2 + 1);
+    }
+
+    // Draw Balls
+    for (let ball of ib_balls) {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = "#000000";
+        ctx.stroke();
+    }
+}
+
+function ib_loop(time) {
+    if (!showingGame) return;
+    
+    let dt = (time - ib_lastTime) / 1000;
+    ib_lastTime = time;
+    if (dt > 0.1) dt = 0.1; // Cap dt to prevent clipping on lag
+
+    ib_update(dt);
+    ib_draw();
+    
+    ib_reqId = requestAnimationFrame(ib_loop);
+}
+
 </script>
 </body>
 </html>
