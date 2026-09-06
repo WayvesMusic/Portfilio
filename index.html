@@ -536,6 +536,28 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
 .ib-upgrade-buy .ib-price { display: block; margin-top: 1px; }
 .ib-upgrade-buy:active:not(:disabled) { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 
+.ib-leaderboard-list { display: flex; flex-direction: column; background: #fff; padding: 2px; max-height: 250px; overflow-y: auto; }
+.ib-leaderboard-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px; border-bottom: 1px solid var(--shadow); font-size: 11px; }
+.ib-leaderboard-row:last-child { border-bottom: 0; }
+.ib-leaderboard-rank { font-weight: 700; width: 20px; flex: 0 0 auto; }
+.ib-leaderboard-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ib-leaderboard-score { font-family: "Courier New", monospace; font-weight: 700; flex: 0 0 auto; }
+.ib-leaderboard-row.mine { background: #dcdcdc; }
+.ib-name-input {
+    width: 100%;
+    height: 26px;
+    padding: 0 6px;
+    font: 400 12px Tahoma, "MS Sans Serif", sans-serif;
+    border: 0;
+    margin-top: 4px;
+}
+.ib-save-score-note {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 8px;
+}
+
 @media (pointer: fine) and (hover: hover) {
     body.custom-cursor-ready { cursor: none; }
     body.custom-cursor-ready a,
@@ -728,6 +750,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                     <div class="ib-effects-box">
                         <span class="ib-effects-label">EFFECTS</span>
                         <div class="ib-effects-icons">
+                            <button class="ib-icon-btn raised" id="btnLeaderboard" title="Leaderboard">🏆</button>
                             <button class="ib-icon-btn raised" id="btnSettings" title="Settings">⚙</button>
                             <button class="ib-icon-btn raised" id="btnMute" title="Mute sound effects">🔊</button>
                         </div>
@@ -855,6 +878,42 @@ body.custom-cursor-ready .custom-cursor { display: block; }
     </div>
 </div>
 
+<!-- SAVE SCORE MODAL -->
+<div class="ib-modal-overlay" id="saveScoreOverlay" style="display:none">
+    <div class="ib-modal raised">
+        <div class="title-bar">
+            <span class="title-bar-text">Save Your Score</span>
+            <div class="title-bar-controls">
+                <span class="raised" id="closeSaveScore">✕</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="rate-modal-title">Looks like you're leaving!</div>
+            <div class="rate-modal-current" id="saveScoreSummary">Score: 0</div>
+            <input type="text" id="saveScoreName" class="ib-name-input sunken" maxlength="16" placeholder="Enter a name for the leaderboard">
+            <button type="button" class="toggle-btn raised" id="saveScoreConfirmBtn" style="margin-top:14px;">Save to Leaderboard</button>
+            <div class="ib-save-score-note">Your progress is auto-saved on this device either way.</div>
+        </div>
+    </div>
+</div>
+
+<!-- LEADERBOARD MODAL -->
+<div class="ib-modal-overlay" id="leaderboardOverlay" style="display:none">
+    <div class="ib-modal raised">
+        <div class="title-bar">
+            <span class="title-bar-text">Leaderboard</span>
+            <div class="title-bar-controls">
+                <span class="raised" id="closeLeaderboard">✕</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="ib-leaderboard-list sunken" id="leaderboardList">
+                <div class="ib-leaderboard-row"><span class="ib-leaderboard-name">No scores yet</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
 <audio id="errorSound" src="ErrorSound.mp3" preload="auto"></audio>
 <audio id="wowDogeSound" src="wow-doge.mp3" preload="auto"></audio>
@@ -874,6 +933,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const ratingsRef = firebase.database().ref("ratings");
+const leaderboardRef = firebase.database().ref("leaderboard");
 </script>
 
 <script>
@@ -1307,22 +1367,32 @@ const toggleBtn = document.getElementById("toggleBtn");
 let gameStarted = false;
 let showingGame = false;
 
-toggleBtn.addEventListener("click", () => {
-    showingGame = !showingGame;
-    playerWindow.style.display = showingGame ? "none" : "";
-    gameWindow.style.display = showingGame ? "" : "none";
-    toggleBtn.textContent = showingGame ? "Back to Player" : "Play Game";
-
-    if (showingGame) {
-        if (!gameStarted) {
-            gameStarted = true;
-            initIdleBreakout();
-        }
-        ib_lastTime = performance.now();
-        ib_reqId = requestAnimationFrame(ib_loop);
-    } else {
-        cancelAnimationFrame(ib_reqId);
+function showGameView() {
+    if (showingGame) return;
+    showingGame = true;
+    playerWindow.style.display = "none";
+    gameWindow.style.display = "";
+    toggleBtn.textContent = "Back to Player";
+    if (!gameStarted) {
+        gameStarted = true;
+        initIdleBreakout();
     }
+    ib_lastTime = performance.now();
+    ib_reqId = requestAnimationFrame(ib_loop);
+}
+
+function showPlayerView() {
+    if (!showingGame) return;
+    showingGame = false;
+    playerWindow.style.display = "";
+    gameWindow.style.display = "none";
+    toggleBtn.textContent = "Play Game";
+    cancelAnimationFrame(ib_reqId);
+}
+
+toggleBtn.addEventListener("click", () => {
+    if (showingGame) showPlayerView();
+    else showGameView();
 });
 
 const canvas = document.getElementById('gameCanvas');
@@ -1363,10 +1433,69 @@ let ib_costs = {
     cDmg: 15, crit: 30
 };
 
+function ib_getSaveKey() {
+    return `ib_save_${anonId}`;
+}
+
+function ib_saveState() {
+    const state = {
+        money: ib_money,
+        level: ib_level,
+        clickDmg: ib_clickDmg,
+        critChance: ib_critChance,
+        prestigeMult: ib_prestigeMult,
+        stats: ib_stats,
+        costs: ib_costs,
+        ballTypes: ib_balls.map(b => b.type),
+        muted: ib_muted
+    };
+    try {
+        localStorage.setItem(ib_getSaveKey(), JSON.stringify(state));
+    } catch {}
+}
+
+function ib_loadState() {
+    let raw;
+    try {
+        raw = localStorage.getItem(ib_getSaveKey());
+    } catch {
+        raw = null;
+    }
+    if (!raw) return false;
+    let state;
+    try {
+        state = JSON.parse(raw);
+    } catch {
+        return false;
+    }
+    ib_money = state.money || 0;
+    ib_level = state.level || 1;
+    ib_clickDmg = state.clickDmg || 1;
+    ib_critChance = state.critChance || 0;
+    ib_prestigeMult = state.prestigeMult || 1;
+    if (state.stats) ib_stats = state.stats;
+    if (state.costs) ib_costs = state.costs;
+    ib_muted = !!state.muted;
+    document.getElementById("btnMute").textContent = ib_muted ? "🔇" : "🔊";
+    ib_balls = [];
+    (state.ballTypes || []).forEach(type => addBall(type));
+    return true;
+}
+
+function ib_hasProgress() {
+    return ib_money > 0 || ib_level > 1 || ib_balls.length > 0 || ib_prestigeMult > 1;
+}
+
+function ib_computeScore() {
+    return Math.floor(ib_money + ib_level * 100 + (ib_prestigeMult - 1) * 10000);
+}
+
 function initIdleBreakout() {
+    const restored = ib_loadState();
     spawnBricks();
     document.getElementById("ballsMax").textContent = IB_MAX_BALLS;
     updateUI();
+    if (restored && ib_hasProgress()) showToast("Welcome back! Your progress was restored.");
 }
 
 function spawnBricks() {
@@ -1421,6 +1550,7 @@ function buyBall(type) {
         addBall(type);
         ib_costs[type] = Math.floor(ib_costs[type] * 1.5);
         updateUI();
+        ib_saveState();
     }
 }
 
@@ -1482,6 +1612,7 @@ function handleUpgrade(statObj, costKey, type, increment) {
         statObj[type] += increment;
         ib_costs[costKey] = Math.floor(ib_costs[costKey] * (type === 'dmg' || increment === 1 ? 1.6 : 1.5));
         updateUI();
+        ib_saveState();
     }
 }
 
@@ -1498,6 +1629,7 @@ document.getElementById('btnUpgClick').addEventListener('click', () => {
         ib_clickDmg++;
         ib_costs.cDmg = Math.floor(ib_costs.cDmg * 1.4);
         updateUI();
+        ib_saveState();
     }
 });
 
@@ -1507,6 +1639,7 @@ document.getElementById("btnBuyCrit").addEventListener("click", () => {
         ib_critChance = Math.min(IB_CRIT_CAP, ib_critChance + 5);
         ib_costs.crit = Math.floor(ib_costs.crit * 1.6);
         updateUI();
+        ib_saveState();
     }
 });
 
@@ -1517,6 +1650,7 @@ document.getElementById("btnMute").addEventListener("click", () => {
     ib_muted = !ib_muted;
     document.getElementById("btnMute").textContent = ib_muted ? "🔇" : "🔊";
     showToast(ib_muted ? "Muted" : "Unmuted");
+    ib_saveState();
 });
 
 function doPrestige() {
@@ -1528,6 +1662,8 @@ function doPrestige() {
     spawnBricks();
     updateUI();
     showToast(`Prestiged! Multiplier now x${ib_prestigeMult.toFixed(1)}`);
+    ib_saveState();
+    ib_submitScore();
 }
 document.getElementById("btnPrestige").addEventListener("click", doPrestige);
 document.getElementById("btnPrestigeIcon").addEventListener("click", doPrestige);
@@ -1564,6 +1700,7 @@ function processDeadBricks() {
     if (changed) {
         updateUI();
         if (ib_bricks.length === 0) { ib_level++; spawnBricks(); updateUI(); }
+        ib_saveState();
     }
 }
 
@@ -1713,6 +1850,143 @@ function ib_loop(time) {
     ib_draw();
     ib_reqId = requestAnimationFrame(ib_loop);
 }
+
+function ib_getSavedName() {
+    try {
+        return localStorage.getItem("ib_player_name") || "";
+    } catch {
+        return "";
+    }
+}
+
+function ib_setSavedName(name) {
+    try {
+        localStorage.setItem("ib_player_name", name);
+    } catch {}
+}
+
+function ib_submitScore(name) {
+    const score = ib_computeScore();
+    if (score <= 0) return;
+    const finalName = (name || ib_getSavedName() || "Anonymous").slice(0, 16);
+    leaderboardRef.child(anonId).once("value").then(snapshot => {
+        const existing = snapshot.val();
+        if (!existing || score > existing.score) {
+            leaderboardRef.child(anonId).set({
+                name: finalName,
+                score: score,
+                level: ib_level,
+                prestige: ib_prestigeMult,
+                updatedAt: Date.now()
+            });
+        } else if (existing.name !== finalName) {
+            leaderboardRef.child(anonId).update({ name: finalName });
+        }
+    }).catch(() => {});
+}
+
+const leaderboardOverlay = document.getElementById("leaderboardOverlay");
+const leaderboardList = document.getElementById("leaderboardList");
+const btnLeaderboard = document.getElementById("btnLeaderboard");
+const closeLeaderboard = document.getElementById("closeLeaderboard");
+
+function ib_renderLeaderboard(entries) {
+    leaderboardList.innerHTML = "";
+    if (!entries.length) {
+        const row = document.createElement("div");
+        row.className = "ib-leaderboard-row";
+        row.innerHTML = `<span class="ib-leaderboard-name">No scores yet</span>`;
+        leaderboardList.appendChild(row);
+        return;
+    }
+    entries.forEach((entry, index) => {
+        const row = document.createElement("div");
+        row.className = "ib-leaderboard-row" + (entry.id === anonId ? " mine" : "");
+        const rank = document.createElement("span");
+        rank.className = "ib-leaderboard-rank";
+        rank.textContent = `${index + 1}.`;
+        const name = document.createElement("span");
+        name.className = "ib-leaderboard-name";
+        name.textContent = entry.name || "Anonymous";
+        const score = document.createElement("span");
+        score.className = "ib-leaderboard-score";
+        score.textContent = entry.score;
+        row.appendChild(rank);
+        row.appendChild(name);
+        row.appendChild(score);
+        leaderboardList.appendChild(row);
+    });
+}
+
+leaderboardRef.orderByChild("score").limitToLast(15).on("value", snapshot => {
+    const entries = [];
+    snapshot.forEach(child => {
+        const val = child.val();
+        entries.push({ id: child.key, name: val.name, score: val.score });
+    });
+    entries.reverse();
+    ib_renderLeaderboard(entries);
+}, () => {});
+
+btnLeaderboard.addEventListener("click", () => {
+    leaderboardOverlay.style.display = "flex";
+});
+closeLeaderboard.addEventListener("click", () => {
+    leaderboardOverlay.style.display = "none";
+});
+
+const saveScoreOverlay = document.getElementById("saveScoreOverlay");
+const saveScoreSummary = document.getElementById("saveScoreSummary");
+const saveScoreName = document.getElementById("saveScoreName");
+const saveScoreConfirmBtn = document.getElementById("saveScoreConfirmBtn");
+const closeSaveScoreBtn = document.getElementById("closeSaveScore");
+
+function ib_openSaveScoreModal() {
+    saveScoreSummary.textContent = `Score: ${ib_computeScore()} (Level ${ib_level}, x${ib_prestigeMult.toFixed(1)} prestige)`;
+    saveScoreName.value = ib_getSavedName();
+    saveScoreOverlay.style.display = "flex";
+}
+
+function ib_closeSaveScoreModal() {
+    saveScoreOverlay.style.display = "none";
+}
+
+saveScoreConfirmBtn.addEventListener("click", () => {
+    const name = saveScoreName.value.trim() || "Anonymous";
+    ib_setSavedName(name);
+    ib_submitScore(name);
+    showToast("Score saved to leaderboard!");
+    ib_closeSaveScoreModal();
+});
+
+closeSaveScoreBtn.addEventListener("click", ib_closeSaveScoreModal);
+
+let ib_pendingLeavePrompt = false;
+
+window.addEventListener("beforeunload", (e) => {
+    if (gameStarted) ib_saveState();
+    if (gameStarted && ib_hasProgress()) {
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
+    }
+});
+
+document.addEventListener("visibilitychange", () => {
+    if (!gameStarted) return;
+    if (document.visibilityState === "hidden") {
+        ib_saveState();
+        if (ib_hasProgress()) ib_pendingLeavePrompt = true;
+    } else if (document.visibilityState === "visible" && ib_pendingLeavePrompt) {
+        ib_pendingLeavePrompt = false;
+        showGameView();
+        ib_openSaveScoreModal();
+    }
+});
+
+setInterval(() => {
+    if (gameStarted) ib_saveState();
+}, 8000);
 </script>
 </body>
 </html>
