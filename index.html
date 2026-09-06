@@ -828,8 +828,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 const firebaseConfig = {
     apiKey: "AIzaSyA01jTxtyNil96pYbKh8a6IpVrXnRjJo2s",
     authDomain: "portfolio-e4692.firebaseapp.com",
-    // TODO: confirm this once you create the Realtime Database (step below) -
-    // the console shows the exact URL at the top of the Realtime Database page.
     databaseURL: "https://portfolio-e4692-default-rtdb.firebaseio.com",
     projectId: "portfolio-e4692"
 };
@@ -838,7 +836,6 @@ const ratingsRef = firebase.database().ref("ratings");
 </script>
 
 <script>
-// --- MEDIA PLAYER LOGIC ---
 const audio = document.getElementById("audio");
 const clickSound = document.getElementById("clickSound");
 const errorSound = document.getElementById("errorSound");
@@ -858,7 +855,7 @@ const toast = document.getElementById("toast");
 
 let currentIndex = -1;
 let toastTimer;
-let ib_muted = false; // shared mute flag, toggled from the Idle Breakout HUD
+let ib_muted = false;
 
 audio.volume = Number(volume.value);
 
@@ -917,30 +914,44 @@ function setPlayingVisuals(playing) {
     tracks.forEach(t => t.classList.toggle("playing", playing && t.classList.contains("active")));
 }
 
-// --- STAR RATING LOGIC (synced globally via Firebase Realtime Database) ---
-const ratings = {}; // keyed by a sanitized track key, values 1-5 (0/absent = unrated)
-const rateButtons = []; // { button, getSrc } for every "Rate" button on the page
+function getAnonId() {
+    let id = localStorage.getItem("ib_anon_id");
+    if (!id) {
+        id = "u_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem("ib_anon_id", id);
+    }
+    return id;
+}
 
-// Firebase Realtime Database keys can't contain . # $ [ ] /, so turn the
-// track src into a safe key (still unique per track).
+const anonId = getAnonId();
+const ratings = {};
+const rateButtons = [];
+
 function sanitizeKey(src) {
     return src.replace(/[.#$\[\]/]/g, "_");
+}
+
+function getTrackStats(key) {
+    const votes = ratings[key] || {};
+    const values = Object.values(votes);
+    const count = values.length;
+    const avg = count ? values.reduce((sum, v) => sum + v, 0) / count : 0;
+    const mine = votes[anonId] || 0;
+    return { avg, count, mine };
 }
 
 function updateRateButtonLabel(button, getSrc) {
     const src = getSrc();
     const key = src ? sanitizeKey(src) : null;
-    const value = key ? (ratings[key] || 0) : 0;
-    button.textContent = value ? `★ ${value}` : "☆ Rate";
-    button.classList.toggle("rated", value > 0);
+    const stats = key ? getTrackStats(key) : { avg: 0, count: 0, mine: 0 };
+    button.textContent = stats.count ? `★ ${stats.avg.toFixed(1)}` : "☆ Rate";
+    button.classList.toggle("rated", stats.mine > 0);
 }
 
 function refreshRateButtons() {
     rateButtons.forEach(({ button, getSrc }) => updateRateButtonLabel(button, getSrc));
 }
 
-// Keep the local `ratings` cache in sync with the database in real time,
-// so every visitor sees the same ratings, live.
 ratingsRef.on("value", snapshot => {
     const data = snapshot.val() || {};
     Object.keys(ratings).forEach(key => delete ratings[key]);
@@ -971,7 +982,6 @@ function createRateButton(getSrc, getTitle) {
     return wrapper;
 }
 
-// --- RATE SONG MODAL ---
 const rateOverlay = document.getElementById("rateOverlay");
 const rateModalTitleEl = document.getElementById("rateModalTitle");
 const rateModalCurrentEl = document.getElementById("rateModalCurrent");
@@ -993,10 +1003,12 @@ function openRateModal(getSrc, getTitle) {
     if (!src) return;
     rateModalGetSrc = getSrc;
     const key = sanitizeKey(src);
-    const currentTotal = ratings[key] || 0;
-    ratePendingValue = 0; // every visit adds fresh stars on top of the running total
+    const stats = getTrackStats(key);
+    ratePendingValue = stats.mine;
     rateModalTitleEl.textContent = getTitle() || "this track";
-    rateModalCurrentEl.textContent = `Current score: ${currentTotal} ★`;
+    rateModalCurrentEl.textContent = stats.count
+        ? `Average: ${stats.avg.toFixed(1)} ★ (${stats.count} rating${stats.count === 1 ? "" : "s"})`
+        : "No ratings yet";
     paintModalStars(ratePendingValue);
     rateOverlay.style.display = "flex";
 }
@@ -1010,7 +1022,6 @@ rateModalStars.addEventListener("click", event => {
     const star = event.target.closest(".star");
     if (!star) return;
     const value = Number(star.dataset.value);
-    // Clicking the currently-selected star clears the pending rating.
     ratePendingValue = ratePendingValue === value ? 0 : value;
     paintModalStars(ratePendingValue);
 });
@@ -1027,12 +1038,17 @@ closeRateBtn.addEventListener("click", closeRateModal);
 rateConfirmBtn.addEventListener("click", () => {
     if (!rateModalGetSrc) { closeRateModal(); return; }
     const src = rateModalGetSrc();
-    if (!src || ratePendingValue === 0) { closeRateModal(); return; }
+    if (!src) { closeRateModal(); return; }
     const key = sanitizeKey(src);
-    ratings[key] = (ratings[key] || 0) + ratePendingValue; // optimistic local update
+    if (ratePendingValue > 0) {
+        if (!ratings[key]) ratings[key] = {};
+        ratings[key][anonId] = ratePendingValue;
+        ratingsRef.child(key).child(anonId).set(ratePendingValue);
+    } else if (ratings[key]) {
+        delete ratings[key][anonId];
+        ratingsRef.child(key).child(anonId).remove();
+    }
     refreshRateButtons();
-    // Atomic increment so two people rating at the same moment don't clobber each other.
-    ratingsRef.child(key).transaction(current => (current || 0) + ratePendingValue);
     closeRateModal();
 });
 
@@ -1147,8 +1163,6 @@ volume.addEventListener("input", () => {
     audio.volume = Number(volume.value);
 });
 
-
-// --- CURSOR LOGIC ---
 const cursorQuery = window.matchMedia("(pointer: fine) and (hover: hover)");
 const customCursor = document.getElementById("customCursor");
 
@@ -1170,8 +1184,6 @@ function moveCustomCursor(event) {
 if (cursorQuery.matches) enableCustomCursor();
 cursorQuery.addEventListener("change", e => e.matches ? enableCustomCursor() : disableCustomCursor());
 
-
-// --- VIEW TOGGLE LOGIC ---
 const playerWindow = document.getElementById("playerWindow");
 const gameWindow = document.getElementById("gameWindow");
 const toggleBtn = document.getElementById("toggleBtn");
@@ -1183,7 +1195,7 @@ toggleBtn.addEventListener("click", () => {
     playerWindow.style.display = showingGame ? "none" : "";
     gameWindow.style.display = showingGame ? "" : "none";
     toggleBtn.textContent = showingGame ? "Back to Player" : "Play Game";
-    
+
     if (showingGame) {
         if (!gameStarted) {
             gameStarted = true;
@@ -1196,15 +1208,12 @@ toggleBtn.addEventListener("click", () => {
     }
 });
 
-
-// --- IDLE BREAKOUT LOGIC ---
-// --- IDLE BREAKOUT ENGINE ---
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 const IB_MAX_BALLS = 50;
 const IB_PRESTIGE_MIN_LEVEL = 5;
-const IB_CRIT_CAP = 50; 
+const IB_CRIT_CAP = 50;
 const IB_COLS = 6;
 const IB_ROWS = 4;
 const BRICK_W = 50;
@@ -1273,8 +1282,7 @@ function spawnBricks() {
 
 function addBall(type) {
     if (ib_balls.length >= IB_MAX_BALLS) return;
-    
-    // Default angles for Bouncer and Spread
+
     let dx = (Math.random() > 0.5 ? 1 : -1) * (100 + Math.random() * 50);
     let dy = -150 - Math.random() * 50;
 
@@ -1303,12 +1311,11 @@ function updateUI() {
     document.getElementById("moneyDisplay").textContent = ib_money;
     document.getElementById("levelDisplay").textContent = ib_level;
     document.getElementById("ballsCount").textContent = ib_balls.length;
-    
-    // Top Bar Buttons
+
     document.getElementById('btnBuyBouncer').disabled = ib_money < ib_costs.bouncer;
     document.getElementById('btnBuySpread').disabled = ib_money < ib_costs.spread;
     document.getElementById('btnBuySniper').disabled = ib_money < ib_costs.sniper;
-    
+
     document.getElementById('priceBouncer').textContent = `$${ib_costs.bouncer}`;
     document.getElementById('priceSpread').textContent = `$${ib_costs.spread}`;
     document.getElementById('priceSniper').textContent = `$${ib_costs.sniper}`;
@@ -1316,7 +1323,6 @@ function updateUI() {
     document.getElementById("btnPrestige").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
     document.getElementById("btnPrestigeIcon").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
 
-    // Upgrades Modal
     document.getElementById('btnUpgBouncerDmg').disabled = ib_money < ib_costs.bouncerDmg;
     document.getElementById('btnUpgBouncerSpeed').disabled = ib_money < ib_costs.bouncerSpeed;
     document.getElementById('valBouncerDmg').textContent = ib_stats.bouncer.dmg;
@@ -1337,7 +1343,7 @@ function updateUI() {
     document.getElementById('valSniperSpeed').textContent = ib_stats.sniper.speed.toFixed(2);
     document.getElementById('priceSniperDmg').textContent = `$${ib_costs.sniperDmg}`;
     document.getElementById('priceSniperSpeed').textContent = `$${ib_costs.sniperSpeed}`;
-    
+
     document.getElementById('btnUpgClick').disabled = ib_money < ib_costs.cDmg;
     document.getElementById('valClickDmg').textContent = ib_clickDmg;
     document.getElementById('priceClickDmg').textContent = `$${ib_costs.cDmg}`;
@@ -1345,11 +1351,10 @@ function updateUI() {
     document.getElementById("btnBuyCrit").disabled = ib_critChance >= IB_CRIT_CAP || ib_money < ib_costs.crit;
     document.getElementById("valCrit").textContent = ib_critChance;
     document.getElementById("priceCrit").textContent = ib_critChance >= IB_CRIT_CAP ? "MAX" : `$${ib_costs.crit}`;
-    
+
     document.getElementById("valPrestige").textContent = ib_prestigeMult.toFixed(1);
 }
 
-// Upgrade Listeners
 document.getElementById('btnBuyBouncer').addEventListener('click', () => buyBall('bouncer'));
 document.getElementById('btnBuySpread').addEventListener('click', () => buyBall('spread'));
 document.getElementById('btnBuySniper').addEventListener('click', () => buyBall('sniper'));
@@ -1388,7 +1393,6 @@ document.getElementById("btnBuyCrit").addEventListener("click", () => {
     }
 });
 
-// Modals and Settings
 document.getElementById('btnUpgradesInfo').addEventListener('click', () => document.getElementById('upgradesOverlay').style.display = 'flex');
 document.getElementById('closeUpgrades').addEventListener('click', () => document.getElementById('upgradesOverlay').style.display = 'none');
 document.getElementById("btnSettings").addEventListener("click", () => showToast("Settings coming soon!"));
@@ -1411,7 +1415,6 @@ function doPrestige() {
 document.getElementById("btnPrestige").addEventListener("click", doPrestige);
 document.getElementById("btnPrestigeIcon").addEventListener("click", doPrestige);
 
-// Click Damage
 canvas.addEventListener("mousedown", (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -1476,34 +1479,31 @@ function ib_update(dt) {
         ball.x += ball.dx * (ball.type === 'sniper' ? 1 : speedMult) * dt;
         ball.y += ball.dy * (ball.type === 'sniper' ? 1 : speedMult) * dt;
 
-        // Walls
         if (ball.x - ball.r < 0) { ball.x = ball.r; ball.dx *= -1; }
         if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.dx *= -1; }
         if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy *= -1; }
         if (ball.y + ball.r > canvas.height) { ball.y = canvas.height - ball.r; ball.dy *= -1; }
 
-        // Bricks
         for (let i = 0; i < ib_bricks.length; i++) {
             let b = ib_bricks[i];
-            
+
             let testX = ball.x < b.x ? b.x : (ball.x > b.x + b.w ? b.x + b.w : ball.x);
             let testY = ball.y < b.y ? b.y : (ball.y > b.y + b.h ? b.y + b.h : ball.y);
-            
+
             let distX = ball.x - testX;
             let distY = ball.y - testY;
-            
+
             if (Math.sqrt((distX*distX) + (distY*distY)) <= ball.r) {
                 if (ball.type === 'sniper') {
-                    ball.dx *= -1.5; // bounce back aggressively
+                    ball.dx *= -1.5;
                     ball.dy *= -1.5;
-                    ball.cooldown = 0.3; // short delay before locking next target
+                    ball.cooldown = 0.3;
                     b.hp -= baseDmg;
                 } else {
                     if (Math.abs(distX) > Math.abs(distY)) ball.dx *= -1; else ball.dy *= -1;
                     b.hp -= baseDmg;
-                    
+
                     if (ball.type === 'spread') {
-                        // Apply 30% damage to nearby bricks (within ~65px distance to center)
                         for (let j = 0; j < ib_bricks.length; j++) {
                             if (i !== j && Math.abs(ib_bricks[j].x - b.x) <= 60 && Math.abs(ib_bricks[j].y - b.y) <= 30) {
                                 ib_bricks[j].hp -= Math.max(1, Math.floor(baseDmg * 0.3));
@@ -1513,7 +1513,7 @@ function ib_update(dt) {
                     }
                 }
                 if (b.hp <= 0) b.dead = true;
-                break; // One collision per frame
+                break;
             }
         }
     }
