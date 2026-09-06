@@ -217,10 +217,20 @@ body {
 
 .star-widget.large .star { font-size: 16px; }
 
+.rate-cell {
+    margin-left: auto;
+    flex: 0 0 auto;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 2px solid #000;
+    padding-left: 8px;
+}
+
 .rate-btn {
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
-    margin-left: auto;
     flex: 0 0 64px;
     width: 64px;
     border: 0;
@@ -934,9 +944,14 @@ ratingsRef.on("value", snapshot => {
 });
 
 function createRateButton(getSrc, getTitle) {
+    const wrapper = document.createElement("span");
+    wrapper.className = "rate-cell";
+
     const button = document.createElement("button");
     button.type = "button";
     button.className = "rate-btn raised";
+    wrapper.appendChild(button);
+
     rateButtons.push({ button, getSrc });
     updateRateButtonLabel(button, getSrc);
 
@@ -945,7 +960,7 @@ function createRateButton(getSrc, getTitle) {
         openRateModal(getSrc, getTitle);
     });
 
-    return button;
+    return wrapper;
 }
 
 // --- RATE SONG MODAL ---
