@@ -559,7 +559,7 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
 
 .confetti-piece {
     position: fixed;
-    top: -16px;
+    bottom: -16px;
     width: 8px;
     height: 8px;
     pointer-events: none;
@@ -567,30 +567,31 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
     box-shadow:
         inset -1px -1px 0 rgba(0, 0, 0, .35),
         inset 1px 1px 0 rgba(255, 255, 255, .5);
-    animation: confetti-fall linear forwards;
+    animation: confetti-shoot ease-out forwards;
 }
 
-@keyframes confetti-fall {
-    to { transform: translateY(115vh) rotate(600deg); }
+@keyframes confetti-shoot {
+    from { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    to { transform: translate(var(--dx, 0), -115vh) rotate(600deg); opacity: 0; }
 }
 
 .tomato-overlay {
     position: fixed;
     inset: 0;
     z-index: 800;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: #000;
-    cursor: pointer;
+    pointer-events: none;
+    background: transparent;
 }
 
-.tomato-overlay.show { display: flex; }
-
-.tomato-overlay img {
+.tomato-overlay img.tomato-gif {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    background: transparent;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 body.custom-cursor-ready .custom-cursor { display: block; }
@@ -598,9 +599,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 </head>
 <body>
 
-<div class="tomato-overlay" id="tomatoOverlay">
-    <img src="tomato.gif" alt="">
-</div>
+<div class="tomato-overlay" id="tomatoOverlay"></div>
 
 <div class="app-stack">
 
@@ -946,12 +945,7 @@ const wowDogeSound = document.getElementById("wowDogeSound");
 const bruhSound = document.getElementById("bruhSound");
 const tomatoOverlay = document.getElementById("tomatoOverlay");
 const WIN98_CONFETTI_COLORS = ["#000080", "#008080", "#800000", "#808000", "#800080", "#c0c0c0", "#00ff00", "#ffff00"];
-let tomatoTimer;
-
-tomatoOverlay.addEventListener("click", () => {
-    tomatoOverlay.classList.remove("show");
-    clearTimeout(tomatoTimer);
-});
+let tomatoDurationPromise = null;
 
 function launchConfetti() {
     const pieceCount = 70;
@@ -959,18 +953,44 @@ function launchConfetti() {
         const piece = document.createElement("div");
         piece.className = "confetti-piece";
         piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.setProperty("--dx", `${Math.random() * 200 - 100}px`);
         piece.style.background = WIN98_CONFETTI_COLORS[Math.floor(Math.random() * WIN98_CONFETTI_COLORS.length)];
-        piece.style.animationDuration = `${2 + Math.random() * 1.5}s`;
+        piece.style.animationDuration = `${1.4 + Math.random() * 1}s`;
         piece.style.width = piece.style.height = `${6 + Math.random() * 6}px`;
         document.body.appendChild(piece);
         piece.addEventListener("animationend", () => piece.remove());
     }
 }
 
-function showTomatoOverlay() {
-    tomatoOverlay.classList.add("show");
-    clearTimeout(tomatoTimer);
-    tomatoTimer = setTimeout(() => tomatoOverlay.classList.remove("show"), 3000);
+function getTomatoDuration() {
+    if (tomatoDurationPromise) return tomatoDurationPromise;
+    tomatoDurationPromise = fetch("tomato.gif")
+        .then(res => res.arrayBuffer())
+        .then(buffer => {
+            const bytes = new Uint8Array(buffer);
+            let duration = 0;
+            for (let i = 0; i < bytes.length - 8; i++) {
+                if (bytes[i] === 0x21 && bytes[i + 1] === 0xF9 && bytes[i + 2] === 0x04) {
+                    const delay = bytes[i + 4] | (bytes[i + 5] << 8);
+                    duration += (delay === 0 ? 10 : delay) * 10;
+                }
+            }
+            return duration || 3000;
+        })
+        .catch(() => 3000);
+    return tomatoDurationPromise;
+}
+
+function spawnTomatoGif() {
+    const img = document.createElement("img");
+    img.src = "tomato.gif";
+    img.alt = "";
+    img.className = "tomato-gif";
+    img.addEventListener("click", () => img.remove());
+    tomatoOverlay.appendChild(img);
+    getTomatoDuration().then(duration => {
+        setTimeout(() => img.remove(), duration);
+    });
 }
 
 function playRatingSound(value) {
@@ -985,7 +1005,7 @@ function playRatingSound(value) {
             } catch {}
         }
     } else if (value <= 2) {
-        showTomatoOverlay();
+        spawnTomatoGif();
         if (!ib_muted) {
             try {
                 const sound = bruhSound.cloneNode(true);
