@@ -536,11 +536,11 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
 .ib-upgrade-buy .ib-price { display: block; margin-top: 1px; }
 .ib-upgrade-buy:active:not(:disabled) { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 
-.game-area { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
-.game-area .player-wrap { flex: 1 1 260px; min-width: 0; }
+.game-area { display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch; }
+.game-area .player-wrap { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; }
 .app-stack.game-mode { max-width: 860px; }
 
-.ib-leaderboard-list { display: flex; flex-direction: column; background: #fff; padding: 2px; max-height: 250px; overflow-y: auto; }
+.ib-leaderboard-list { display: flex; flex-direction: column; background: #fff; padding: 2px; overflow-y: auto; flex: 1 1 auto; min-height: 250px; }
 .ib-leaderboard-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px; border-bottom: 1px solid var(--shadow); font-size: 11px; }
 .ib-leaderboard-row:last-child { border-bottom: 0; }
 .ib-leaderboard-rank { font-weight: 700; width: 20px; flex: 0 0 auto; }
@@ -560,6 +560,22 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
     color: var(--muted);
     text-align: center;
     margin-top: 8px;
+}
+
+#leaderboardWindow .window-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-btn-row {
+    width: 100%;
+}
+
+.bottom-btn-row .toggle-btn {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 @media (pointer: fine) and (hover: hover) {
@@ -778,12 +794,14 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <div class="ib-leaderboard-list sunken" id="leaderboardList">
                     <div class="ib-leaderboard-row"><span class="ib-leaderboard-name">No scores yet</span></div>
                 </div>
-                <button type="button" class="toggle-btn raised" id="btnSaveScore" style="margin-top:8px;">Save Score</button>
             </div>
         </div>
     </div>
 
-    <button class="toggle-btn raised" id="toggleBtn">Play Game</button>
+    <div class="bottom-btn-row" id="bottomBtnRow" style="display:flex; gap:8px;">
+        <button class="toggle-btn raised" id="toggleBtn">Play Game</button>
+        <button class="toggle-btn raised" id="btnSaveScoreBottom" style="display:none;">Save Score</button>
+    </div>
 </div>
 
 <!-- UPGRADES MODAL -->
@@ -932,6 +950,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 
 <audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
 <audio id="errorSound" src="ErrorSound.mp3" preload="auto"></audio>
+<audio id="notificationSound" src="Notification.mp3" preload="auto"></audio>
 <audio id="wowDogeSound" src="wow-doge.mp3" preload="auto"></audio>
 <audio id="bruhSound" src="bruh.mp3" preload="auto"></audio>
 <div class="toast" id="toast"></div>
@@ -956,6 +975,7 @@ const leaderboardRef = firebase.database().ref("leaderboard");
 const audio = document.getElementById("audio");
 const clickSound = document.getElementById("clickSound");
 const errorSound = document.getElementById("errorSound");
+const notificationSound = document.getElementById("notificationSound");
 const tracks = [...document.querySelectorAll(".track")];
 const filterButtons = [...document.querySelectorAll(".filter")];
 const playBtn = document.getElementById("playBtn");
@@ -1012,6 +1032,15 @@ function playErrorSound() {
     if (ib_muted) return;
     try {
         const sound = errorSound.cloneNode(true);
+        sound.volume = 0.6;
+        sound.play().catch(() => {});
+    } catch {}
+}
+
+function playNotificationSound() {
+    if (ib_muted) return;
+    try {
+        const sound = notificationSound.cloneNode(true);
         sound.volume = 0.6;
         sound.play().catch(() => {});
     } catch {}
@@ -1092,12 +1121,13 @@ function playRatingSound(value) {
     }
 }
 
-function showToast(message) {
+function showToast(message, isError = false) {
     toast.textContent = message;
     toast.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
-    playErrorSound();
+    if (isError) playErrorSound();
+    else playNotificationSound();
 }
 
 function setPlayingVisuals(playing) {
@@ -1150,7 +1180,7 @@ ratingsRef.on("value", snapshot => {
     Object.assign(ratings, data);
     refreshRateButtons();
 }, error => {
-    showToast("Couldn't connect to the ratings database. Check firebaseConfig.");
+    showToast("Couldn't connect to the ratings database. Check firebaseConfig.", true);
     console.error(error);
 });
 
@@ -1281,7 +1311,7 @@ function selectTrack(index, autoplay = false) {
     if (autoplay) {
         audio.play().then(() => setPlayingVisuals(true)).catch(() => {
             setPlayingVisuals(false);
-            showToast("Audio could not start. Check that the MP3 file is beside index.html.");
+            showToast("Audio could not start. Check that the MP3 file is beside index.html.", true);
         });
     } else {
         setPlayingVisuals(false);
@@ -1296,7 +1326,7 @@ function togglePlay() {
 
     if (audio.paused) {
         audio.play().then(() => setPlayingVisuals(true)).catch(() => {
-            showToast("Audio could not start. Check the MP3 filename.");
+            showToast("Audio could not start. Check the MP3 filename.", true);
         });
     } else {
         audio.pause();
@@ -1345,7 +1375,7 @@ audio.addEventListener("ended", () => {
 
 audio.addEventListener("error", () => {
     setPlayingVisuals(false);
-    showToast("Could not load this audio file. Make sure the filename matches exactly.");
+    showToast("Could not load this audio file. Make sure the filename matches exactly.", true);
 });
 
 progress.addEventListener("input", () => {
@@ -1381,6 +1411,7 @@ const playerWindow = document.getElementById("playerWindow");
 const gameArea = document.getElementById("gameArea");
 const appStack = document.querySelector(".app-stack");
 const toggleBtn = document.getElementById("toggleBtn");
+const btnSaveScoreBottom = document.getElementById("btnSaveScoreBottom");
 let gameStarted = false;
 let showingGame = false;
 
@@ -1391,6 +1422,7 @@ function showGameView() {
     gameArea.style.display = "";
     appStack.classList.add("game-mode");
     toggleBtn.textContent = "Back to Player";
+    btnSaveScoreBottom.style.display = "";
     if (!gameStarted) {
         gameStarted = true;
         initIdleBreakout();
@@ -1406,12 +1438,17 @@ function showPlayerView() {
     gameArea.style.display = "none";
     appStack.classList.remove("game-mode");
     toggleBtn.textContent = "Play Game";
+    btnSaveScoreBottom.style.display = "none";
     cancelAnimationFrame(ib_reqId);
 }
 
 toggleBtn.addEventListener("click", () => {
     if (showingGame) showPlayerView();
     else showGameView();
+});
+
+btnSaveScoreBottom.addEventListener("click", () => {
+    ib_openSaveScoreModal();
 });
 
 const canvas = document.getElementById('gameCanvas');
@@ -1427,6 +1464,7 @@ const BRICK_H = 20;
 const PADDING = 8;
 const OFFSET_X = 20;
 const OFFSET_Y = 20;
+const IB_SNIPER_RETREAT_SPEED = 220;
 
 let ib_money = 0;
 let ib_level = 1;
@@ -1581,7 +1619,7 @@ function addBall(type) {
 
 function buyBall(type) {
     if (ib_balls.length >= IB_MAX_BALLS) {
-        showToast(`Max balls reached (${IB_MAX_BALLS}).`);
+        showToast(`Max balls reached (${IB_MAX_BALLS}).`, true);
         return;
     }
     if (ib_money >= ib_costs[type]) {
@@ -1694,7 +1732,7 @@ document.getElementById("btnMute").addEventListener("click", () => {
 });
 
 function doPrestige() {
-    if (ib_level < IB_PRESTIGE_MIN_LEVEL) { showToast(`Reach level ${IB_PRESTIGE_MIN_LEVEL} to prestige.`); return; }
+    if (ib_level < IB_PRESTIGE_MIN_LEVEL) { showToast(`Reach level ${IB_PRESTIGE_MIN_LEVEL} to prestige.`, true); return; }
     ib_prestigeMult = +(ib_prestigeMult + 0.1).toFixed(2);
     ib_money = 0; ib_level = 1; ib_balls = []; ib_clickDmg = 1; ib_critChance = 0;
     ib_stats = { bouncer: { dmg: 1, speed: 1 }, spread: { dmg: 2, speed: 1 }, sniper: { dmg: 5, speed: 1.5 } };
@@ -1793,8 +1831,10 @@ function ib_update(dt) {
 
             if (Math.sqrt((distX*distX) + (distY*distY)) <= ball.r) {
                 if (ball.type === 'sniper') {
-                    ball.dx *= -1.5;
-                    ball.dy *= -1.5;
+                    const retreatSpeed = IB_SNIPER_RETREAT_SPEED * speedMult;
+                    const towardLeft = ball.x < canvas.width / 2;
+                    ball.dx = (towardLeft ? -1 : 1) * retreatSpeed;
+                    ball.dy = (distY < 0 ? -1 : 1) * retreatSpeed * 0.4;
                     ball.cooldown = 0.3;
                     b.hp -= baseDmg;
                     ib_lifetimeStats.totalDamage += baseDmg;
@@ -1825,6 +1865,7 @@ function ib_update(dt) {
 }
 
 function ib_resolveBallCollisions() {
+    const IB_MAX_COLLISION_SPEED = 260;
     for (let i = 0; i < ib_balls.length; i++) {
         for (let j = i + 1; j < ib_balls.length; j++) {
             const a = ib_balls[i], b = ib_balls[j];
@@ -1843,6 +1884,15 @@ function ib_resolveBallCollisions() {
                 const diff = bDotN - aDotN;
                 a.dx += diff * nx; a.dy += diff * ny;
                 b.dx -= diff * nx; b.dy -= diff * ny;
+
+                [a, b].forEach(ball => {
+                    const speed = Math.hypot(ball.dx, ball.dy);
+                    if (speed > IB_MAX_COLLISION_SPEED) {
+                        const scale = IB_MAX_COLLISION_SPEED / speed;
+                        ball.dx *= scale;
+                        ball.dy *= scale;
+                    }
+                });
             }
         }
     }
@@ -1974,10 +2024,6 @@ leaderboardRef.orderByChild("score").limitToLast(15).on("value", snapshot => {
     entries.reverse();
     ib_renderLeaderboard(entries);
 }, () => {});
-
-document.getElementById("btnSaveScore").addEventListener("click", () => {
-    ib_openSaveScoreModal();
-});
 
 const saveScoreOverlay = document.getElementById("saveScoreOverlay");
 const saveScoreSummary = document.getElementById("saveScoreSummary");
