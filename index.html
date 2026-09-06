@@ -263,6 +263,13 @@ body {
     font-weight: 700;
     font-size: 13px;
     text-align: center;
+    margin-bottom: 4px;
+}
+
+.rate-modal-current {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
     margin-bottom: 10px;
 }
 
@@ -796,6 +803,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
         </div>
         <div class="window-body">
             <div class="rate-modal-title" id="rateModalTitle">Song Title</div>
+            <div class="rate-modal-current" id="rateModalCurrent">Current score: 0 ★</div>
             <div class="star-widget large" id="rateModalStars">
                 <span class="star" data-value="1">★</span>
                 <span class="star" data-value="2">★</span>
@@ -966,6 +974,7 @@ function createRateButton(getSrc, getTitle) {
 // --- RATE SONG MODAL ---
 const rateOverlay = document.getElementById("rateOverlay");
 const rateModalTitleEl = document.getElementById("rateModalTitle");
+const rateModalCurrentEl = document.getElementById("rateModalCurrent");
 const rateModalStars = document.getElementById("rateModalStars");
 const rateConfirmBtn = document.getElementById("rateConfirmBtn");
 const closeRateBtn = document.getElementById("closeRate");
@@ -984,8 +993,10 @@ function openRateModal(getSrc, getTitle) {
     if (!src) return;
     rateModalGetSrc = getSrc;
     const key = sanitizeKey(src);
-    ratePendingValue = ratings[key] || 0;
+    const currentTotal = ratings[key] || 0;
+    ratePendingValue = 0; // every visit adds fresh stars on top of the running total
     rateModalTitleEl.textContent = getTitle() || "this track";
+    rateModalCurrentEl.textContent = `Current score: ${currentTotal} ★`;
     paintModalStars(ratePendingValue);
     rateOverlay.style.display = "flex";
 }
@@ -1016,13 +1027,12 @@ closeRateBtn.addEventListener("click", closeRateModal);
 rateConfirmBtn.addEventListener("click", () => {
     if (!rateModalGetSrc) { closeRateModal(); return; }
     const src = rateModalGetSrc();
-    if (!src) { closeRateModal(); return; }
+    if (!src || ratePendingValue === 0) { closeRateModal(); return; }
     const key = sanitizeKey(src);
-    ratings[key] = ratePendingValue; // optimistic local update
+    ratings[key] = (ratings[key] || 0) + ratePendingValue; // optimistic local update
     refreshRateButtons();
-    // Persist globally. Writing 0 removes the entry instead of storing a zero.
-    if (ratePendingValue === 0) ratingsRef.child(key).remove();
-    else ratingsRef.child(key).set(ratePendingValue);
+    // Atomic increment so two people rating at the same moment don't clobber each other.
+    ratingsRef.child(key).transaction(current => (current || 0) + ratePendingValue);
     closeRateModal();
 });
 
