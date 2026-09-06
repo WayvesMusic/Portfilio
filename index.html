@@ -184,6 +184,34 @@ body {
 
 .track.active.playing .play-indicator { visibility: visible; }
 
+.star-widget {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-left: auto;
+    flex: 0 0 auto;
+}
+
+.star-widget .star {
+    font-size: 13px;
+    line-height: 1;
+    color: var(--shadow);
+    cursor: pointer;
+    user-select: none;
+}
+
+.star-widget .star.filled { color: #ffd700; }
+
+.track.active .star-widget .star:not(.filled) { color: rgba(255, 255, 255, .45); }
+
+.star-widget.large {
+    justify-content: center;
+    margin: 6px 0 0;
+    gap: 4px;
+}
+
+.star-widget.large .star { font-size: 16px; }
+
 .player {
     margin-top: 8px;
     padding: 8px;
@@ -528,6 +556,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <div class="lcd sunken">
                     <div class="player-title" id="playerTitle">NO TRACK LOADED</div>
                     <div class="player-genre" id="playerGenre">SELECT A TRACK ABOVE</div>
+                    <div id="playerRating"></div>
                 </div>
 
                 <div class="progress-wrap">
@@ -704,6 +733,22 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 <div class="toast" id="toast"></div>
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
+<!-- FIREBASE (free Spark plan, no card required) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyA01jTxtyNil96pYbKh8a6IpVrXnRjJo2s",
+    authDomain: "portfolio-e4692.firebaseapp.com",
+    // TODO: confirm this once you create the Realtime Database (step below) -
+    // the console shows the exact URL at the top of the Realtime Database page.
+    databaseURL: "https://portfolio-e4692-default-rtdb.firebaseio.com",
+    projectId: "portfolio-e4692"
+};
+firebase.initializeApp(firebaseConfig);
+const ratingsRef = firebase.database().ref("ratings");
+</script>
+
 <script>
 // --- MEDIA PLAYER LOGIC ---
 const audio = document.getElementById("audio");
@@ -718,6 +763,7 @@ const progress = document.getElementById("progress");
 const volume = document.getElementById("volume");
 const playerTitle = document.getElementById("playerTitle");
 const playerGenre = document.getElementById("playerGenre");
+const playerRatingEl = document.getElementById("playerRating");
 const currentTime = document.getElementById("currentTime");
 const duration = document.getElementById("duration");
 const toast = document.getElementById("toast");
@@ -783,6 +829,87 @@ function setPlayingVisuals(playing) {
     tracks.forEach(t => t.classList.toggle("playing", playing && t.classList.contains("active")));
 }
 
+// --- STAR RATING LOGIC (synced globally via Firebase Realtime Database) ---
+const ratings = {}; // keyed by a sanitized track key, values 1-5 (0/absent = unrated)
+const starWidgets = []; // every star widget on the page, kept in sync
+
+// Firebase Realtime Database keys can't contain . # $ [ ] /, so turn the
+// track src into a safe key (still unique per track).
+function sanitizeKey(src) {
+    return src.replace(/[.#$\[\]/]/g, "_");
+}
+
+// Keep the local `ratings` cache in sync with the database in real time,
+// so every visitor sees the same ratings, live.
+ratingsRef.on("value", snapshot => {
+    const data = snapshot.val() || {};
+    Object.keys(ratings).forEach(key => delete ratings[key]);
+    Object.assign(ratings, data);
+    starWidgets.forEach(widget => widget.refresh());
+}, error => {
+    showToast("Couldn't connect to the ratings database. Check firebaseConfig.");
+    console.error(error);
+});
+
+function createStarWidget(getSrc, size) {
+    const container = document.createElement("span");
+    container.className = "star-widget" + (size === "large" ? " large" : "");
+
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement("span");
+        star.className = "star";
+        star.dataset.value = i;
+        star.textContent = "★";
+        container.appendChild(star);
+    }
+
+    function paint(value) {
+        [...container.children].forEach(star => {
+            star.classList.toggle("filled", Number(star.dataset.value) <= value);
+        });
+    }
+
+    function refresh() {
+        const src = getSrc();
+        const key = src ? sanitizeKey(src) : null;
+        paint(key ? (ratings[key] || 0) : 0);
+    }
+
+    container.addEventListener("click", event => {
+        event.stopPropagation();
+        const star = event.target.closest(".star");
+        const src = getSrc();
+        if (!star || !src) return;
+        const key = sanitizeKey(src);
+        const value = Number(star.dataset.value);
+        // Clicking the current rating clears it, otherwise sets the new rating (max 5 stars).
+        const newValue = ratings[key] === value ? 0 : value;
+        ratings[key] = newValue; // optimistic local update
+        starWidgets.forEach(widget => widget.refresh());
+        // Persist globally. Writing 0 removes the entry instead of storing a zero.
+        if (newValue === 0) ratingsRef.child(key).remove();
+        else ratingsRef.child(key).set(newValue);
+    });
+
+    container.addEventListener("mousemove", event => {
+        const star = event.target.closest(".star");
+        if (star) paint(Number(star.dataset.value));
+    });
+
+    container.addEventListener("mouseleave", refresh);
+
+    container.refresh = refresh;
+    refresh();
+    starWidgets.push(container);
+    return container;
+}
+
+tracks.forEach(track => {
+    track.appendChild(createStarWidget(() => track.dataset.src));
+});
+
+playerRatingEl.appendChild(createStarWidget(() => tracks[currentIndex]?.dataset.src, "large"));
+
 function selectTrack(index, autoplay = false) {
     if (index < 0 || index >= tracks.length) return;
 
@@ -797,6 +924,7 @@ function selectTrack(index, autoplay = false) {
 
     playerTitle.textContent = title;
     playerGenre.textContent = genre;
+    starWidgets.forEach(widget => widget.refresh());
 
     if (audio.src !== new URL(src, window.location.href).href) {
         audio.src = src;
