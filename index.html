@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#008080">
-<title>Media Player & Idle Breakout</title>
+<title>Le Epic Port</title>
 <style>
 :root {
     --face: #c0c0c0;
@@ -536,6 +536,10 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
 .ib-upgrade-buy .ib-price { display: block; margin-top: 1px; }
 .ib-upgrade-buy:active:not(:disabled) { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 
+.game-area { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+.game-area .player-wrap { flex: 1 1 260px; min-width: 0; }
+.app-stack.game-mode { max-width: 860px; }
+
 .ib-leaderboard-list { display: flex; flex-direction: column; background: #fff; padding: 2px; max-height: 250px; overflow-y: auto; }
 .ib-leaderboard-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px; border-bottom: 1px solid var(--shadow); font-size: 11px; }
 .ib-leaderboard-row:last-child { border-bottom: 0; }
@@ -707,62 +711,76 @@ body.custom-cursor-ready .custom-cursor { display: block; }
         </div>
     </div>
 
-    <div class="player-wrap raised" id="gameWindow" style="display:none">
-        <div class="title-bar">
-            <span class="title-bar-text">Idle Breakout</span>
-            <div class="title-bar-controls"><span class="raised">_</span><span class="raised">□</span><span class="raised">✕</span></div>
-        </div>
-        <div class="window-body">
-            <div class="ib-toolbar raised">
-                <!-- 3 BALL SHOP BUTTONS -->
-                <div class="ib-shop-row">
-                    <button class="ib-shop-btn" id="btnBuyBouncer" title="Buy Bouncer Ball">
-                        <span class="ib-icon-circle" style="background:#ffe135;">B</span>
-                        <span class="ib-price" id="priceBouncer">$10</span>
-                    </button>
-                    <button class="ib-shop-btn" id="btnBuySpread" title="Buy Spread Ball">
-                        <span class="ib-icon-circle" style="background:#35ff8c;">S</span>
-                        <span class="ib-price" id="priceSpread">$50</span>
-                    </button>
-                    <button class="ib-shop-btn" id="btnBuySniper" title="Buy Sniper Ball">
-                        <span class="ib-icon-circle" style="background:#ff3535;">X</span>
-                        <span class="ib-price" id="priceSniper">$200</span>
-                    </button>
-                    <div class="ib-balls-box sunken">
-                        <span><span id="ballsCount">0</span>/<span id="ballsMax">50</span></span>
-                        <span class="ib-balls-label">BALLS</span>
+    <div class="game-area" id="gameArea" style="display:none">
+        <div class="player-wrap raised" id="gameWindow">
+            <div class="title-bar">
+                <span class="title-bar-text">Idle Breakout</span>
+                <div class="title-bar-controls"><span class="raised">_</span><span class="raised">□</span><span class="raised">✕</span></div>
+            </div>
+            <div class="window-body">
+                <div class="ib-toolbar raised">
+                    <!-- 3 BALL SHOP BUTTONS -->
+                    <div class="ib-shop-row">
+                        <button class="ib-shop-btn" id="btnBuyBouncer" title="Buy Bouncer Ball">
+                            <span class="ib-icon-circle" style="background:#ffe135;">B</span>
+                            <span class="ib-price" id="priceBouncer">$10</span>
+                        </button>
+                        <button class="ib-shop-btn" id="btnBuySpread" title="Buy Spread Ball">
+                            <span class="ib-icon-circle" style="background:#35ff8c;">S</span>
+                            <span class="ib-price" id="priceSpread">$50</span>
+                        </button>
+                        <button class="ib-shop-btn" id="btnBuySniper" title="Buy Sniper Ball">
+                            <span class="ib-icon-circle" style="background:#ff3535;">X</span>
+                            <span class="ib-price" id="priceSniper">$200</span>
+                        </button>
+                        <div class="ib-balls-box sunken">
+                            <span><span id="ballsCount">0</span>/<span id="ballsMax">50</span></span>
+                            <span class="ib-balls-label">BALLS</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="ib-status-row">
-                    <div class="ib-box sunken">
-                        <span class="ib-box-label">LEVEL</span>
-                        <span class="ib-box-value" id="levelDisplay">1</span>
-                    </div>
-                    <div class="ib-stack">
-                        <button class="ib-mini-toggle raised" id="btnUpgradesInfo">UPGRADES</button>
-                        <button class="ib-mini-toggle raised" id="btnPrestige">PRESTIGE</button>
-                    </div>
-                    <button class="ib-prestige-icon raised" id="btnPrestigeIcon" title="Prestige">▲▲</button>
-                    <div class="ib-money-box sunken">
-                        <span>$</span><span id="moneyDisplay">0</span>
-                    </div>
-                    <div class="ib-effects-box">
-                        <span class="ib-effects-label">EFFECTS</span>
-                        <div class="ib-effects-icons">
-                            <button class="ib-icon-btn raised" id="btnLeaderboard" title="Leaderboard">🏆</button>
-                            <button class="ib-icon-btn raised" id="btnSettings" title="Settings">⚙</button>
-                            <button class="ib-icon-btn raised" id="btnMute" title="Mute sound effects">🔊</button>
+                    <div class="ib-status-row">
+                        <div class="ib-box sunken">
+                            <span class="ib-box-label">LEVEL</span>
+                            <span class="ib-box-value" id="levelDisplay">1</span>
+                        </div>
+                        <div class="ib-stack">
+                            <button class="ib-mini-toggle raised" id="btnUpgradesInfo">UPGRADES</button>
+                            <button class="ib-mini-toggle raised" id="btnPrestige">PRESTIGE</button>
+                        </div>
+                        <button class="ib-prestige-icon raised" id="btnPrestigeIcon" title="Prestige">▲▲</button>
+                        <div class="ib-money-box sunken">
+                            <span>$</span><span id="moneyDisplay">0</span>
+                        </div>
+                        <div class="ib-effects-box">
+                            <span class="ib-effects-label">EFFECTS</span>
+                            <div class="ib-effects-icons">
+                                <button class="ib-icon-btn raised" id="btnSettings" title="Settings">⚙</button>
+                                <button class="ib-icon-btn raised" id="btnMute" title="Mute sound effects">🔊</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="canvas-container sunken">
-                <canvas id="gameCanvas" width="380" height="240"></canvas>
+                <div class="canvas-container sunken">
+                    <canvas id="gameCanvas" width="380" height="240"></canvas>
+                </div>
+            </div>
+            <div class="status-bar sunken" id="gameStatus">Click bricks to deal damage. Buy balls & upgrades!</div>
+        </div>
+
+        <div class="player-wrap raised" id="leaderboardWindow">
+            <div class="title-bar">
+                <span class="title-bar-text">Leaderboard</span>
+                <div class="title-bar-controls"><span class="raised">_</span><span class="raised">□</span><span class="raised">✕</span></div>
+            </div>
+            <div class="window-body">
+                <div class="ib-leaderboard-list sunken" id="leaderboardList">
+                    <div class="ib-leaderboard-row"><span class="ib-leaderboard-name">No scores yet</span></div>
+                </div>
+                <button type="button" class="toggle-btn raised" id="btnSaveScore" style="margin-top:8px;">Save Score</button>
             </div>
         </div>
-        <div class="status-bar sunken" id="gameStatus">Click bricks to deal damage. Buy balls & upgrades!</div>
     </div>
 
     <button class="toggle-btn raised" id="toggleBtn">Play Game</button>
@@ -897,19 +915,17 @@ body.custom-cursor-ready .custom-cursor { display: block; }
     </div>
 </div>
 
-<!-- LEADERBOARD MODAL -->
-<div class="ib-modal-overlay" id="leaderboardOverlay" style="display:none">
+<!-- PLAYER DETAILS MODAL -->
+<div class="ib-modal-overlay" id="playerDetailsOverlay" style="display:none">
     <div class="ib-modal raised">
         <div class="title-bar">
-            <span class="title-bar-text">Leaderboard</span>
+            <span class="title-bar-text" id="playerDetailsTitle">Player Details</span>
             <div class="title-bar-controls">
-                <span class="raised" id="closeLeaderboard">✕</span>
+                <span class="raised" id="closePlayerDetails">✕</span>
             </div>
         </div>
         <div class="window-body">
-            <div class="ib-leaderboard-list sunken" id="leaderboardList">
-                <div class="ib-leaderboard-row"><span class="ib-leaderboard-name">No scores yet</span></div>
-            </div>
+            <div class="ib-upgrade-list sunken" id="playerDetailsList"></div>
         </div>
     </div>
 </div>
@@ -1362,7 +1378,8 @@ if (cursorQuery.matches) enableCustomCursor();
 cursorQuery.addEventListener("change", e => e.matches ? enableCustomCursor() : disableCustomCursor());
 
 const playerWindow = document.getElementById("playerWindow");
-const gameWindow = document.getElementById("gameWindow");
+const gameArea = document.getElementById("gameArea");
+const appStack = document.querySelector(".app-stack");
 const toggleBtn = document.getElementById("toggleBtn");
 let gameStarted = false;
 let showingGame = false;
@@ -1371,7 +1388,8 @@ function showGameView() {
     if (showingGame) return;
     showingGame = true;
     playerWindow.style.display = "none";
-    gameWindow.style.display = "";
+    gameArea.style.display = "";
+    appStack.classList.add("game-mode");
     toggleBtn.textContent = "Back to Player";
     if (!gameStarted) {
         gameStarted = true;
@@ -1385,7 +1403,8 @@ function showPlayerView() {
     if (!showingGame) return;
     showingGame = false;
     playerWindow.style.display = "";
-    gameWindow.style.display = "none";
+    gameArea.style.display = "none";
+    appStack.classList.remove("game-mode");
     toggleBtn.textContent = "Play Game";
     cancelAnimationFrame(ib_reqId);
 }
@@ -1433,6 +1452,13 @@ let ib_costs = {
     cDmg: 15, crit: 30
 };
 
+let ib_lifetimeStats = {
+    totalDamage: 0,
+    totalMoneyEarned: 0,
+    totalClicks: 0,
+    ballsPurchased: { bouncer: 0, spread: 0, sniper: 0 }
+};
+
 function ib_getSaveKey() {
     return `ib_save_${anonId}`;
 }
@@ -1447,7 +1473,8 @@ function ib_saveState() {
         stats: ib_stats,
         costs: ib_costs,
         ballTypes: ib_balls.map(b => b.type),
-        muted: ib_muted
+        muted: ib_muted,
+        lifetimeStats: ib_lifetimeStats
     };
     try {
         localStorage.setItem(ib_getSaveKey(), JSON.stringify(state));
@@ -1475,6 +1502,18 @@ function ib_loadState() {
     ib_prestigeMult = state.prestigeMult || 1;
     if (state.stats) ib_stats = state.stats;
     if (state.costs) ib_costs = state.costs;
+    if (state.lifetimeStats) {
+        ib_lifetimeStats = {
+            totalDamage: state.lifetimeStats.totalDamage || 0,
+            totalMoneyEarned: state.lifetimeStats.totalMoneyEarned || 0,
+            totalClicks: state.lifetimeStats.totalClicks || 0,
+            ballsPurchased: {
+                bouncer: state.lifetimeStats.ballsPurchased?.bouncer || 0,
+                spread: state.lifetimeStats.ballsPurchased?.spread || 0,
+                sniper: state.lifetimeStats.ballsPurchased?.sniper || 0
+            }
+        };
+    }
     ib_muted = !!state.muted;
     document.getElementById("btnMute").textContent = ib_muted ? "🔇" : "🔊";
     ib_balls = [];
@@ -1549,6 +1588,7 @@ function buyBall(type) {
         ib_money -= ib_costs[type];
         addBall(type);
         ib_costs[type] = Math.floor(ib_costs[type] * 1.5);
+        ib_lifetimeStats.ballsPurchased[type] = (ib_lifetimeStats.ballsPurchased[type] || 0) + 1;
         updateUI();
         ib_saveState();
     }
@@ -1677,7 +1717,10 @@ canvas.addEventListener("mousedown", (e) => {
         let b = ib_bricks[i];
         if (mouseX >= b.x && mouseX <= b.x + b.w && mouseY >= b.y && mouseY <= b.y + b.h) {
             const isCrit = Math.random() * 100 < ib_critChance;
-            b.hp -= isCrit ? ib_clickDmg * 3 : ib_clickDmg;
+            const dmgDealt = isCrit ? ib_clickDmg * 3 : ib_clickDmg;
+            b.hp -= dmgDealt;
+            ib_lifetimeStats.totalDamage += dmgDealt;
+            ib_lifetimeStats.totalClicks++;
             playClickSound();
             if(b.hp <= 0) b.dead = true;
             break;
@@ -1692,6 +1735,7 @@ function processDeadBricks() {
             const b = ib_bricks[i];
             const payout = b.isGold ? Math.floor(b.maxHp * ib_prestigeMult) : Math.max(1, Math.floor((b.maxHp / 2) * ib_prestigeMult));
             ib_money += payout;
+            ib_lifetimeStats.totalMoneyEarned += payout;
             if (b.isGold) showToast(`⭐ Gold Block destroyed! +$${payout}`);
             ib_bricks.splice(i, 1);
             changed = true;
@@ -1753,14 +1797,18 @@ function ib_update(dt) {
                     ball.dy *= -1.5;
                     ball.cooldown = 0.3;
                     b.hp -= baseDmg;
+                    ib_lifetimeStats.totalDamage += baseDmg;
                 } else {
                     if (Math.abs(distX) > Math.abs(distY)) ball.dx *= -1; else ball.dy *= -1;
                     b.hp -= baseDmg;
+                    ib_lifetimeStats.totalDamage += baseDmg;
 
                     if (ball.type === 'spread') {
                         for (let j = 0; j < ib_bricks.length; j++) {
                             if (i !== j && Math.abs(ib_bricks[j].x - b.x) <= 60 && Math.abs(ib_bricks[j].y - b.y) <= 30) {
-                                ib_bricks[j].hp -= Math.max(1, Math.floor(baseDmg * 0.3));
+                                const splashDmg = Math.max(1, Math.floor(baseDmg * 0.3));
+                                ib_bricks[j].hp -= splashDmg;
+                                ib_lifetimeStats.totalDamage += splashDmg;
                                 if (ib_bricks[j].hp <= 0) ib_bricks[j].dead = true;
                             }
                         }
@@ -1871,24 +1919,22 @@ function ib_submitScore(name) {
     const finalName = (name || ib_getSavedName() || "Anonymous").slice(0, 16);
     leaderboardRef.child(anonId).once("value").then(snapshot => {
         const existing = snapshot.val();
-        if (!existing || score > existing.score) {
-            leaderboardRef.child(anonId).set({
-                name: finalName,
-                score: score,
-                level: ib_level,
-                prestige: ib_prestigeMult,
-                updatedAt: Date.now()
-            });
-        } else if (existing.name !== finalName) {
-            leaderboardRef.child(anonId).update({ name: finalName });
-        }
+        const bestScore = existing ? Math.max(score, existing.score || 0) : score;
+        leaderboardRef.child(anonId).set({
+            name: finalName,
+            score: bestScore,
+            level: ib_level,
+            prestige: ib_prestigeMult,
+            damage: Math.floor(ib_lifetimeStats.totalDamage),
+            moneyEarned: Math.floor(ib_lifetimeStats.totalMoneyEarned),
+            clicks: ib_lifetimeStats.totalClicks,
+            ballsPurchased: ib_lifetimeStats.ballsPurchased,
+            updatedAt: Date.now()
+        });
     }).catch(() => {});
 }
 
-const leaderboardOverlay = document.getElementById("leaderboardOverlay");
 const leaderboardList = document.getElementById("leaderboardList");
-const btnLeaderboard = document.getElementById("btnLeaderboard");
-const closeLeaderboard = document.getElementById("closeLeaderboard");
 
 function ib_renderLeaderboard(entries) {
     leaderboardList.innerHTML = "";
@@ -1902,6 +1948,7 @@ function ib_renderLeaderboard(entries) {
     entries.forEach((entry, index) => {
         const row = document.createElement("div");
         row.className = "ib-leaderboard-row" + (entry.id === anonId ? " mine" : "");
+        row.style.cursor = "pointer";
         const rank = document.createElement("span");
         rank.className = "ib-leaderboard-rank";
         rank.textContent = `${index + 1}.`;
@@ -1914,6 +1961,7 @@ function ib_renderLeaderboard(entries) {
         row.appendChild(rank);
         row.appendChild(name);
         row.appendChild(score);
+        row.addEventListener("click", () => ib_openPlayerDetailsModal(entry));
         leaderboardList.appendChild(row);
     });
 }
@@ -1921,18 +1969,14 @@ function ib_renderLeaderboard(entries) {
 leaderboardRef.orderByChild("score").limitToLast(15).on("value", snapshot => {
     const entries = [];
     snapshot.forEach(child => {
-        const val = child.val();
-        entries.push({ id: child.key, name: val.name, score: val.score });
+        entries.push({ id: child.key, ...child.val() });
     });
     entries.reverse();
     ib_renderLeaderboard(entries);
 }, () => {});
 
-btnLeaderboard.addEventListener("click", () => {
-    leaderboardOverlay.style.display = "flex";
-});
-closeLeaderboard.addEventListener("click", () => {
-    leaderboardOverlay.style.display = "none";
+document.getElementById("btnSaveScore").addEventListener("click", () => {
+    ib_openSaveScoreModal();
 });
 
 const saveScoreOverlay = document.getElementById("saveScoreOverlay");
@@ -1961,15 +2005,52 @@ saveScoreConfirmBtn.addEventListener("click", () => {
 
 closeSaveScoreBtn.addEventListener("click", ib_closeSaveScoreModal);
 
+const playerDetailsOverlay = document.getElementById("playerDetailsOverlay");
+const playerDetailsTitle = document.getElementById("playerDetailsTitle");
+const playerDetailsList = document.getElementById("playerDetailsList");
+const closePlayerDetailsBtn = document.getElementById("closePlayerDetails");
+
+function ib_addDetailRow(label, value) {
+    const row = document.createElement("div");
+    row.className = "ib-upgrade-row";
+    const info = document.createElement("div");
+    info.className = "ib-upgrade-info";
+    const name = document.createElement("span");
+    name.className = "ib-upgrade-name";
+    name.textContent = label;
+    info.appendChild(name);
+    const val = document.createElement("span");
+    val.className = "ib-upgrade-val";
+    val.textContent = value;
+    row.appendChild(info);
+    row.appendChild(val);
+    playerDetailsList.appendChild(row);
+}
+
+function ib_openPlayerDetailsModal(entry) {
+    playerDetailsTitle.textContent = entry.name || "Anonymous";
+    playerDetailsList.innerHTML = "";
+    const balls = entry.ballsPurchased || {};
+    ib_addDetailRow("Score", entry.score ?? 0);
+    ib_addDetailRow("Level Reached", entry.level ?? 1);
+    ib_addDetailRow("Prestige Multiplier", `x${(entry.prestige ?? 1).toFixed(1)}`);
+    ib_addDetailRow("Total Damage Dealt", entry.damage ?? 0);
+    ib_addDetailRow("Total Money Earned", `$${entry.moneyEarned ?? 0}`);
+    ib_addDetailRow("Manual Clicks", entry.clicks ?? 0);
+    ib_addDetailRow("Bouncer Balls Bought", balls.bouncer ?? 0);
+    ib_addDetailRow("Spread Balls Bought", balls.spread ?? 0);
+    ib_addDetailRow("Sniper Balls Bought", balls.sniper ?? 0);
+    playerDetailsOverlay.style.display = "flex";
+}
+
+closePlayerDetailsBtn.addEventListener("click", () => {
+    playerDetailsOverlay.style.display = "none";
+});
+
 let ib_pendingLeavePrompt = false;
 
-window.addEventListener("beforeunload", (e) => {
+window.addEventListener("beforeunload", () => {
     if (gameStarted) ib_saveState();
-    if (gameStarted && ib_hasProgress()) {
-        e.preventDefault();
-        e.returnValue = "";
-        return "";
-    }
 });
 
 document.addEventListener("visibilitychange", () => {
