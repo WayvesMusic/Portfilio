@@ -212,6 +212,43 @@ body {
 
 .star-widget.large .star { font-size: 16px; }
 
+.rate-btn {
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    margin-left: auto;
+    flex: 0 0 auto;
+    border: 0;
+    height: 22px;
+    padding: 0 8px;
+    font: 700 11px Tahoma, "MS Sans Serif", sans-serif;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.rate-btn.rated, .mini-btn.rated { color: #7a5b00; }
+
+.rate-btn:active {
+    box-shadow:
+        inset -1px -1px 0 var(--highlight),
+        inset 1px 1px 0 var(--dark-shadow),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--shadow) !important;
+    transform: translate(1px, 1px);
+}
+
+.player-rate-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.rate-modal-title {
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
 .player {
     margin-top: 8px;
     padding: 8px;
@@ -556,7 +593,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <div class="lcd sunken">
                     <div class="player-title" id="playerTitle">NO TRACK LOADED</div>
                     <div class="player-genre" id="playerGenre">SELECT A TRACK ABOVE</div>
-                    <div id="playerRating"></div>
                 </div>
 
                 <div class="progress-wrap">
@@ -573,6 +609,10 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <div class="volume">
                     <span>Vol</span>
                     <input id="volume" type="range" min="0" max="1" value=".8" step=".01" aria-label="Volume">
+                </div>
+
+                <div class="player-rate-row">
+                    <button type="button" class="mini-btn raised" id="playerRateBtn">☆ Rate</button>
                 </div>
 
                 <audio id="audio" preload="metadata"></audio>
@@ -728,6 +768,29 @@ body.custom-cursor-ready .custom-cursor { display: block; }
     </div>
 </div>
 
+<!-- RATE SONG MODAL -->
+<div class="ib-modal-overlay" id="rateOverlay" style="display:none">
+    <div class="ib-modal raised">
+        <div class="title-bar">
+            <span class="title-bar-text">Rate Song</span>
+            <div class="title-bar-controls">
+                <span class="raised" id="closeRate">✕</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="rate-modal-title" id="rateModalTitle">Song Title</div>
+            <div class="star-widget large" id="rateModalStars">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <button type="button" class="toggle-btn raised" id="rateConfirmBtn" style="margin-top:14px;">Confirm</button>
+        </div>
+    </div>
+</div>
+
 <audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
 <audio id="errorSound" src="ErrorSound.mp3" preload="auto"></audio>
 <div class="toast" id="toast"></div>
@@ -763,7 +826,7 @@ const progress = document.getElementById("progress");
 const volume = document.getElementById("volume");
 const playerTitle = document.getElementById("playerTitle");
 const playerGenre = document.getElementById("playerGenre");
-const playerRatingEl = document.getElementById("playerRating");
+const playerRateBtn = document.getElementById("playerRateBtn");
 const currentTime = document.getElementById("currentTime");
 const duration = document.getElementById("duration");
 const toast = document.getElementById("toast");
@@ -831,12 +894,24 @@ function setPlayingVisuals(playing) {
 
 // --- STAR RATING LOGIC (synced globally via Firebase Realtime Database) ---
 const ratings = {}; // keyed by a sanitized track key, values 1-5 (0/absent = unrated)
-const starWidgets = []; // every star widget on the page, kept in sync
+const rateButtons = []; // { button, getSrc } for every "Rate" button on the page
 
 // Firebase Realtime Database keys can't contain . # $ [ ] /, so turn the
 // track src into a safe key (still unique per track).
 function sanitizeKey(src) {
     return src.replace(/[.#$\[\]/]/g, "_");
+}
+
+function updateRateButtonLabel(button, getSrc) {
+    const src = getSrc();
+    const key = src ? sanitizeKey(src) : null;
+    const value = key ? (ratings[key] || 0) : 0;
+    button.textContent = value ? `★ ${value}` : "☆ Rate";
+    button.classList.toggle("rated", value > 0);
+}
+
+function refreshRateButtons() {
+    rateButtons.forEach(({ button, getSrc }) => updateRateButtonLabel(button, getSrc));
 }
 
 // Keep the local `ratings` cache in sync with the database in real time,
@@ -845,70 +920,99 @@ ratingsRef.on("value", snapshot => {
     const data = snapshot.val() || {};
     Object.keys(ratings).forEach(key => delete ratings[key]);
     Object.assign(ratings, data);
-    starWidgets.forEach(widget => widget.refresh());
+    refreshRateButtons();
 }, error => {
     showToast("Couldn't connect to the ratings database. Check firebaseConfig.");
     console.error(error);
 });
 
-function createStarWidget(getSrc, size) {
-    const container = document.createElement("span");
-    container.className = "star-widget" + (size === "large" ? " large" : "");
+function createRateButton(getSrc, getTitle) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "rate-btn raised";
+    rateButtons.push({ button, getSrc });
+    updateRateButtonLabel(button, getSrc);
 
-    for (let i = 1; i <= 5; i++) {
-        const star = document.createElement("span");
-        star.className = "star";
-        star.dataset.value = i;
-        star.textContent = "★";
-        container.appendChild(star);
-    }
-
-    function paint(value) {
-        [...container.children].forEach(star => {
-            star.classList.toggle("filled", Number(star.dataset.value) <= value);
-        });
-    }
-
-    function refresh() {
-        const src = getSrc();
-        const key = src ? sanitizeKey(src) : null;
-        paint(key ? (ratings[key] || 0) : 0);
-    }
-
-    container.addEventListener("click", event => {
+    button.addEventListener("click", event => {
         event.stopPropagation();
-        const star = event.target.closest(".star");
-        const src = getSrc();
-        if (!star || !src) return;
-        const key = sanitizeKey(src);
-        const value = Number(star.dataset.value);
-        // Clicking the current rating clears it, otherwise sets the new rating (max 5 stars).
-        const newValue = ratings[key] === value ? 0 : value;
-        ratings[key] = newValue; // optimistic local update
-        starWidgets.forEach(widget => widget.refresh());
-        // Persist globally. Writing 0 removes the entry instead of storing a zero.
-        if (newValue === 0) ratingsRef.child(key).remove();
-        else ratingsRef.child(key).set(newValue);
+        openRateModal(getSrc, getTitle);
     });
 
-    container.addEventListener("mousemove", event => {
-        const star = event.target.closest(".star");
-        if (star) paint(Number(star.dataset.value));
-    });
-
-    container.addEventListener("mouseleave", refresh);
-
-    container.refresh = refresh;
-    refresh();
-    starWidgets.push(container);
-    return container;
+    return button;
 }
 
-tracks.forEach(track => {
-    track.appendChild(createStarWidget(() => track.dataset.src));
+// --- RATE SONG MODAL ---
+const rateOverlay = document.getElementById("rateOverlay");
+const rateModalTitleEl = document.getElementById("rateModalTitle");
+const rateModalStars = document.getElementById("rateModalStars");
+const rateConfirmBtn = document.getElementById("rateConfirmBtn");
+const closeRateBtn = document.getElementById("closeRate");
+
+let rateModalGetSrc = null;
+let ratePendingValue = 0;
+
+function paintModalStars(value) {
+    [...rateModalStars.children].forEach(star => {
+        star.classList.toggle("filled", Number(star.dataset.value) <= value);
+    });
+}
+
+function openRateModal(getSrc, getTitle) {
+    const src = getSrc();
+    if (!src) return;
+    rateModalGetSrc = getSrc;
+    const key = sanitizeKey(src);
+    ratePendingValue = ratings[key] || 0;
+    rateModalTitleEl.textContent = getTitle() || "this track";
+    paintModalStars(ratePendingValue);
+    rateOverlay.style.display = "flex";
+}
+
+function closeRateModal() {
+    rateOverlay.style.display = "none";
+    rateModalGetSrc = null;
+}
+
+rateModalStars.addEventListener("click", event => {
+    const star = event.target.closest(".star");
+    if (!star) return;
+    const value = Number(star.dataset.value);
+    // Clicking the currently-selected star clears the pending rating.
+    ratePendingValue = ratePendingValue === value ? 0 : value;
+    paintModalStars(ratePendingValue);
 });
 
-playerRatingEl.appendChild(createStarWidget(() => tracks[currentIndex]?.dataset.src, "large"));
+rateModalStars.addEventListener("mousemove", event => {
+    const star = event.target.closest(".star");
+    if (star) paintModalStars(Number(star.dataset.value));
+});
+
+rateModalStars.addEventListener("mouseleave", () => paintModalStars(ratePendingValue));
+
+closeRateBtn.addEventListener("click", closeRateModal);
+
+rateConfirmBtn.addEventListener("click", () => {
+    if (!rateModalGetSrc) { closeRateModal(); return; }
+    const src = rateModalGetSrc();
+    if (!src) { closeRateModal(); return; }
+    const key = sanitizeKey(src);
+    ratings[key] = ratePendingValue; // optimistic local update
+    refreshRateButtons();
+    // Persist globally. Writing 0 removes the entry instead of storing a zero.
+    if (ratePendingValue === 0) ratingsRef.child(key).remove();
+    else ratingsRef.child(key).set(ratePendingValue);
+    closeRateModal();
+});
+
+tracks.forEach(track => {
+    track.appendChild(createRateButton(() => track.dataset.src, () => track.dataset.title));
+});
+
+playerRateBtn.addEventListener("click", () => {
+    openRateModal(() => tracks[currentIndex]?.dataset.src, () => tracks[currentIndex]?.dataset.title || "this track");
+});
+rateButtons.push({ button: playerRateBtn, getSrc: () => tracks[currentIndex]?.dataset.src });
+updateRateButtonLabel(playerRateBtn, () => tracks[currentIndex]?.dataset.src);
 
 function selectTrack(index, autoplay = false) {
     if (index < 0 || index >= tracks.length) return;
@@ -924,7 +1028,7 @@ function selectTrack(index, autoplay = false) {
 
     playerTitle.textContent = title;
     playerGenre.textContent = genre;
-    starWidgets.forEach(widget => widget.refresh());
+    updateRateButtonLabel(playerRateBtn, () => tracks[currentIndex]?.dataset.src);
 
     if (audio.src !== new URL(src, window.location.href).href) {
         audio.src = src;
