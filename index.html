@@ -743,7 +743,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
             </div>
             <div class="window-body">
                 <div class="ib-toolbar raised">
-                    <!-- 4 SHOP BUTTONS: 3 balls + laser turret -->
+                    <!-- 5 SHOP BUTTONS: 3 balls + laser turret + auto turret -->
                     <div class="ib-shop-row">
                         <button class="ib-shop-btn" id="btnBuyBouncer" title="Buy Bouncer Ball">
                             <span class="ib-icon-circle" style="background:#ffe135;">B</span>
@@ -760,6 +760,10 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                         <button class="ib-shop-btn" id="btnBuyLaser" title="Buy Laser Turret" style="display:none;">
                             <span class="ib-icon-circle" style="background:#ff35f3;">L</span>
                             <span class="ib-price" id="priceLaser">$750</span>
+                        </button>
+                        <button class="ib-shop-btn" id="btnBuyTurret" title="Buy Auto Turret">
+                            <span class="ib-icon-circle" style="background:#ff9d35;">T</span>
+                            <span class="ib-price" id="priceTurret">$1.2K</span>
                         </button>
                         <div class="ib-balls-box sunken">
                             <span><span id="ballsCount">0</span>/<span id="ballsMax">50</span></span>
@@ -900,6 +904,29 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                     <button class="ib-upgrade-buy raised" id="btnUpgLaserSweep">Buy<span class="ib-price" id="priceLaserSweep">$250</span></button>
                 </div>
 
+                <div class="ib-upgrade-section-title">AUTO TURRETS</div>
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Turret Damage</span>
+                        <span class="ib-upgrade-val">Level <span id="valTurretDmg">12</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgTurretDmg">Buy<span class="ib-price" id="priceTurretDmg">$700</span></button>
+                </div>
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Turret Fire Rate</span>
+                        <span class="ib-upgrade-val">Every <span id="valTurretRate">1.40</span>s</span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgTurretRate">Buy<span class="ib-price" id="priceTurretRate">$500</span></button>
+                </div>
+                <div class="ib-upgrade-row">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Turret Targeting</span>
+                        <span class="ib-upgrade-val">Range x<span id="valTurretRange">1.00</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgTurretRange">Buy<span class="ib-price" id="priceTurretRange">$400</span></button>
+                </div>
+
                 <div class="ib-upgrade-section-title">GLOBAL</div>
                 <!-- GLOBAL UPGRADES -->
                 <div class="ib-upgrade-row">
@@ -946,10 +973,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <div class="ib-settings-row">
                     <span class="ib-settings-label">Particle Effects</span>
                     <button class="ib-settings-toggle raised" id="toggleParticles">ON</button>
-                </div>
-                <div class="ib-settings-row">
-                    <span class="ib-settings-label">Damage Numbers</span>
-                    <button class="ib-settings-toggle raised" id="toggleDamageNums">ON</button>
                 </div>
                 <div class="ib-settings-row">
                     <span class="ib-settings-label">Sound Effects</span>
@@ -1526,6 +1549,7 @@ const ctx = canvas.getContext('2d');
 
 const IB_MAX_BALLS = 50;
 const IB_MAX_LASERS = 4;
+const IB_MAX_TURRETS = 6;
 const IB_PRESTIGE_MIN_LEVEL = 5;
 const IB_CRIT_CAP = 50;
 const IB_COLS = 6;
@@ -1546,21 +1570,28 @@ let ib_critChance = 0;
 let ib_prestigeMult = 1;
 let ib_balls = [];
 let ib_lasers = [];
+let ib_turrets = [];
 let ib_bricks = [];
 let ib_lastTime = 0;
 let ib_reqId = null;
+const IB_MAX_PARTICLES = 140;
 let ib_particles = [];
-let ib_damageTexts = [];
 let ib_beamFlashes = [];
+let ib_turretShots = [];
 let ib_shakeTime = 0;
+let ib_shakeInitialTime = 0;
 let ib_shakeMag = 0;
+let ib_shakeOffsetX = 0;
+let ib_shakeOffsetY = 0;
+let ib_shakeTargetX = 0;
+let ib_shakeTargetY = 0;
+let ib_shakeTargetTimer = 0;
 let ib_bossActive = false;
 let ib_lastLeaveTime = null;
 
 let ib_settings = {
     shake: true,
     particles: true,
-    damageNums: true,
     sfx: true
 };
 
@@ -1568,15 +1599,17 @@ let ib_stats = {
     bouncer: { dmg: 1, speed: 1 },
     spread:  { dmg: 2, speed: 1 },
     sniper:  { dmg: 5, speed: 1.5 },
-    laser:   { dmg: 8, rate: 2.5, sweep: 1 }
+    laser:   { dmg: 8, rate: 2.5, sweep: 1 },
+    turret:  { dmg: 12, rate: 1.4, range: 1 }
 };
 
 let ib_costs = {
-    bouncer: 10, spread: 50, sniper: 200, laser: 750,
+    bouncer: 10, spread: 50, sniper: 200, laser: 750, turret: 1200,
     bouncerDmg: 25, bouncerSpeed: 20,
     spreadDmg: 100, spreadSpeed: 80,
     sniperDmg: 400, sniperSpeed: 300,
     laserDmg: 500, laserRate: 350, laserSweep: 250,
+    turretDmg: 700, turretRate: 500, turretRange: 400,
     cDmg: 15, crit: 30
 };
 
@@ -1584,7 +1617,7 @@ let ib_lifetimeStats = {
     totalDamage: 0,
     totalMoneyEarned: 0,
     totalClicks: 0,
-    ballsPurchased: { bouncer: 0, spread: 0, sniper: 0, laser: 0 },
+    ballsPurchased: { bouncer: 0, spread: 0, sniper: 0, laser: 0, turret: 0 },
     bossesDefeated: 0
 };
 
@@ -1614,6 +1647,7 @@ function ib_saveState() {
         costs: ib_costs,
         ballTypes: ib_balls.map(b => b.type),
         laserCount: ib_lasers.length,
+        turretCount: ib_turrets.length,
         muted: ib_muted,
         settings: ib_settings,
         lifetimeStats: ib_lifetimeStats,
@@ -1644,11 +1678,21 @@ function ib_loadState() {
     ib_critChance = state.critChance || 0;
     ib_prestigeMult = state.prestigeMult || 1;
     if (state.stats) {
-        ib_stats = Object.assign({ laser: { dmg: 8, rate: 2.5, sweep: 1 } }, state.stats);
-        if (!ib_stats.laser) ib_stats.laser = { dmg: 8, rate: 2.5, sweep: 1 };
+        ib_stats = Object.assign({
+            bouncer: { dmg: 1, speed: 1 },
+            spread: { dmg: 2, speed: 1 },
+            sniper: { dmg: 5, speed: 1.5 },
+            laser: { dmg: 8, rate: 2.5, sweep: 1 },
+            turret: { dmg: 12, rate: 1.4, range: 1 }
+        }, state.stats);
+        ib_stats.laser = Object.assign({ dmg: 8, rate: 2.5, sweep: 1 }, ib_stats.laser || {});
+        ib_stats.turret = Object.assign({ dmg: 12, rate: 1.4, range: 1 }, ib_stats.turret || {});
     }
     if (state.costs) {
-        ib_costs = Object.assign({ laser: 750, laserDmg: 500, laserRate: 350, laserSweep: 250 }, state.costs);
+        ib_costs = Object.assign({
+            laser: 750, laserDmg: 500, laserRate: 350, laserSweep: 250,
+            turret: 1200, turretDmg: 700, turretRate: 500, turretRange: 400
+        }, state.costs);
     }
     if (state.settings) ib_settings = Object.assign(ib_settings, state.settings);
     if (state.lifetimeStats) {
@@ -1660,7 +1704,8 @@ function ib_loadState() {
                 bouncer: state.lifetimeStats.ballsPurchased?.bouncer || 0,
                 spread: state.lifetimeStats.ballsPurchased?.spread || 0,
                 sniper: state.lifetimeStats.ballsPurchased?.sniper || 0,
-                laser: state.lifetimeStats.ballsPurchased?.laser || 0
+                laser: state.lifetimeStats.ballsPurchased?.laser || 0,
+                turret: state.lifetimeStats.ballsPurchased?.turret || 0
             },
             bossesDefeated: state.lifetimeStats.bossesDefeated || 0
         };
@@ -1668,14 +1713,16 @@ function ib_loadState() {
     ib_muted = !!state.muted;
     document.getElementById("btnMute").textContent = ib_muted ? "🔇" : "🔊";
     ib_balls = [];
+    ib_turrets = [];
     (state.ballTypes || []).forEach(type => addBall(type));
     for (let i = 0; i < (state.laserCount || 0); i++) addLaser();
+    for (let i = 0; i < (state.turretCount || 0); i++) addTurret();
     ib_lastLeaveTime = state.lastActive || null;
     return true;
 }
 
 function ib_hasProgress() {
-    return ib_money > 0 || ib_level > 1 || ib_balls.length > 0 || ib_prestigeMult > 1;
+    return ib_money > 0 || ib_level > 1 || ib_balls.length > 0 || ib_lasers.length > 0 || ib_turrets.length > 0 || ib_prestigeMult > 1;
 }
 
 function ib_computeScore() {
@@ -1690,6 +1737,9 @@ function ib_estimateDps() {
     }
     for (let i = 0; i < ib_lasers.length; i++) {
         dps += ib_stats.laser.dmg / Math.max(0.4, ib_stats.laser.rate);
+    }
+    for (let i = 0; i < ib_turrets.length; i++) {
+        dps += ib_stats.turret.dmg / Math.max(0.35, ib_stats.turret.rate);
     }
     return dps;
 }
@@ -1706,7 +1756,7 @@ function ib_applyOfflineEarnings() {
     if (earned <= 0) return;
     ib_money += earned;
     ib_lifetimeStats.totalMoneyEarned += earned;
-    showToast(`Welcome back! Idle balls & lasers earned $${ib_formatNumber(earned)} while away.`);
+    showToast(`Welcome back! Idle defenses earned $${ib_formatNumber(earned)} while away.`);
     ib_saveState();
 }
 
@@ -1800,6 +1850,16 @@ function addLaser() {
     });
 }
 
+function addTurret() {
+    if (ib_turrets.length >= IB_MAX_TURRETS) return;
+    ib_turrets.push({
+        angle: -Math.PI / 2,
+        cooldown: Math.random() * 0.8,
+        recoil: 0,
+        flash: 0
+    });
+}
+
 function buyBall(type) {
     if (ib_balls.length >= IB_MAX_BALLS) {
         showToast(`Max balls reached (${IB_MAX_BALLS}).`, true);
@@ -1830,6 +1890,21 @@ function buyLaser() {
     }
 }
 
+function buyTurret() {
+    if (ib_turrets.length >= IB_MAX_TURRETS) {
+        showToast(`Max auto turrets reached (${IB_MAX_TURRETS}).`, true);
+        return;
+    }
+    if (ib_money >= ib_costs.turret) {
+        ib_money -= ib_costs.turret;
+        addTurret();
+        ib_costs.turret = Math.floor(ib_costs.turret * 1.75);
+        ib_lifetimeStats.ballsPurchased.turret = (ib_lifetimeStats.ballsPurchased.turret || 0) + 1;
+        updateUI();
+        ib_saveState();
+    }
+}
+
 function updateUI() {
     document.getElementById("moneyDisplay").textContent = ib_formatNumber(ib_money);
     document.getElementById("levelDisplay").textContent = ib_level;
@@ -1839,11 +1914,13 @@ function updateUI() {
     document.getElementById('btnBuySpread').disabled = ib_money < ib_costs.spread;
     document.getElementById('btnBuySniper').disabled = ib_money < ib_costs.sniper;
     document.getElementById('btnBuyLaser').disabled = ib_money < ib_costs.laser || ib_lasers.length >= IB_MAX_LASERS;
+    document.getElementById('btnBuyTurret').disabled = ib_money < ib_costs.turret || ib_turrets.length >= IB_MAX_TURRETS;
 
     document.getElementById('priceBouncer').textContent = `$${ib_formatNumber(ib_costs.bouncer)}`;
     document.getElementById('priceSpread').textContent = `$${ib_formatNumber(ib_costs.spread)}`;
     document.getElementById('priceSniper').textContent = `$${ib_formatNumber(ib_costs.sniper)}`;
     document.getElementById('priceLaser').textContent = ib_lasers.length >= IB_MAX_LASERS ? "MAX" : `$${ib_formatNumber(ib_costs.laser)}`;
+    document.getElementById('priceTurret').textContent = ib_turrets.length >= IB_MAX_TURRETS ? "MAX" : `$${ib_formatNumber(ib_costs.turret)}`;
 
     document.getElementById("btnPrestige").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
     document.getElementById("btnPrestigeIcon").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
@@ -1879,6 +1956,16 @@ function updateUI() {
     document.getElementById('priceLaserRate').textContent = ib_stats.laser.rate <= 0.4 ? "MAX" : `$${ib_formatNumber(ib_costs.laserRate)}`;
     document.getElementById('priceLaserSweep').textContent = `$${ib_formatNumber(ib_costs.laserSweep)}`;
 
+    document.getElementById('btnUpgTurretDmg').disabled = ib_money < ib_costs.turretDmg;
+    document.getElementById('btnUpgTurretRate').disabled = ib_money < ib_costs.turretRate || ib_stats.turret.rate <= 0.35;
+    document.getElementById('btnUpgTurretRange').disabled = ib_money < ib_costs.turretRange;
+    document.getElementById('valTurretDmg').textContent = ib_stats.turret.dmg;
+    document.getElementById('valTurretRate').textContent = ib_stats.turret.rate.toFixed(2);
+    document.getElementById('valTurretRange').textContent = ib_stats.turret.range.toFixed(2);
+    document.getElementById('priceTurretDmg').textContent = `$${ib_formatNumber(ib_costs.turretDmg)}`;
+    document.getElementById('priceTurretRate').textContent = ib_stats.turret.rate <= 0.35 ? "MAX" : `$${ib_formatNumber(ib_costs.turretRate)}`;
+    document.getElementById('priceTurretRange').textContent = `$${ib_formatNumber(ib_costs.turretRange)}`;
+
     document.getElementById('btnUpgClick').disabled = ib_money < ib_costs.cDmg;
     document.getElementById('valClickDmg').textContent = ib_clickDmg;
     document.getElementById('priceClickDmg').textContent = `$${ib_formatNumber(ib_costs.cDmg)}`;
@@ -1896,6 +1983,7 @@ document.getElementById('btnBuyBouncer').addEventListener('click', () => buyBall
 document.getElementById('btnBuySpread').addEventListener('click', () => buyBall('spread'));
 document.getElementById('btnBuySniper').addEventListener('click', () => buyBall('sniper'));
 document.getElementById('btnBuyLaser').addEventListener('click', buyLaser);
+document.getElementById('btnBuyTurret').addEventListener('click', buyTurret);
 
 function handleUpgrade(statObj, costKey, type, increment) {
     if (ib_money >= ib_costs[costKey]) {
@@ -1926,6 +2014,18 @@ document.getElementById('btnUpgLaserRate').addEventListener('click', () => {
     }
 });
 document.getElementById('btnUpgLaserSweep').addEventListener('click', () => handleUpgrade(ib_stats.laser, 'laserSweep', 'sweep', 0.2));
+document.getElementById('btnUpgTurretDmg').addEventListener('click', () => handleUpgrade(ib_stats.turret, 'turretDmg', 'dmg', 5));
+document.getElementById('btnUpgTurretRate').addEventListener('click', () => {
+    if (ib_stats.turret.rate <= 0.35) return;
+    if (ib_money >= ib_costs.turretRate) {
+        ib_money -= ib_costs.turretRate;
+        ib_stats.turret.rate = Math.max(0.35, +(ib_stats.turret.rate - 0.12).toFixed(2));
+        ib_costs.turretRate = Math.floor(ib_costs.turretRate * 1.65);
+        updateUI();
+        ib_saveState();
+    }
+});
+document.getElementById('btnUpgTurretRange').addEventListener('click', () => handleUpgrade(ib_stats.turret, 'turretRange', 'range', 0.2));
 
 document.getElementById('btnUpgClick').addEventListener('click', () => {
     if (ib_money >= ib_costs.cDmg) {
@@ -1961,7 +2061,6 @@ function ib_refreshSettingsUI() {
     const map = {
         toggleShake: 'shake',
         toggleParticles: 'particles',
-        toggleDamageNums: 'damageNums',
         toggleSfx: 'sfx'
     };
     Object.entries(map).forEach(([id, key]) => {
@@ -1982,7 +2081,6 @@ function ib_bindSettingsToggle(id, key) {
 }
 ib_bindSettingsToggle("toggleShake", "shake");
 ib_bindSettingsToggle("toggleParticles", "particles");
-ib_bindSettingsToggle("toggleDamageNums", "damageNums");
 ib_bindSettingsToggle("toggleSfx", "sfx");
 
 document.getElementById("btnMute").addEventListener("click", () => {
@@ -1996,9 +2094,9 @@ document.getElementById("btnMute").addEventListener("click", () => {
 function doPrestige() {
     if (ib_level < IB_PRESTIGE_MIN_LEVEL) { showToast(`Reach level ${IB_PRESTIGE_MIN_LEVEL} to prestige.`, true); return; }
     ib_prestigeMult = +(ib_prestigeMult + 0.1).toFixed(2);
-    ib_money = 0; ib_level = 1; ib_balls = []; ib_lasers = []; ib_clickDmg = 1; ib_critChance = 0;
-    ib_stats = { bouncer: { dmg: 1, speed: 1 }, spread: { dmg: 2, speed: 1 }, sniper: { dmg: 5, speed: 1.5 }, laser: { dmg: 8, rate: 2.5, sweep: 1 } };
-    ib_costs = { bouncer: 10, spread: 50, sniper: 200, laser: 750, bouncerDmg: 25, bouncerSpeed: 20, spreadDmg: 100, spreadSpeed: 80, sniperDmg: 400, sniperSpeed: 300, laserDmg: 500, laserRate: 350, laserSweep: 250, cDmg: 15, crit: 30 };
+    ib_money = 0; ib_level = 1; ib_balls = []; ib_lasers = []; ib_turrets = []; ib_clickDmg = 1; ib_critChance = 0;
+    ib_stats = { bouncer: { dmg: 1, speed: 1 }, spread: { dmg: 2, speed: 1 }, sniper: { dmg: 5, speed: 1.5 }, laser: { dmg: 8, rate: 2.5, sweep: 1 }, turret: { dmg: 12, rate: 1.4, range: 1 } };
+    ib_costs = { bouncer: 10, spread: 50, sniper: 200, laser: 750, turret: 1200, bouncerDmg: 25, bouncerSpeed: 20, spreadDmg: 100, spreadSpeed: 80, sniperDmg: 400, sniperSpeed: 300, laserDmg: 500, laserRate: 350, laserSweep: 250, turretDmg: 700, turretRate: 500, turretRange: 400, cDmg: 15, crit: 30 };
     spawnBricks();
     updateUI();
     showToast(`Prestiged! Multiplier now x${ib_prestigeMult.toFixed(1)}`);
@@ -2010,35 +2108,63 @@ document.getElementById("btnPrestigeIcon").addEventListener("click", doPrestige)
 
 function ib_screenShake(duration, magnitude) {
     if (!ib_settings.shake) return;
-    ib_shakeTime = Math.max(ib_shakeTime, duration);
-    ib_shakeMag = Math.max(ib_shakeMag, magnitude);
+    // Only restart the shake if this hit is stronger than what's already playing,
+    // so small hits don't keep resetting a bigger ongoing shake.
+    if (magnitude >= ib_shakeMag || ib_shakeTime <= 0) {
+        ib_shakeMag = magnitude;
+        ib_shakeTime = duration;
+        ib_shakeInitialTime = duration;
+        ib_shakeTargetTimer = 0;
+    }
+}
+
+function ib_updateShake(dt) {
+    if (ib_shakeTime > 0) {
+        ib_shakeTime -= dt;
+        ib_shakeTargetTimer -= dt;
+
+        // Ease the magnitude out over the shake's lifetime instead of a hard cutoff.
+        const progress = ib_shakeInitialTime > 0 ? Math.max(0, ib_shakeTime / ib_shakeInitialTime) : 0;
+        const eased = ib_shakeMag * progress * progress;
+
+        // Pick a new random target only a handful of times per second, then glide
+        // toward it every frame - this reads as a smooth wobble instead of jitter.
+        if (ib_shakeTargetTimer <= 0) {
+            ib_shakeTargetX = (Math.random() * 2 - 1) * eased;
+            ib_shakeTargetY = (Math.random() * 2 - 1) * eased;
+            ib_shakeTargetTimer = 0.045;
+        }
+    } else {
+        ib_shakeTargetX = 0;
+        ib_shakeTargetY = 0;
+    }
+
+    // Frame-rate independent smoothing toward the current target.
+    const smoothing = 1 - Math.pow(0.0005, dt);
+    ib_shakeOffsetX += (ib_shakeTargetX - ib_shakeOffsetX) * smoothing;
+    ib_shakeOffsetY += (ib_shakeTargetY - ib_shakeOffsetY) * smoothing;
+    if (Math.abs(ib_shakeOffsetX) < 0.02) ib_shakeOffsetX = 0;
+    if (Math.abs(ib_shakeOffsetY) < 0.02) ib_shakeOffsetY = 0;
 }
 
 function ib_spawnParticles(x, y, color, count) {
     if (!ib_settings.particles) return;
-    for (let i = 0; i < count; i++) {
+    const room = IB_MAX_PARTICLES - ib_particles.length;
+    if (room <= 0) return;
+    const spawnCount = Math.min(count, room);
+    for (let i = 0; i < spawnCount; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 40 + Math.random() * 100;
         ib_particles.push({
             x, y,
             dx: Math.cos(angle) * speed,
             dy: Math.sin(angle) * speed,
-            life: 0.4 + Math.random() * 0.4,
+            life: 0.35 + Math.random() * 0.3,
             age: 0,
             size: 2 + Math.random() * 3,
             color
         });
     }
-}
-
-function ib_spawnDamageText(x, y, value, isCrit) {
-    if (!ib_settings.damageNums) return;
-    ib_damageTexts.push({
-        x, y, value,
-        isCrit: !!isCrit,
-        life: 0.7,
-        age: 0
-    });
 }
 
 function ib_addBeamFlash(x1, y1, x2, y2) {
@@ -2059,8 +2185,7 @@ canvas.addEventListener("mousedown", (e) => {
             ib_lifetimeStats.totalDamage += dmgDealt;
             ib_lifetimeStats.totalClicks++;
             playClickSound();
-            ib_spawnDamageText(mouseX, mouseY, dmgDealt, isCrit);
-            ib_spawnParticles(mouseX, mouseY, b.isBoss ? "#ff3535" : (b.isGold ? "#ffd700" : "#5bc8ea"), 4);
+            ib_spawnParticles(mouseX, mouseY, b.isBoss ? "#ff3535" : (b.isGold ? "#ffd700" : "#5bc8ea"), 3);
             if (b.hp <= 0) b.dead = true;
             break;
         }
@@ -2077,7 +2202,7 @@ function processDeadBricks() {
                 : Math.max(1, Math.floor((b.maxHp / 2) * ib_prestigeMult));
             ib_money += payout;
             ib_lifetimeStats.totalMoneyEarned += payout;
-            ib_spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.isBoss ? "#ff3535" : (b.isGold ? "#ffd700" : "#5bc8ea"), b.isBoss ? 40 : (b.isGold ? 24 : 10));
+            ib_spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.isBoss ? "#ff3535" : (b.isGold ? "#ffd700" : "#5bc8ea"), b.isBoss ? 26 : (b.isGold ? 16 : 7));
             if (b.isBoss) {
                 ib_lifetimeStats.bossesDefeated++;
                 ib_screenShake(0.5, 10);
@@ -2100,7 +2225,6 @@ function processDeadBricks() {
 function ib_dealBrickDamage(b, dmg) {
     b.hp -= dmg;
     ib_lifetimeStats.totalDamage += dmg;
-    ib_spawnDamageText(b.x + b.w / 2, b.y + b.h / 2, dmg, false);
     if (b.hp <= 0) b.dead = true;
 }
 
@@ -2132,6 +2256,60 @@ function ib_updateLasers(dt) {
                     ib_dealBrickDamage(b, ib_stats.laser.dmg);
                 }
             }
+        }
+    }
+}
+
+function ib_getTurretPosition(index) {
+    const spacing = canvas.width / (ib_turrets.length + 1);
+    return {
+        x: spacing * (index + 1),
+        y: canvas.height - 17
+    };
+}
+
+function ib_updateTurrets(dt) {
+    for (let i = 0; i < ib_turrets.length; i++) {
+        const turret = ib_turrets[i];
+        const pos = ib_getTurretPosition(i);
+        let target = null;
+        let targetDistance = Infinity;
+        const maxRange = 250 * ib_stats.turret.range;
+
+        for (const b of ib_bricks) {
+            if (b.dead) continue;
+            const distance = Math.hypot((b.x + b.w / 2) - pos.x, (b.y + b.h / 2) - pos.y);
+            if (distance <= maxRange && distance < targetDistance) {
+                target = b;
+                targetDistance = distance;
+            }
+        }
+
+        if (target) {
+            const targetX = target.x + target.w / 2;
+            const targetY = target.y + target.h / 2;
+            turret.angle = Math.atan2(targetY - pos.y, targetX - pos.x);
+        }
+
+        turret.cooldown -= dt;
+        turret.recoil = Math.max(0, turret.recoil - dt * 5);
+        turret.flash = Math.max(0, turret.flash - dt);
+
+        if (turret.cooldown <= 0 && target) {
+            turret.cooldown = ib_stats.turret.rate;
+            turret.recoil = 1;
+            turret.flash = 0.12;
+            const muzzleDistance = 19;
+            const muzzleX = pos.x + Math.cos(turret.angle) * muzzleDistance;
+            const muzzleY = pos.y + Math.sin(turret.angle) * muzzleDistance;
+            const targetX = target.x + target.w / 2;
+            const targetY = target.y + target.h / 2;
+            ib_turretShots.push({
+                x1: muzzleX, y1: muzzleY, x2: targetX, y2: targetY,
+                life: 0.14, age: 0
+            });
+            ib_dealBrickDamage(target, ib_stats.turret.dmg);
+            ib_spawnParticles(targetX, targetY, "#ff9d35", 5);
         }
     }
 }
@@ -2200,32 +2378,43 @@ function ib_update(dt) {
                         }
                     }
                 }
-                ib_spawnParticles(testX, testY, ball.type === 'bouncer' ? "#ffe135" : ball.type === 'spread' ? "#35ff8c" : "#ff3535", 3);
+                ib_spawnParticles(testX, testY, ball.type === 'bouncer' ? "#ffe135" : ball.type === 'spread' ? "#35ff8c" : "#ff3535", 2);
                 break;
             }
         }
     }
 
     ib_updateLasers(dt);
+    ib_updateTurrets(dt);
 
-    for (let p of ib_particles) {
-        p.age += dt;
-        p.x += p.dx * dt;
-        p.y += p.dy * dt;
-        p.dy += 220 * dt;
+    if (ib_particles.length) {
+        for (let i = ib_particles.length - 1; i >= 0; i--) {
+            const p = ib_particles[i];
+            p.age += dt;
+            if (p.age >= p.life) { ib_particles.splice(i, 1); continue; }
+            p.x += p.dx * dt;
+            p.y += p.dy * dt;
+            p.dy += 220 * dt;
+        }
     }
-    ib_particles = ib_particles.filter(p => p.age < p.life);
 
-    for (let t of ib_damageTexts) {
-        t.age += dt;
-        t.y -= 26 * dt;
+    if (ib_beamFlashes.length) {
+        for (let i = ib_beamFlashes.length - 1; i >= 0; i--) {
+            const f = ib_beamFlashes[i];
+            f.age += dt;
+            if (f.age >= f.life) ib_beamFlashes.splice(i, 1);
+        }
     }
-    ib_damageTexts = ib_damageTexts.filter(t => t.age < t.life);
 
-    for (let f of ib_beamFlashes) f.age += dt;
-    ib_beamFlashes = ib_beamFlashes.filter(f => f.age < f.life);
+    if (ib_turretShots.length) {
+        for (let i = ib_turretShots.length - 1; i >= 0; i--) {
+            const shot = ib_turretShots[i];
+            shot.age += dt;
+            if (shot.age >= shot.life) ib_turretShots.splice(i, 1);
+        }
+    }
 
-    if (ib_shakeTime > 0) ib_shakeTime -= dt;
+    ib_updateShake(dt);
 
     processDeadBricks();
     ib_resolveBallCollisions();
@@ -2265,48 +2454,124 @@ function ib_resolveBallCollisions() {
     }
 }
 
+function ib_drawWallLaser(laser) {
+    const x = laser.side === 'left' ? 9 : canvas.width - 9;
+    const direction = laser.side === 'left' ? 1 : -1;
+    const glow = laser.firing ? 1 : 0.55;
+
+    ctx.save();
+    ctx.translate(x, laser.y);
+
+    // Heavy wall bracket and pivot.
+    ctx.fillStyle = "#20252b";
+    ctx.fillRect(direction * -5, -15, direction * 10, 30);
+    ctx.fillStyle = "#6f7882";
+    ctx.fillRect(direction * -4, -12, direction * 4, 24);
+    ctx.strokeStyle = "#050505";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(direction * -5, -15, direction * 10, 30);
+
+    // Rotating emitter barrel aimed into the arena.
+    ctx.rotate(0);
+    ctx.fillStyle = "#3c4650";
+    ctx.fillRect(direction * 2, -6, direction * 19, 12);
+    ctx.fillStyle = "#9ba7b2";
+    ctx.fillRect(direction * 4, -3, direction * 12, 6);
+    ctx.fillStyle = glow > 0.7 ? "#fff" : "#ff9df8";
+    ctx.fillRect(direction * 17, -3, direction * 7, 6);
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(direction * 2, -6, direction * 19, 12);
+
+    ctx.beginPath();
+    ctx.arc(0, 0, 9, 0, Math.PI * 2);
+    ctx.fillStyle = "#59636e";
+    ctx.fill();
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(direction * 18, 0, 4 + glow * 2, 0, Math.PI * 2);
+    ctx.fillStyle = glow > 0.7 ? "#fff" : "#ff35f3";
+    ctx.fill();
+    ctx.strokeStyle = "#7a0d73";
+    ctx.stroke();
+    ctx.restore();
+}
+
+function ib_drawTurret(turret, index) {
+    const pos = ib_getTurretPosition(index);
+    const recoilOffset = turret.recoil * 4;
+
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+
+    // Ground shadow and armored base.
+    ctx.beginPath();
+    ctx.ellipse(0, 9, 22, 6, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0,0,0,.45)";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(0, 3, 15, 0, Math.PI * 2);
+    ctx.fillStyle = "#303840";
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#050505";
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 3, 10, 0, Math.PI * 2);
+    ctx.fillStyle = "#68737d";
+    ctx.fill();
+    ctx.strokeStyle = "#1b2025";
+    ctx.stroke();
+
+    // Barrel follows the nearest brick.
+    ctx.save();
+    ctx.rotate(turret.angle);
+    ctx.translate(-recoilOffset, 0);
+    ctx.fillStyle = "#252b31";
+    ctx.fillRect(0, -6, 24, 12);
+    ctx.fillStyle = "#a6b0b8";
+    ctx.fillRect(3, -3, 17, 6);
+    ctx.fillStyle = turret.flash > 0 ? "#fff" : "#ff9d35";
+    ctx.fillRect(19, -4, 8, 8);
+    ctx.strokeStyle = "#050505";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, -6, 24, 12);
+    if (turret.flash > 0) {
+        ctx.globalAlpha = turret.flash / 0.12;
+        ctx.beginPath();
+        ctx.moveTo(28, 0);
+        ctx.lineTo(38, -6);
+        ctx.lineTo(35, 0);
+        ctx.lineTo(38, 6);
+        ctx.closePath();
+        ctx.fillStyle = "#ffe8a8";
+        ctx.fill();
+    }
+    ctx.restore();
+
+    // Rivets make the body read as a small machine rather than a circle.
+    ctx.fillStyle = "#d2d8dc";
+    for (const bolt of [[-7, 3], [7, 3], [0, -5]]) {
+        ctx.beginPath();
+        ctx.arc(bolt[0], bolt[1], 1.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.restore();
+}
+
 function ib_draw() {
     ctx.save();
 
-    if (ib_shakeTime > 0) {
-        const mag = ib_shakeMag * (ib_shakeTime > 0 ? 1 : 0);
-        ctx.translate((Math.random() * 2 - 1) * mag, (Math.random() * 2 - 1) * mag);
+    if (ib_shakeOffsetX !== 0 || ib_shakeOffsetY !== 0) {
+        ctx.translate(ib_shakeOffsetX, ib_shakeOffsetY);
     }
 
     ctx.fillStyle = "#008080";
     ctx.fillRect(-20, -20, canvas.width + 40, canvas.height + 40);
 
-    for (let laser of ib_lasers) {
-        const x = laser.side === 'left' ? 6 : canvas.width - 6;
-        ctx.beginPath();
-        ctx.arc(x, laser.y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = "#ff35f3";
-        ctx.fill();
-        ctx.lineWidth = 1.5;
-        ctx.strokeStyle = "#000";
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, laser.y - 8);
-        ctx.lineTo(x, laser.y + 8);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#7a0d73";
-        ctx.stroke();
-    }
-
-    for (let f of ib_beamFlashes) {
-        const t = 1 - (f.age / f.life);
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, t);
-        ctx.strokeStyle = "#ff35f3";
-        ctx.lineWidth = 3 + 3 * t;
-        ctx.shadowColor = "#ff35f3";
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-        ctx.moveTo(f.x1, f.y1);
-        ctx.lineTo(f.x2, f.y2);
-        ctx.stroke();
-        ctx.restore();
-    }
+    for (let laser of ib_lasers) ib_drawWallLaser(laser);
 
     for (let b of ib_bricks) {
         ctx.beginPath();
@@ -2322,17 +2587,24 @@ function ib_draw() {
             b.pulse = (b.pulse || 0) + 0.06;
             const glow = 0.5 + 0.5 * Math.sin(b.pulse);
             ctx.fillStyle = `rgb(${140 + Math.floor(glow * 80)}, 20, 40)`;
-            ctx.shadowColor = "#ff0033";
-            ctx.shadowBlur = 8 + glow * 6;
         } else {
             ctx.fillStyle = b.isGold ? "#ffd700" : "#5bc8ea";
-            ctx.shadowBlur = 0;
         }
         ctx.fill();
-        ctx.shadowBlur = 0;
         ctx.lineWidth = (b.isGold || b.isBoss) ? 3 : 2;
         ctx.strokeStyle = "#000000";
         ctx.stroke();
+
+        if (b.isBoss) {
+            // Cheap glow ring instead of shadowBlur: a second, wider, translucent stroke.
+            const glow = 0.5 + 0.5 * Math.sin(b.pulse);
+            ctx.save();
+            ctx.globalAlpha = 0.25 + glow * 0.25;
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "#ff3535";
+            ctx.stroke();
+            ctx.restore();
+        }
 
         if (b.isBoss) {
             const barW = b.w - 10;
@@ -2351,6 +2623,57 @@ function ib_draw() {
         ctx.fillText((b.isBoss ? "BOSS " : "") + ib_formatNumber(Math.max(0, b.hp)), b.x + b.w / 2, b.y + b.h / 2 + 1);
     }
 
+    if (ib_beamFlashes.length) {
+        ctx.save();
+        for (let f of ib_beamFlashes) {
+            const t = Math.max(0, 1 - (f.age / f.life));
+            // Layered strokes fake a glow without the perf hit of shadowBlur.
+            ctx.globalAlpha = t * 0.35;
+            ctx.strokeStyle = "#ff9df8";
+            ctx.lineWidth = 7;
+            ctx.beginPath();
+            ctx.moveTo(f.x1, f.y1);
+            ctx.lineTo(f.x2, f.y2);
+            ctx.stroke();
+
+            ctx.globalAlpha = t;
+            ctx.strokeStyle = "#ff35f3";
+            ctx.lineWidth = 2 + 2 * t;
+            ctx.beginPath();
+            ctx.moveTo(f.x1, f.y1);
+            ctx.lineTo(f.x2, f.y2);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    if (ib_turretShots.length) {
+        ctx.save();
+        for (const shot of ib_turretShots) {
+            const t = Math.max(0, 1 - shot.age / shot.life);
+            ctx.globalAlpha = t * 0.45;
+            ctx.strokeStyle = "#ffd27a";
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(shot.x1, shot.y1);
+            ctx.lineTo(shot.x2, shot.y2);
+            ctx.stroke();
+            ctx.globalAlpha = t;
+            ctx.strokeStyle = "#ff9d35";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(shot.x1, shot.y1);
+            ctx.lineTo(shot.x2, shot.y2);
+            ctx.stroke();
+            ctx.strokeStyle = "#fff7d6";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    for (let i = 0; i < ib_turrets.length; i++) ib_drawTurret(ib_turrets[i], i);
+
     for (let ball of ib_balls) {
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
@@ -2363,23 +2686,13 @@ function ib_draw() {
         ctx.stroke();
     }
 
-    for (let p of ib_particles) {
-        const t = 1 - (p.age / p.life);
+    if (ib_particles.length) {
         ctx.save();
-        ctx.globalAlpha = Math.max(0, t);
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
-        ctx.restore();
-    }
-
-    for (let t of ib_damageTexts) {
-        const a = 1 - (t.age / t.life);
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, a);
-        ctx.fillStyle = t.isCrit ? "#ffd700" : "#ffffff";
-        ctx.font = t.isCrit ? "bold 13px 'Courier New'" : "bold 11px 'Courier New'";
-        ctx.textAlign = "center";
-        ctx.fillText((t.isCrit ? "CRIT " : "") + ib_formatNumber(t.value), t.x, t.y);
+        for (let p of ib_particles) {
+            ctx.globalAlpha = Math.max(0, 1 - (p.age / p.life));
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+        }
         ctx.restore();
     }
 
@@ -2537,6 +2850,7 @@ function ib_openPlayerDetailsModal(entry) {
     ib_addDetailRow("Spread Balls Bought", balls.spread ?? 0);
     ib_addDetailRow("Sniper Balls Bought", balls.sniper ?? 0);
     ib_addDetailRow("Laser Turrets Bought", balls.laser ?? 0);
+    ib_addDetailRow("Auto Turrets Bought", balls.turret ?? 0);
     playerDetailsOverlay.style.display = "flex";
 }
 
