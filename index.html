@@ -483,7 +483,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* Idle Breakout Styles */
-.canvas-container { width: 100%; background: #000; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
+.canvas-container { width: 100%; background: #000; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; position: relative; }
 canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: crosshair; }
 
 .ib-toolbar { padding: 6px; margin-bottom: 8px; }
@@ -536,6 +536,8 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
 .ib-upgrade-buy .ib-price { display: block; margin-top: 1px; }
 .ib-upgrade-buy:active:not(:disabled) { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 
+.ib-upgrade-section-title { padding: 5px 8px 3px; font: 700 10px Tahoma, sans-serif; letter-spacing: .05em; color: #fff; background: linear-gradient(90deg, var(--navy), var(--navy-2)); }
+
 .game-area { display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch; }
 .game-area .player-wrap { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; }
 .app-stack.game-mode { max-width: 860px; }
@@ -577,6 +579,12 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
     flex: 1 1 0;
     min-width: 0;
 }
+
+.ib-settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--shadow); }
+.ib-settings-row:last-child { border-bottom: 0; }
+.ib-settings-label { font-size: 11px; font-weight: 700; }
+.ib-settings-toggle { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; border: 0; height: 24px; padding: 0 12px; font: 700 11px Tahoma, sans-serif; color: var(--text); cursor: pointer; }
+.ib-settings-toggle.on { background: var(--navy); color: #fff; }
 
 @media (pointer: fine) and (hover: hover) {
     body.custom-cursor-ready { cursor: none; }
@@ -735,7 +743,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
             </div>
             <div class="window-body">
                 <div class="ib-toolbar raised">
-                    <!-- 3 BALL SHOP BUTTONS -->
+                    <!-- 4 SHOP BUTTONS: 3 balls + laser turret -->
                     <div class="ib-shop-row">
                         <button class="ib-shop-btn" id="btnBuyBouncer" title="Buy Bouncer Ball">
                             <span class="ib-icon-circle" style="background:#ffe135;">B</span>
@@ -748,6 +756,10 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                         <button class="ib-shop-btn" id="btnBuySniper" title="Buy Sniper Ball">
                             <span class="ib-icon-circle" style="background:#ff3535;">X</span>
                             <span class="ib-price" id="priceSniper">$200</span>
+                        </button>
+                        <button class="ib-shop-btn" id="btnBuyLaser" title="Buy Laser Turret" style="display:none;">
+                            <span class="ib-icon-circle" style="background:#ff35f3;">L</span>
+                            <span class="ib-price" id="priceLaser">$750</span>
                         </button>
                         <div class="ib-balls-box sunken">
                             <span><span id="ballsCount">0</span>/<span id="ballsMax">50</span></span>
@@ -815,6 +827,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
         </div>
         <div class="window-body">
             <div class="ib-upgrade-list sunken">
+                <div class="ib-upgrade-section-title">BALLS</div>
                 <!-- BOUNCER UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
@@ -863,6 +876,31 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                     <button class="ib-upgrade-buy raised" id="btnUpgSniperSpeed">Buy<span class="ib-price" id="priceSniperSpeed">$300</span></button>
                 </div>
 
+                <div class="ib-upgrade-section-title" id="laserSectionTitle" style="display:none;">WALL LASERS</div>
+                <!-- LASER UPGRADES -->
+                <div class="ib-upgrade-row" id="rowLaserDmg" style="display:none;">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Laser Damage</span>
+                        <span class="ib-upgrade-val">Level <span id="valLaserDmg">8</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgLaserDmg">Buy<span class="ib-price" id="priceLaserDmg">$500</span></button>
+                </div>
+                <div class="ib-upgrade-row" id="rowLaserRate" style="display:none;">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Laser Fire Rate</span>
+                        <span class="ib-upgrade-val">Every <span id="valLaserRate">2.50</span>s</span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgLaserRate">Buy<span class="ib-price" id="priceLaserRate">$350</span></button>
+                </div>
+                <div class="ib-upgrade-row" id="rowLaserSweep" style="display:none;">
+                    <div class="ib-upgrade-info">
+                        <span class="ib-upgrade-name">Laser Sweep Speed</span>
+                        <span class="ib-upgrade-val">Multiplier: x<span id="valLaserSweep">1.00</span></span>
+                    </div>
+                    <button class="ib-upgrade-buy raised" id="btnUpgLaserSweep">Buy<span class="ib-price" id="priceLaserSweep">$250</span></button>
+                </div>
+
+                <div class="ib-upgrade-section-title">GLOBAL</div>
                 <!-- GLOBAL UPGRADES -->
                 <div class="ib-upgrade-row">
                     <div class="ib-upgrade-info">
@@ -884,6 +922,38 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                         <span class="ib-upgrade-val">x<span id="valPrestige">1.0</span> from all sources</span>
                     </div>
                     <span class="ib-upgrade-val" style="align-self:center;">Prestige to raise</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="ib-modal-overlay" id="settingsOverlay" style="display:none">
+    <div class="ib-modal raised">
+        <div class="title-bar">
+            <span class="title-bar-text">Game Settings</span>
+            <div class="title-bar-controls">
+                <span class="raised" id="closeSettings">✕</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="ib-upgrade-list sunken">
+                <div class="ib-settings-row">
+                    <span class="ib-settings-label">Screen Shake</span>
+                    <button class="ib-settings-toggle raised" id="toggleShake">ON</button>
+                </div>
+                <div class="ib-settings-row">
+                    <span class="ib-settings-label">Particle Effects</span>
+                    <button class="ib-settings-toggle raised" id="toggleParticles">ON</button>
+                </div>
+                <div class="ib-settings-row">
+                    <span class="ib-settings-label">Damage Numbers</span>
+                    <button class="ib-settings-toggle raised" id="toggleDamageNums">ON</button>
+                </div>
+                <div class="ib-settings-row">
+                    <span class="ib-settings-label">Sound Effects</span>
+                    <button class="ib-settings-toggle raised" id="toggleSfx">ON</button>
                 </div>
             </div>
         </div>
@@ -1455,6 +1525,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 const IB_MAX_BALLS = 50;
+const IB_MAX_LASERS = 4;
 const IB_PRESTIGE_MIN_LEVEL = 5;
 const IB_CRIT_CAP = 50;
 const IB_COLS = 6;
@@ -1465,6 +1536,8 @@ const PADDING = 8;
 const OFFSET_X = 20;
 const OFFSET_Y = 20;
 const IB_SNIPER_RETREAT_SPEED = 220;
+const IB_LASER_UNLOCK_LEVEL = 3;
+const IB_BOSS_LEVEL_INTERVAL = 5;
 
 let ib_money = 0;
 let ib_level = 1;
@@ -1472,21 +1545,38 @@ let ib_clickDmg = 1;
 let ib_critChance = 0;
 let ib_prestigeMult = 1;
 let ib_balls = [];
+let ib_lasers = [];
 let ib_bricks = [];
 let ib_lastTime = 0;
 let ib_reqId = null;
+let ib_particles = [];
+let ib_damageTexts = [];
+let ib_beamFlashes = [];
+let ib_shakeTime = 0;
+let ib_shakeMag = 0;
+let ib_bossActive = false;
+let ib_lastLeaveTime = null;
+
+let ib_settings = {
+    shake: true,
+    particles: true,
+    damageNums: true,
+    sfx: true
+};
 
 let ib_stats = {
     bouncer: { dmg: 1, speed: 1 },
     spread:  { dmg: 2, speed: 1 },
-    sniper:  { dmg: 5, speed: 1.5 }
+    sniper:  { dmg: 5, speed: 1.5 },
+    laser:   { dmg: 8, rate: 2.5, sweep: 1 }
 };
 
 let ib_costs = {
-    bouncer: 10, spread: 50, sniper: 200,
+    bouncer: 10, spread: 50, sniper: 200, laser: 750,
     bouncerDmg: 25, bouncerSpeed: 20,
     spreadDmg: 100, spreadSpeed: 80,
     sniperDmg: 400, sniperSpeed: 300,
+    laserDmg: 500, laserRate: 350, laserSweep: 250,
     cDmg: 15, crit: 30
 };
 
@@ -1494,8 +1584,20 @@ let ib_lifetimeStats = {
     totalDamage: 0,
     totalMoneyEarned: 0,
     totalClicks: 0,
-    ballsPurchased: { bouncer: 0, spread: 0, sniper: 0 }
+    ballsPurchased: { bouncer: 0, spread: 0, sniper: 0, laser: 0 },
+    bossesDefeated: 0
 };
+
+function ib_formatNumber(value) {
+    const num = Math.floor(value);
+    const abs = Math.abs(num);
+    if (abs < 1000) return String(num);
+    const units = ["", "K", "M", "B", "T", "Qa", "Qi"];
+    let tier = Math.min(units.length - 1, Math.floor(Math.log10(abs) / 3));
+    let scaled = num / Math.pow(1000, tier);
+    let str = scaled.toFixed(scaled < 10 ? 2 : (scaled < 100 ? 1 : 0));
+    return str + units[tier];
+}
 
 function ib_getSaveKey() {
     return `ib_save_${anonId}`;
@@ -1511,8 +1613,11 @@ function ib_saveState() {
         stats: ib_stats,
         costs: ib_costs,
         ballTypes: ib_balls.map(b => b.type),
+        laserCount: ib_lasers.length,
         muted: ib_muted,
-        lifetimeStats: ib_lifetimeStats
+        settings: ib_settings,
+        lifetimeStats: ib_lifetimeStats,
+        lastActive: Date.now()
     };
     try {
         localStorage.setItem(ib_getSaveKey(), JSON.stringify(state));
@@ -1538,8 +1643,14 @@ function ib_loadState() {
     ib_clickDmg = state.clickDmg || 1;
     ib_critChance = state.critChance || 0;
     ib_prestigeMult = state.prestigeMult || 1;
-    if (state.stats) ib_stats = state.stats;
-    if (state.costs) ib_costs = state.costs;
+    if (state.stats) {
+        ib_stats = Object.assign({ laser: { dmg: 8, rate: 2.5, sweep: 1 } }, state.stats);
+        if (!ib_stats.laser) ib_stats.laser = { dmg: 8, rate: 2.5, sweep: 1 };
+    }
+    if (state.costs) {
+        ib_costs = Object.assign({ laser: 750, laserDmg: 500, laserRate: 350, laserSweep: 250 }, state.costs);
+    }
+    if (state.settings) ib_settings = Object.assign(ib_settings, state.settings);
     if (state.lifetimeStats) {
         ib_lifetimeStats = {
             totalDamage: state.lifetimeStats.totalDamage || 0,
@@ -1548,14 +1659,18 @@ function ib_loadState() {
             ballsPurchased: {
                 bouncer: state.lifetimeStats.ballsPurchased?.bouncer || 0,
                 spread: state.lifetimeStats.ballsPurchased?.spread || 0,
-                sniper: state.lifetimeStats.ballsPurchased?.sniper || 0
-            }
+                sniper: state.lifetimeStats.ballsPurchased?.sniper || 0,
+                laser: state.lifetimeStats.ballsPurchased?.laser || 0
+            },
+            bossesDefeated: state.lifetimeStats.bossesDefeated || 0
         };
     }
     ib_muted = !!state.muted;
     document.getElementById("btnMute").textContent = ib_muted ? "🔇" : "🔊";
     ib_balls = [];
     (state.ballTypes || []).forEach(type => addBall(type));
+    for (let i = 0; i < (state.laserCount || 0); i++) addLaser();
+    ib_lastLeaveTime = state.lastActive || null;
     return true;
 }
 
@@ -1567,16 +1682,58 @@ function ib_computeScore() {
     return Math.floor(ib_money + ib_level * 100 + (ib_prestigeMult - 1) * 10000);
 }
 
+function ib_estimateDps() {
+    let dps = 0;
+    for (let b of ib_balls) {
+        if (b.type === 'sniper') dps += (ib_stats.sniper.dmg) * 1.4;
+        else dps += ib_stats[b.type].dmg * ib_stats[b.type].speed * 1.1;
+    }
+    for (let i = 0; i < ib_lasers.length; i++) {
+        dps += ib_stats.laser.dmg / Math.max(0.4, ib_stats.laser.rate);
+    }
+    return dps;
+}
+
+function ib_applyOfflineEarnings() {
+    if (!ib_lastLeaveTime) return;
+    const elapsedMs = Date.now() - ib_lastLeaveTime;
+    const elapsedSec = elapsedMs / 1000;
+    if (elapsedSec < 30) return;
+    const cappedSec = Math.min(elapsedSec, 8 * 3600);
+    const dps = ib_estimateDps();
+    if (dps <= 0) return;
+    const earned = Math.floor(dps * cappedSec * 0.35 * ib_prestigeMult);
+    if (earned <= 0) return;
+    ib_money += earned;
+    ib_lifetimeStats.totalMoneyEarned += earned;
+    showToast(`Welcome back! Idle balls & lasers earned $${ib_formatNumber(earned)} while away.`);
+    ib_saveState();
+}
+
 function initIdleBreakout() {
     const restored = ib_loadState();
     spawnBricks();
     document.getElementById("ballsMax").textContent = IB_MAX_BALLS;
+    updateLaserVisibility();
     updateUI();
-    if (restored && ib_hasProgress()) showToast("Welcome back! Your progress was restored.");
+    if (restored && ib_hasProgress()) {
+        ib_applyOfflineEarnings();
+        showToast("Welcome back! Your progress was restored.");
+    }
+}
+
+function updateLaserVisibility() {
+    const unlocked = ib_level >= IB_LASER_UNLOCK_LEVEL || ib_lasers.length > 0;
+    document.getElementById("btnBuyLaser").style.display = unlocked ? "" : "none";
+    document.getElementById("laserSectionTitle").style.display = unlocked ? "" : "none";
+    document.getElementById("rowLaserDmg").style.display = unlocked ? "" : "none";
+    document.getElementById("rowLaserRate").style.display = unlocked ? "" : "none";
+    document.getElementById("rowLaserSweep").style.display = unlocked ? "" : "none";
 }
 
 function spawnBricks() {
     ib_bricks = [];
+    ib_bossActive = false;
     const baseHp = ib_level * 5;
     for(let r = 0; r < IB_ROWS; r++) {
         for(let c = 0; c < IB_COLS; c++) {
@@ -1585,21 +1742,33 @@ function spawnBricks() {
                 y: OFFSET_Y + r * (BRICK_H + PADDING),
                 w: BRICK_W, h: BRICK_H,
                 hp: baseHp + Math.floor(Math.random() * (ib_level * 5)),
-                maxHp: 0, isGold: false
+                maxHp: 0, isGold: false, isBoss: false
             });
         }
     }
     ib_bricks.forEach(b => b.maxHp = b.hp);
 
+    const gridBottom = OFFSET_Y + IB_ROWS * (BRICK_H + PADDING) - PADDING;
+
     if (ib_level % 10 === 0) {
         const goldHp = ib_level * 60;
-        const gridBottom = OFFSET_Y + IB_ROWS * (BRICK_H + PADDING) - PADDING;
         ib_bricks.push({
             x: OFFSET_X, y: gridBottom + 16,
             w: canvas.width - OFFSET_X * 2, h: 30,
-            hp: goldHp, maxHp: goldHp, isGold: true
+            hp: goldHp, maxHp: goldHp, isGold: true, isBoss: false
         });
-        showToast(`⭐ Gold Block appeared! HP: ${goldHp}`);
+        showToast(`⭐ Gold Block appeared! HP: ${ib_formatNumber(goldHp)}`);
+    } else if (ib_level % IB_BOSS_LEVEL_INTERVAL === 0) {
+        const bossHp = Math.floor(ib_level * 90 * (1 + (ib_level / 50)));
+        ib_bricks.push({
+            x: OFFSET_X, y: gridBottom + 16,
+            w: canvas.width - OFFSET_X * 2, h: 34,
+            hp: bossHp, maxHp: bossHp, isGold: false, isBoss: true,
+            phase: 1, pulse: 0
+        });
+        ib_bossActive = true;
+        ib_screenShake(0.4, 6);
+        showToast(`☠ BOSS incoming! HP: ${ib_formatNumber(bossHp)}`);
     }
 }
 
@@ -1614,6 +1783,20 @@ function addBall(type) {
         dx: dx, dy: dy,
         r: 4, type: type,
         cooldown: 0
+    });
+}
+
+function addLaser() {
+    if (ib_lasers.length >= IB_MAX_LASERS) return;
+    const side = ib_lasers.length % 2 === 0 ? 'left' : 'right';
+    ib_lasers.push({
+        side,
+        y: 40 + Math.random() * (canvas.height - 80),
+        dir: Math.random() > 0.5 ? 1 : -1,
+        speed: 30 + Math.random() * 10,
+        cooldown: Math.random() * 1.5,
+        firing: false,
+        fireTimer: 0
     });
 }
 
@@ -1632,18 +1815,35 @@ function buyBall(type) {
     }
 }
 
+function buyLaser() {
+    if (ib_lasers.length >= IB_MAX_LASERS) {
+        showToast(`Max laser turrets reached (${IB_MAX_LASERS}).`, true);
+        return;
+    }
+    if (ib_money >= ib_costs.laser) {
+        ib_money -= ib_costs.laser;
+        addLaser();
+        ib_costs.laser = Math.floor(ib_costs.laser * 1.7);
+        ib_lifetimeStats.ballsPurchased.laser = (ib_lifetimeStats.ballsPurchased.laser || 0) + 1;
+        updateUI();
+        ib_saveState();
+    }
+}
+
 function updateUI() {
-    document.getElementById("moneyDisplay").textContent = ib_money;
+    document.getElementById("moneyDisplay").textContent = ib_formatNumber(ib_money);
     document.getElementById("levelDisplay").textContent = ib_level;
     document.getElementById("ballsCount").textContent = ib_balls.length;
 
     document.getElementById('btnBuyBouncer').disabled = ib_money < ib_costs.bouncer;
     document.getElementById('btnBuySpread').disabled = ib_money < ib_costs.spread;
     document.getElementById('btnBuySniper').disabled = ib_money < ib_costs.sniper;
+    document.getElementById('btnBuyLaser').disabled = ib_money < ib_costs.laser || ib_lasers.length >= IB_MAX_LASERS;
 
-    document.getElementById('priceBouncer').textContent = `$${ib_costs.bouncer}`;
-    document.getElementById('priceSpread').textContent = `$${ib_costs.spread}`;
-    document.getElementById('priceSniper').textContent = `$${ib_costs.sniper}`;
+    document.getElementById('priceBouncer').textContent = `$${ib_formatNumber(ib_costs.bouncer)}`;
+    document.getElementById('priceSpread').textContent = `$${ib_formatNumber(ib_costs.spread)}`;
+    document.getElementById('priceSniper').textContent = `$${ib_formatNumber(ib_costs.sniper)}`;
+    document.getElementById('priceLaser').textContent = ib_lasers.length >= IB_MAX_LASERS ? "MAX" : `$${ib_formatNumber(ib_costs.laser)}`;
 
     document.getElementById("btnPrestige").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
     document.getElementById("btnPrestigeIcon").disabled = ib_level < IB_PRESTIGE_MIN_LEVEL;
@@ -1652,37 +1852,50 @@ function updateUI() {
     document.getElementById('btnUpgBouncerSpeed').disabled = ib_money < ib_costs.bouncerSpeed;
     document.getElementById('valBouncerDmg').textContent = ib_stats.bouncer.dmg;
     document.getElementById('valBouncerSpeed').textContent = ib_stats.bouncer.speed.toFixed(2);
-    document.getElementById('priceBouncerDmg').textContent = `$${ib_costs.bouncerDmg}`;
-    document.getElementById('priceBouncerSpeed').textContent = `$${ib_costs.bouncerSpeed}`;
+    document.getElementById('priceBouncerDmg').textContent = `$${ib_formatNumber(ib_costs.bouncerDmg)}`;
+    document.getElementById('priceBouncerSpeed').textContent = `$${ib_formatNumber(ib_costs.bouncerSpeed)}`;
 
     document.getElementById('btnUpgSpreadDmg').disabled = ib_money < ib_costs.spreadDmg;
     document.getElementById('btnUpgSpreadSpeed').disabled = ib_money < ib_costs.spreadSpeed;
     document.getElementById('valSpreadDmg').textContent = ib_stats.spread.dmg;
     document.getElementById('valSpreadSpeed').textContent = ib_stats.spread.speed.toFixed(2);
-    document.getElementById('priceSpreadDmg').textContent = `$${ib_costs.spreadDmg}`;
-    document.getElementById('priceSpreadSpeed').textContent = `$${ib_costs.spreadSpeed}`;
+    document.getElementById('priceSpreadDmg').textContent = `$${ib_formatNumber(ib_costs.spreadDmg)}`;
+    document.getElementById('priceSpreadSpeed').textContent = `$${ib_formatNumber(ib_costs.spreadSpeed)}`;
 
     document.getElementById('btnUpgSniperDmg').disabled = ib_money < ib_costs.sniperDmg;
     document.getElementById('btnUpgSniperSpeed').disabled = ib_money < ib_costs.sniperSpeed;
     document.getElementById('valSniperDmg').textContent = ib_stats.sniper.dmg;
     document.getElementById('valSniperSpeed').textContent = ib_stats.sniper.speed.toFixed(2);
-    document.getElementById('priceSniperDmg').textContent = `$${ib_costs.sniperDmg}`;
-    document.getElementById('priceSniperSpeed').textContent = `$${ib_costs.sniperSpeed}`;
+    document.getElementById('priceSniperDmg').textContent = `$${ib_formatNumber(ib_costs.sniperDmg)}`;
+    document.getElementById('priceSniperSpeed').textContent = `$${ib_formatNumber(ib_costs.sniperSpeed)}`;
+
+    document.getElementById('btnUpgLaserDmg').disabled = ib_money < ib_costs.laserDmg;
+    document.getElementById('btnUpgLaserRate').disabled = ib_money < ib_costs.laserRate || ib_stats.laser.rate <= 0.4;
+    document.getElementById('btnUpgLaserSweep').disabled = ib_money < ib_costs.laserSweep;
+    document.getElementById('valLaserDmg').textContent = ib_stats.laser.dmg;
+    document.getElementById('valLaserRate').textContent = ib_stats.laser.rate.toFixed(2);
+    document.getElementById('valLaserSweep').textContent = ib_stats.laser.sweep.toFixed(2);
+    document.getElementById('priceLaserDmg').textContent = `$${ib_formatNumber(ib_costs.laserDmg)}`;
+    document.getElementById('priceLaserRate').textContent = ib_stats.laser.rate <= 0.4 ? "MAX" : `$${ib_formatNumber(ib_costs.laserRate)}`;
+    document.getElementById('priceLaserSweep').textContent = `$${ib_formatNumber(ib_costs.laserSweep)}`;
 
     document.getElementById('btnUpgClick').disabled = ib_money < ib_costs.cDmg;
     document.getElementById('valClickDmg').textContent = ib_clickDmg;
-    document.getElementById('priceClickDmg').textContent = `$${ib_costs.cDmg}`;
+    document.getElementById('priceClickDmg').textContent = `$${ib_formatNumber(ib_costs.cDmg)}`;
 
     document.getElementById("btnBuyCrit").disabled = ib_critChance >= IB_CRIT_CAP || ib_money < ib_costs.crit;
     document.getElementById("valCrit").textContent = ib_critChance;
-    document.getElementById("priceCrit").textContent = ib_critChance >= IB_CRIT_CAP ? "MAX" : `$${ib_costs.crit}`;
+    document.getElementById("priceCrit").textContent = ib_critChance >= IB_CRIT_CAP ? "MAX" : `$${ib_formatNumber(ib_costs.crit)}`;
 
     document.getElementById("valPrestige").textContent = ib_prestigeMult.toFixed(1);
+
+    updateLaserVisibility();
 }
 
 document.getElementById('btnBuyBouncer').addEventListener('click', () => buyBall('bouncer'));
 document.getElementById('btnBuySpread').addEventListener('click', () => buyBall('spread'));
 document.getElementById('btnBuySniper').addEventListener('click', () => buyBall('sniper'));
+document.getElementById('btnBuyLaser').addEventListener('click', buyLaser);
 
 function handleUpgrade(statObj, costKey, type, increment) {
     if (ib_money >= ib_costs[costKey]) {
@@ -1700,6 +1913,19 @@ document.getElementById('btnUpgSpreadDmg').addEventListener('click', () => handl
 document.getElementById('btnUpgSpreadSpeed').addEventListener('click', () => handleUpgrade(ib_stats.spread, 'spreadSpeed', 'speed', 0.15));
 document.getElementById('btnUpgSniperDmg').addEventListener('click', () => handleUpgrade(ib_stats.sniper, 'sniperDmg', 'dmg', 5));
 document.getElementById('btnUpgSniperSpeed').addEventListener('click', () => handleUpgrade(ib_stats.sniper, 'sniperSpeed', 'speed', 0.15));
+
+document.getElementById('btnUpgLaserDmg').addEventListener('click', () => handleUpgrade(ib_stats.laser, 'laserDmg', 'dmg', 4));
+document.getElementById('btnUpgLaserRate').addEventListener('click', () => {
+    if (ib_stats.laser.rate <= 0.4) return;
+    if (ib_money >= ib_costs.laserRate) {
+        ib_money -= ib_costs.laserRate;
+        ib_stats.laser.rate = Math.max(0.4, +(ib_stats.laser.rate - 0.2).toFixed(2));
+        ib_costs.laserRate = Math.floor(ib_costs.laserRate * 1.6);
+        updateUI();
+        ib_saveState();
+    }
+});
+document.getElementById('btnUpgLaserSweep').addEventListener('click', () => handleUpgrade(ib_stats.laser, 'laserSweep', 'sweep', 0.2));
 
 document.getElementById('btnUpgClick').addEventListener('click', () => {
     if (ib_money >= ib_costs.cDmg) {
@@ -1723,9 +1949,45 @@ document.getElementById("btnBuyCrit").addEventListener("click", () => {
 
 document.getElementById('btnUpgradesInfo').addEventListener('click', () => document.getElementById('upgradesOverlay').style.display = 'flex');
 document.getElementById('closeUpgrades').addEventListener('click', () => document.getElementById('upgradesOverlay').style.display = 'none');
-document.getElementById("btnSettings").addEventListener("click", () => showToast("Settings coming soon!"));
+
+const settingsOverlay = document.getElementById("settingsOverlay");
+document.getElementById("btnSettings").addEventListener("click", () => {
+    ib_refreshSettingsUI();
+    settingsOverlay.style.display = "flex";
+});
+document.getElementById("closeSettings").addEventListener("click", () => settingsOverlay.style.display = "none");
+
+function ib_refreshSettingsUI() {
+    const map = {
+        toggleShake: 'shake',
+        toggleParticles: 'particles',
+        toggleDamageNums: 'damageNums',
+        toggleSfx: 'sfx'
+    };
+    Object.entries(map).forEach(([id, key]) => {
+        const btn = document.getElementById(id);
+        const on = !!ib_settings[key];
+        btn.textContent = on ? "ON" : "OFF";
+        btn.classList.toggle("on", on);
+    });
+}
+
+function ib_bindSettingsToggle(id, key) {
+    document.getElementById(id).addEventListener("click", () => {
+        ib_settings[key] = !ib_settings[key];
+        if (key === 'sfx') ib_muted = !ib_settings.sfx;
+        ib_refreshSettingsUI();
+        ib_saveState();
+    });
+}
+ib_bindSettingsToggle("toggleShake", "shake");
+ib_bindSettingsToggle("toggleParticles", "particles");
+ib_bindSettingsToggle("toggleDamageNums", "damageNums");
+ib_bindSettingsToggle("toggleSfx", "sfx");
+
 document.getElementById("btnMute").addEventListener("click", () => {
     ib_muted = !ib_muted;
+    ib_settings.sfx = !ib_muted;
     document.getElementById("btnMute").textContent = ib_muted ? "🔇" : "🔊";
     showToast(ib_muted ? "Muted" : "Unmuted");
     ib_saveState();
@@ -1734,9 +1996,9 @@ document.getElementById("btnMute").addEventListener("click", () => {
 function doPrestige() {
     if (ib_level < IB_PRESTIGE_MIN_LEVEL) { showToast(`Reach level ${IB_PRESTIGE_MIN_LEVEL} to prestige.`, true); return; }
     ib_prestigeMult = +(ib_prestigeMult + 0.1).toFixed(2);
-    ib_money = 0; ib_level = 1; ib_balls = []; ib_clickDmg = 1; ib_critChance = 0;
-    ib_stats = { bouncer: { dmg: 1, speed: 1 }, spread: { dmg: 2, speed: 1 }, sniper: { dmg: 5, speed: 1.5 } };
-    ib_costs = { bouncer: 10, spread: 50, sniper: 200, bouncerDmg: 25, bouncerSpeed: 20, spreadDmg: 100, spreadSpeed: 80, sniperDmg: 400, sniperSpeed: 300, cDmg: 15, crit: 30 };
+    ib_money = 0; ib_level = 1; ib_balls = []; ib_lasers = []; ib_clickDmg = 1; ib_critChance = 0;
+    ib_stats = { bouncer: { dmg: 1, speed: 1 }, spread: { dmg: 2, speed: 1 }, sniper: { dmg: 5, speed: 1.5 }, laser: { dmg: 8, rate: 2.5, sweep: 1 } };
+    ib_costs = { bouncer: 10, spread: 50, sniper: 200, laser: 750, bouncerDmg: 25, bouncerSpeed: 20, spreadDmg: 100, spreadSpeed: 80, sniperDmg: 400, sniperSpeed: 300, laserDmg: 500, laserRate: 350, laserSweep: 250, cDmg: 15, crit: 30 };
     spawnBricks();
     updateUI();
     showToast(`Prestiged! Multiplier now x${ib_prestigeMult.toFixed(1)}`);
@@ -1745,6 +2007,43 @@ function doPrestige() {
 }
 document.getElementById("btnPrestige").addEventListener("click", doPrestige);
 document.getElementById("btnPrestigeIcon").addEventListener("click", doPrestige);
+
+function ib_screenShake(duration, magnitude) {
+    if (!ib_settings.shake) return;
+    ib_shakeTime = Math.max(ib_shakeTime, duration);
+    ib_shakeMag = Math.max(ib_shakeMag, magnitude);
+}
+
+function ib_spawnParticles(x, y, color, count) {
+    if (!ib_settings.particles) return;
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 40 + Math.random() * 100;
+        ib_particles.push({
+            x, y,
+            dx: Math.cos(angle) * speed,
+            dy: Math.sin(angle) * speed,
+            life: 0.4 + Math.random() * 0.4,
+            age: 0,
+            size: 2 + Math.random() * 3,
+            color
+        });
+    }
+}
+
+function ib_spawnDamageText(x, y, value, isCrit) {
+    if (!ib_settings.damageNums) return;
+    ib_damageTexts.push({
+        x, y, value,
+        isCrit: !!isCrit,
+        life: 0.7,
+        age: 0
+    });
+}
+
+function ib_addBeamFlash(x1, y1, x2, y2) {
+    ib_beamFlashes.push({ x1, y1, x2, y2, life: 0.18, age: 0 });
+}
 
 canvas.addEventListener("mousedown", (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -1760,7 +2059,9 @@ canvas.addEventListener("mousedown", (e) => {
             ib_lifetimeStats.totalDamage += dmgDealt;
             ib_lifetimeStats.totalClicks++;
             playClickSound();
-            if(b.hp <= 0) b.dead = true;
+            ib_spawnDamageText(mouseX, mouseY, dmgDealt, isCrit);
+            ib_spawnParticles(mouseX, mouseY, b.isBoss ? "#ff3535" : (b.isGold ? "#ffd700" : "#5bc8ea"), 4);
+            if (b.hp <= 0) b.dead = true;
             break;
         }
     }
@@ -1771,10 +2072,20 @@ function processDeadBricks() {
     for (let i = ib_bricks.length - 1; i >= 0; i--) {
         if (ib_bricks[i].dead) {
             const b = ib_bricks[i];
-            const payout = b.isGold ? Math.floor(b.maxHp * ib_prestigeMult) : Math.max(1, Math.floor((b.maxHp / 2) * ib_prestigeMult));
+            const payout = (b.isGold || b.isBoss)
+                ? Math.floor(b.maxHp * ib_prestigeMult)
+                : Math.max(1, Math.floor((b.maxHp / 2) * ib_prestigeMult));
             ib_money += payout;
             ib_lifetimeStats.totalMoneyEarned += payout;
-            if (b.isGold) showToast(`⭐ Gold Block destroyed! +$${payout}`);
+            ib_spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.isBoss ? "#ff3535" : (b.isGold ? "#ffd700" : "#5bc8ea"), b.isBoss ? 40 : (b.isGold ? 24 : 10));
+            if (b.isBoss) {
+                ib_lifetimeStats.bossesDefeated++;
+                ib_screenShake(0.5, 10);
+                showToast(`☠ BOSS destroyed! +$${ib_formatNumber(payout)}`);
+            } else if (b.isGold) {
+                ib_screenShake(0.3, 5);
+                showToast(`⭐ Gold Block destroyed! +$${ib_formatNumber(payout)}`);
+            }
             ib_bricks.splice(i, 1);
             changed = true;
         }
@@ -1783,6 +2094,45 @@ function processDeadBricks() {
         updateUI();
         if (ib_bricks.length === 0) { ib_level++; spawnBricks(); updateUI(); }
         ib_saveState();
+    }
+}
+
+function ib_dealBrickDamage(b, dmg) {
+    b.hp -= dmg;
+    ib_lifetimeStats.totalDamage += dmg;
+    ib_spawnDamageText(b.x + b.w / 2, b.y + b.h / 2, dmg, false);
+    if (b.hp <= 0) b.dead = true;
+}
+
+function ib_updateLasers(dt) {
+    for (let laser of ib_lasers) {
+        laser.y += laser.dir * laser.speed * ib_stats.laser.sweep * dt;
+        if (laser.y < 24) { laser.y = 24; laser.dir = 1; }
+        if (laser.y > canvas.height - 24) { laser.y = canvas.height - 24; laser.dir = -1; }
+
+        if (laser.firing) {
+            laser.fireTimer -= dt;
+            if (laser.fireTimer <= 0) laser.firing = false;
+            continue;
+        }
+
+        laser.cooldown -= dt;
+        if (laser.cooldown <= 0 && ib_bricks.length > 0) {
+            laser.firing = true;
+            laser.fireTimer = 0.12;
+            laser.cooldown = ib_stats.laser.rate;
+
+            const beamY = laser.y;
+            const x1 = laser.side === 'left' ? 0 : canvas.width;
+            const x2 = laser.side === 'left' ? canvas.width : 0;
+            ib_addBeamFlash(x1, beamY, x2, beamY);
+
+            for (let b of ib_bricks) {
+                if (beamY >= b.y - 3 && beamY <= b.y + b.h + 3) {
+                    ib_dealBrickDamage(b, ib_stats.laser.dmg);
+                }
+            }
+        }
     }
 }
 
@@ -1836,29 +2186,46 @@ function ib_update(dt) {
                     ball.dx = (towardLeft ? -1 : 1) * retreatSpeed;
                     ball.dy = (distY < 0 ? -1 : 1) * retreatSpeed * 0.4;
                     ball.cooldown = 0.3;
-                    b.hp -= baseDmg;
-                    ib_lifetimeStats.totalDamage += baseDmg;
+                    ib_dealBrickDamage(b, baseDmg);
                 } else {
                     if (Math.abs(distX) > Math.abs(distY)) ball.dx *= -1; else ball.dy *= -1;
-                    b.hp -= baseDmg;
-                    ib_lifetimeStats.totalDamage += baseDmg;
+                    ib_dealBrickDamage(b, baseDmg);
 
                     if (ball.type === 'spread') {
                         for (let j = 0; j < ib_bricks.length; j++) {
                             if (i !== j && Math.abs(ib_bricks[j].x - b.x) <= 60 && Math.abs(ib_bricks[j].y - b.y) <= 30) {
                                 const splashDmg = Math.max(1, Math.floor(baseDmg * 0.3));
-                                ib_bricks[j].hp -= splashDmg;
-                                ib_lifetimeStats.totalDamage += splashDmg;
-                                if (ib_bricks[j].hp <= 0) ib_bricks[j].dead = true;
+                                ib_dealBrickDamage(ib_bricks[j], splashDmg);
                             }
                         }
                     }
                 }
-                if (b.hp <= 0) b.dead = true;
+                ib_spawnParticles(testX, testY, ball.type === 'bouncer' ? "#ffe135" : ball.type === 'spread' ? "#35ff8c" : "#ff3535", 3);
                 break;
             }
         }
     }
+
+    ib_updateLasers(dt);
+
+    for (let p of ib_particles) {
+        p.age += dt;
+        p.x += p.dx * dt;
+        p.y += p.dy * dt;
+        p.dy += 220 * dt;
+    }
+    ib_particles = ib_particles.filter(p => p.age < p.life);
+
+    for (let t of ib_damageTexts) {
+        t.age += dt;
+        t.y -= 26 * dt;
+    }
+    ib_damageTexts = ib_damageTexts.filter(t => t.age < t.life);
+
+    for (let f of ib_beamFlashes) f.age += dt;
+    ib_beamFlashes = ib_beamFlashes.filter(f => f.age < f.life);
+
+    if (ib_shakeTime > 0) ib_shakeTime -= dt;
 
     processDeadBricks();
     ib_resolveBallCollisions();
@@ -1899,8 +2266,47 @@ function ib_resolveBallCollisions() {
 }
 
 function ib_draw() {
+    ctx.save();
+
+    if (ib_shakeTime > 0) {
+        const mag = ib_shakeMag * (ib_shakeTime > 0 ? 1 : 0);
+        ctx.translate((Math.random() * 2 - 1) * mag, (Math.random() * 2 - 1) * mag);
+    }
+
     ctx.fillStyle = "#008080";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(-20, -20, canvas.width + 40, canvas.height + 40);
+
+    for (let laser of ib_lasers) {
+        const x = laser.side === 'left' ? 6 : canvas.width - 6;
+        ctx.beginPath();
+        ctx.arc(x, laser.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = "#ff35f3";
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#000";
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, laser.y - 8);
+        ctx.lineTo(x, laser.y + 8);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#7a0d73";
+        ctx.stroke();
+    }
+
+    for (let f of ib_beamFlashes) {
+        const t = 1 - (f.age / f.life);
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, t);
+        ctx.strokeStyle = "#ff35f3";
+        ctx.lineWidth = 3 + 3 * t;
+        ctx.shadowColor = "#ff35f3";
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(f.x1, f.y1);
+        ctx.lineTo(f.x2, f.y2);
+        ctx.stroke();
+        ctx.restore();
+    }
 
     for (let b of ib_bricks) {
         ctx.beginPath();
@@ -1912,17 +2318,37 @@ function ib_draw() {
         ctx.arcTo(b.x, b.y, b.x + b.w, b.y, r);
         ctx.closePath();
 
-        ctx.fillStyle = b.isGold ? "#ffd700" : "#5bc8ea";
+        if (b.isBoss) {
+            b.pulse = (b.pulse || 0) + 0.06;
+            const glow = 0.5 + 0.5 * Math.sin(b.pulse);
+            ctx.fillStyle = `rgb(${140 + Math.floor(glow * 80)}, 20, 40)`;
+            ctx.shadowColor = "#ff0033";
+            ctx.shadowBlur = 8 + glow * 6;
+        } else {
+            ctx.fillStyle = b.isGold ? "#ffd700" : "#5bc8ea";
+            ctx.shadowBlur = 0;
+        }
         ctx.fill();
-        ctx.lineWidth = b.isGold ? 3 : 2;
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = (b.isGold || b.isBoss) ? 3 : 2;
         ctx.strokeStyle = "#000000";
         ctx.stroke();
 
-        ctx.fillStyle = "#000000";
-        ctx.font = b.isGold ? "bold 14px Tahoma" : "bold 11px Tahoma";
+        if (b.isBoss) {
+            const barW = b.w - 10;
+            const barX = b.x + 5;
+            const barY = b.y - 8;
+            ctx.fillStyle = "#000";
+            ctx.fillRect(barX, barY, barW, 5);
+            ctx.fillStyle = "#ff3535";
+            ctx.fillRect(barX, barY, barW * Math.max(0, b.hp / b.maxHp), 5);
+        }
+
+        ctx.fillStyle = b.isBoss ? "#fff" : "#000000";
+        ctx.font = (b.isGold || b.isBoss) ? "bold 14px Tahoma" : "bold 11px Tahoma";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(Math.ceil(b.hp), b.x + b.w / 2, b.y + b.h / 2 + 1);
+        ctx.fillText((b.isBoss ? "BOSS " : "") + ib_formatNumber(Math.max(0, b.hp)), b.x + b.w / 2, b.y + b.h / 2 + 1);
     }
 
     for (let ball of ib_balls) {
@@ -1936,6 +2362,28 @@ function ib_draw() {
         ctx.strokeStyle = "#000000";
         ctx.stroke();
     }
+
+    for (let p of ib_particles) {
+        const t = 1 - (p.age / p.life);
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, t);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+        ctx.restore();
+    }
+
+    for (let t of ib_damageTexts) {
+        const a = 1 - (t.age / t.life);
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.fillStyle = t.isCrit ? "#ffd700" : "#ffffff";
+        ctx.font = t.isCrit ? "bold 13px 'Courier New'" : "bold 11px 'Courier New'";
+        ctx.textAlign = "center";
+        ctx.fillText((t.isCrit ? "CRIT " : "") + ib_formatNumber(t.value), t.x, t.y);
+        ctx.restore();
+    }
+
+    ctx.restore();
 }
 
 function ib_loop(time) {
@@ -1979,6 +2427,7 @@ function ib_submitScore(name) {
             moneyEarned: Math.floor(ib_lifetimeStats.totalMoneyEarned),
             clicks: ib_lifetimeStats.totalClicks,
             ballsPurchased: ib_lifetimeStats.ballsPurchased,
+            bossesDefeated: ib_lifetimeStats.bossesDefeated,
             updatedAt: Date.now()
         });
     }).catch(() => {});
@@ -2007,7 +2456,7 @@ function ib_renderLeaderboard(entries) {
         name.textContent = entry.name || "Anonymous";
         const score = document.createElement("span");
         score.className = "ib-leaderboard-score";
-        score.textContent = entry.score;
+        score.textContent = ib_formatNumber(entry.score || 0);
         row.appendChild(rank);
         row.appendChild(name);
         row.appendChild(score);
@@ -2032,7 +2481,7 @@ const saveScoreConfirmBtn = document.getElementById("saveScoreConfirmBtn");
 const closeSaveScoreBtn = document.getElementById("closeSaveScore");
 
 function ib_openSaveScoreModal() {
-    saveScoreSummary.textContent = `Score: ${ib_computeScore()} (Level ${ib_level}, x${ib_prestigeMult.toFixed(1)} prestige)`;
+    saveScoreSummary.textContent = `Score: ${ib_formatNumber(ib_computeScore())} (Level ${ib_level}, x${ib_prestigeMult.toFixed(1)} prestige)`;
     saveScoreName.value = ib_getSavedName();
     saveScoreOverlay.style.display = "flex";
 }
@@ -2077,15 +2526,17 @@ function ib_openPlayerDetailsModal(entry) {
     playerDetailsTitle.textContent = entry.name || "Anonymous";
     playerDetailsList.innerHTML = "";
     const balls = entry.ballsPurchased || {};
-    ib_addDetailRow("Score", entry.score ?? 0);
+    ib_addDetailRow("Score", ib_formatNumber(entry.score ?? 0));
     ib_addDetailRow("Level Reached", entry.level ?? 1);
     ib_addDetailRow("Prestige Multiplier", `x${(entry.prestige ?? 1).toFixed(1)}`);
-    ib_addDetailRow("Total Damage Dealt", entry.damage ?? 0);
-    ib_addDetailRow("Total Money Earned", `$${entry.moneyEarned ?? 0}`);
-    ib_addDetailRow("Manual Clicks", entry.clicks ?? 0);
+    ib_addDetailRow("Total Damage Dealt", ib_formatNumber(entry.damage ?? 0));
+    ib_addDetailRow("Total Money Earned", `$${ib_formatNumber(entry.moneyEarned ?? 0)}`);
+    ib_addDetailRow("Manual Clicks", ib_formatNumber(entry.clicks ?? 0));
+    ib_addDetailRow("Bosses Defeated", entry.bossesDefeated ?? 0);
     ib_addDetailRow("Bouncer Balls Bought", balls.bouncer ?? 0);
     ib_addDetailRow("Spread Balls Bought", balls.spread ?? 0);
     ib_addDetailRow("Sniper Balls Bought", balls.sniper ?? 0);
+    ib_addDetailRow("Laser Turrets Bought", balls.laser ?? 0);
     playerDetailsOverlay.style.display = "flex";
 }
 
@@ -2106,6 +2557,18 @@ document.addEventListener("visibilitychange", () => {
         if (ib_hasProgress()) ib_pendingLeavePrompt = true;
     } else if (document.visibilityState === "visible" && ib_pendingLeavePrompt) {
         ib_pendingLeavePrompt = false;
+        ib_lastLeaveTime = Date.now() - 1;
+        const raw = localStorage.getItem(ib_getSaveKey());
+        if (raw) {
+            try {
+                const state = JSON.parse(raw);
+                if (state.lastActive) {
+                    ib_lastLeaveTime = state.lastActive;
+                    ib_applyOfflineEarnings();
+                    updateUI();
+                }
+            } catch {}
+        }
         showGameView();
         ib_openSaveScoreModal();
     }
