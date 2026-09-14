@@ -1578,6 +1578,7 @@ const IB_MAX_PARTICLES = 140;
 let ib_particles = [];
 let ib_beamFlashes = [];
 let ib_turretShots = [];
+let ib_spreadBursts = [];
 let ib_shakeTime = 0;
 let ib_shakeInitialTime = 0;
 let ib_shakeMag = 0;
@@ -1832,7 +1833,8 @@ function addBall(type) {
         x: canvas.width / 2, y: canvas.height - 20,
         dx: dx, dy: dy,
         r: 4, type: type,
-        cooldown: 0
+        cooldown: 0,
+        vfxSpin: Math.random() * Math.PI * 2
     });
 }
 
@@ -2171,6 +2173,17 @@ function ib_addBeamFlash(x1, y1, x2, y2) {
     ib_beamFlashes.push({ x1, y1, x2, y2, life: 0.18, age: 0 });
 }
 
+function ib_addSpreadBurst(x, y) {
+    if (ib_spreadBursts.length >= 40) ib_spreadBursts.shift();
+    ib_spreadBursts.push({
+        x, y,
+        age: 0,
+        life: 0.34,
+        maxRadius: 25,
+        spin: Math.random() * Math.PI * 2
+    });
+}
+
 canvas.addEventListener("mousedown", (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -2318,6 +2331,7 @@ function ib_update(dt) {
     for (let ball of ib_balls) {
         let speedMult = ib_stats[ball.type].speed;
         let baseDmg = ib_stats[ball.type].dmg;
+        if (ball.type === 'spread') ball.vfxSpin += dt * 4.5;
 
         if (ball.type === 'sniper') {
             if (ball.cooldown > 0) {
@@ -2370,6 +2384,7 @@ function ib_update(dt) {
                     ib_dealBrickDamage(b, baseDmg);
 
                     if (ball.type === 'spread') {
+                        ib_addSpreadBurst(testX, testY);
                         for (let j = 0; j < ib_bricks.length; j++) {
                             if (i !== j && Math.abs(ib_bricks[j].x - b.x) <= 60 && Math.abs(ib_bricks[j].y - b.y) <= 30) {
                                 const splashDmg = Math.max(1, Math.floor(baseDmg * 0.3));
@@ -2378,7 +2393,7 @@ function ib_update(dt) {
                         }
                     }
                 }
-                ib_spawnParticles(testX, testY, ball.type === 'bouncer' ? "#ffe135" : ball.type === 'spread' ? "#35ff8c" : "#ff3535", 2);
+                ib_spawnParticles(testX, testY, ball.type === 'bouncer' ? "#ffe135" : ball.type === 'spread' ? "#35ff8c" : "#ff3535", ball.type === 'spread' ? 8 : 2);
                 break;
             }
         }
@@ -2411,6 +2426,14 @@ function ib_update(dt) {
             const shot = ib_turretShots[i];
             shot.age += dt;
             if (shot.age >= shot.life) ib_turretShots.splice(i, 1);
+        }
+    }
+
+    if (ib_spreadBursts.length) {
+        for (let i = ib_spreadBursts.length - 1; i >= 0; i--) {
+            const burst = ib_spreadBursts[i];
+            burst.age += dt;
+            if (burst.age >= burst.life) ib_spreadBursts.splice(i, 1);
         }
     }
 
@@ -2647,6 +2670,36 @@ function ib_draw() {
         ctx.restore();
     }
 
+    if (ib_spreadBursts.length) {
+        ctx.save();
+        for (const burst of ib_spreadBursts) {
+            const t = Math.max(0, burst.age / burst.life);
+            const fade = 1 - t;
+            const radius = 4 + burst.maxRadius * t;
+
+            ctx.globalAlpha = fade * 0.75;
+            ctx.strokeStyle = "#35ff8c";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(burst.x, burst.y, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.globalAlpha = fade * 0.9;
+            ctx.strokeStyle = "#b9ffd5";
+            ctx.lineWidth = 1;
+            for (let ray = 0; ray < 8; ray++) {
+                const angle = burst.spin + ray * Math.PI / 4;
+                const inner = radius * 0.45;
+                const outer = radius + 7;
+                ctx.beginPath();
+                ctx.moveTo(burst.x + Math.cos(angle) * inner, burst.y + Math.sin(angle) * inner);
+                ctx.lineTo(burst.x + Math.cos(angle) * outer, burst.y + Math.sin(angle) * outer);
+                ctx.stroke();
+            }
+        }
+        ctx.restore();
+    }
+
     if (ib_turretShots.length) {
         ctx.save();
         for (const shot of ib_turretShots) {
@@ -2675,6 +2728,24 @@ function ib_draw() {
     for (let i = 0; i < ib_turrets.length; i++) ib_drawTurret(ib_turrets[i], i);
 
     for (let ball of ib_balls) {
+        if (ball.type === 'spread') {
+            const pulse = 1 + Math.sin(ball.vfxSpin * 2) * 0.18;
+            ctx.save();
+            ctx.globalAlpha = 0.22;
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, (ball.r + 5) * pulse, 0, Math.PI * 2);
+            ctx.fillStyle = "#35ff8c";
+            ctx.fill();
+            ctx.globalAlpha = 0.9;
+            for (let shard = 0; shard < 3; shard++) {
+                const angle = ball.vfxSpin + shard * Math.PI * 2 / 3;
+                ctx.beginPath();
+                ctx.arc(ball.x + Math.cos(angle) * 7, ball.y + Math.sin(angle) * 7, 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = "#b9ffd5";
+                ctx.fill();
+            }
+            ctx.restore();
+        }
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
         if (ball.type === 'bouncer') ctx.fillStyle = "#ffe135";
