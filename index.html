@@ -1049,12 +1049,14 @@ body.custom-cursor-ready .custom-cursor { display: block; }
             </div>
         </div>
         <div class="window-body">
-            <div class="rate-modal-title">Firebase moderator account</div>
-            <input type="email" id="moderatorEmail" class="ib-name-input sunken" autocomplete="username" placeholder="Email address">
-            <input type="password" id="moderatorPassword" class="ib-name-input sunken" autocomplete="current-password" placeholder="Password">
-            <button type="button" class="toggle-btn raised" id="moderatorLoginBtn" style="margin-top:14px;">Sign in</button>
-            <div class="ib-auth-error" id="moderatorAuthError" role="alert"></div>
-            <div class="ib-save-score-note">Credentials are sent to Firebase Authentication and are not stored in this page.</div>
+            <form id="moderatorLoginForm">
+                <div class="rate-modal-title">Firebase moderator account</div>
+                <input type="email" id="moderatorEmail" class="ib-name-input sunken" autocomplete="username" placeholder="Email address">
+                <input type="password" id="moderatorPassword" class="ib-name-input sunken" autocomplete="current-password" placeholder="Password">
+                <button type="submit" class="toggle-btn raised" id="moderatorLoginBtn" style="margin-top:14px;">Sign in</button>
+                <div class="ib-auth-error" id="moderatorAuthError" role="alert"></div>
+                <div class="ib-save-score-note">Credentials are sent to Firebase Authentication and are not stored in this page.</div>
+            </form>
         </div>
     </div>
 </div>
@@ -1286,6 +1288,7 @@ const moderatorAuthBtn = document.getElementById("moderatorAuthBtn");
 const moderatorAuthOverlay = document.getElementById("moderatorAuthOverlay");
 const moderatorEmail = document.getElementById("moderatorEmail");
 const moderatorPassword = document.getElementById("moderatorPassword");
+const moderatorLoginForm = document.getElementById("moderatorLoginForm");
 const moderatorLoginBtn = document.getElementById("moderatorLoginBtn");
 const moderatorAuthError = document.getElementById("moderatorAuthError");
 const closeModeratorAuthBtn = document.getElementById("closeModeratorAuth");
@@ -1362,6 +1365,7 @@ auth.onAuthStateChanged(async user => {
         }
     }
     ib_setModeratorUi();
+    refreshRateButtons();
 });
 
 moderatorAuthBtn.addEventListener("click", () => {
@@ -1380,7 +1384,8 @@ closeModeratorAuthBtn.addEventListener("click", () => {
     moderatorAuthOverlay.style.display = "none";
 });
 
-moderatorLoginBtn.addEventListener("click", async () => {
+moderatorLoginForm.addEventListener("submit", async event => {
+    event.preventDefault();
     const email = moderatorEmail.value.trim();
     const password = moderatorPassword.value;
     moderatorAuthError.textContent = "";
@@ -1400,10 +1405,6 @@ moderatorLoginBtn.addEventListener("click", async () => {
     }
 });
 
-moderatorPassword.addEventListener("keydown", event => {
-    if (event.key === "Enter") moderatorLoginBtn.click();
-});
-
 function sanitizeKey(src) {
     return src.replace(/[.#$\[\]/]/g, "_");
 }
@@ -1413,7 +1414,7 @@ function getTrackStats(key) {
     const values = Object.values(votes);
     const count = values.length;
     const avg = count ? values.reduce((sum, v) => sum + v, 0) / count : 0;
-    const mine = votes[anonId] || 0;
+    const mine = votes[auth.currentUser?.uid || anonId] || 0;
     return { avg, count, mine };
 }
 
@@ -1517,14 +1518,19 @@ rateConfirmBtn.addEventListener("click", () => {
     const src = rateModalGetSrc();
     if (!src) { closeRateModal(); return; }
     const key = sanitizeKey(src);
+    const voterId = auth.currentUser?.uid;
+    if (!voterId) {
+        showToast("Still connecting to Firebase. Try again in a moment.", true);
+        return;
+    }
     if (ratePendingValue > 0) {
         if (!ratings[key]) ratings[key] = {};
-        ratings[key][anonId] = ratePendingValue;
-        ratingsRef.child(key).child(anonId).set(ratePendingValue);
+        ratings[key][voterId] = ratePendingValue;
+        ratingsRef.child(key).child(voterId).set(ratePendingValue);
         playRatingSound(ratePendingValue);
     } else if (ratings[key]) {
-        delete ratings[key][anonId];
-        ratingsRef.child(key).child(anonId).remove();
+        delete ratings[key][voterId];
+        ratingsRef.child(key).child(voterId).remove();
     }
     refreshRateButtons();
     closeRateModal();
