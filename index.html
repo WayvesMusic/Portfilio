@@ -550,8 +550,11 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
 .ib-leaderboard-score { font-family: "Courier New", monospace; font-weight: 700; flex: 0 0 auto; }
 .ib-leaderboard-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
 .ib-leaderboard-time { color: var(--muted); font-size: 9px; white-space: nowrap; }
+.ib-leaderboard-actions { display: flex; align-items: center; gap: 3px; flex: 0 0 auto; }
 .ib-remove-score { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; border: 0; padding: 3px 5px; font: 700 9px Tahoma, sans-serif; color: #800000; cursor: pointer; }
 .ib-remove-score:active { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
+.ib-change-name { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; border: 0; padding: 3px 5px; font: 700 9px Tahoma, sans-serif; color: var(--navy); cursor: pointer; }
+.ib-change-name:active { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 .ib-leaderboard-row.mine { background: #dcdcdc; }
 .ib-moderator-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; padding: 4px 6px; font-size: 10px; }
 .ib-moderator-status { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1277,6 +1280,20 @@ function getAnonId() {
 }
 
 const anonId = getAnonId();
+function ib_getScoreOwnerId() {
+    try {
+        const savedOwnerId = localStorage.getItem("ib_score_owner_id");
+        if (auth.currentUser?.isAnonymous) {
+            if (savedOwnerId !== auth.currentUser.uid) {
+                localStorage.setItem("ib_score_owner_id", auth.currentUser.uid);
+            }
+            return auth.currentUser.uid;
+        }
+        if (savedOwnerId) return savedOwnerId;
+    } catch {}
+    return auth.currentUser?.uid || anonId;
+}
+
 const ratings = {};
 const rateButtons = [];
 let isModerator = false;
@@ -1318,6 +1335,14 @@ function ib_nameContainsProfanity(value) {
         if (word.length < 4) return words.includes(word);
         return words.includes(word) || normalized.replace(/\s/g, "").includes(word);
     });
+}
+
+function ib_cleanScoreName(value) {
+    return String(value || "Anonymous").trim().replace(/\s+/g, " ").slice(0, 16) || "Anonymous";
+}
+
+function ib_scoreNameKey(value) {
+    return ib_normalizeNameForFilter(value).replace(/\s+/g, "");
 }
 
 function ib_formatSubmittedTime(timestamp) {
@@ -2963,22 +2988,48 @@ function ib_setSavedName(name) {
     } catch {}
 }
 
+let ib_scoreSaveInProgress = false;
+
 async function ib_submitScore(name) {
     const score = ib_computeScore();
     if (score <= 0) return false;
-    const finalName = String(name || ib_getSavedName() || "Anonymous").trim().replace(/\s+/g, " ").slice(0, 16) || "Anonymous";
+    const finalName = ib_cleanScoreName(name || ib_getSavedName());
     if (ib_nameContainsProfanity(finalName)) {
         showToast("Please choose a name without profanity.", true);
         return false;
     }
+    if (ib_scoreSaveInProgress) {
+        showToast("This score is already being saved.", true);
+        return false;
+    }
+    if (!auth.currentUser) {
+        showToast("Still connecting to Firebase. Try again in a moment.", true);
+        return false;
+    }
+    ib_scoreSaveInProgress = true;
     try {
-        const ownerId = auth.currentUser?.uid || anonId;
+        const ownerId = ib_getScoreOwnerId();
         const snapshot = await leaderboardRef.child(ownerId).once("value");
         const existing = snapshot.val();
+        const nameKey = ib_scoreNameKey(finalName);
+        const allScoresSnapshot = await leaderboardRef.once("value");
+        const allowedOwnerIds = new Set([ownerId, anonId]);
+        let duplicateName = false;
+        allScoresSnapshot.forEach(child => {
+            if (allowedOwnerIds.has(child.key)) return;
+            const otherScore = child.val() || {};
+            if (ib_scoreNameKey(otherScore.name) === nameKey) duplicateName = true;
+        });
+        if (duplicateName) {
+            showToast("That leaderboard name is already taken.", true);
+            return false;
+        }
         const isNewBest = !existing || score >= Number(existing.score || 0);
         const bestScore = existing ? Math.max(score, existing.score || 0) : score;
         await leaderboardRef.child(ownerId).set({
+            playerId: ownerId,
             name: finalName,
+            nameKey,
             score: bestScore,
             level: ib_level,
             prestige: ib_prestigeMult,
@@ -2996,6 +3047,8 @@ async function ib_submitScore(name) {
         console.error("Could not save score.", error);
         showToast("Could not save the score. Check your Firebase rules.", true);
         return false;
+    } finally {
+        ib_scoreSaveInProgress = false;
     }
 }
 
@@ -3013,7 +3066,7 @@ function ib_renderLeaderboard(entries) {
     }
     entries.forEach((entry, index) => {
         const row = document.createElement("div");
-        row.className = "ib-leaderboard-row" + (entry.id === (auth.currentUser?.uid || anonId) ? " mine" : "");
+        row.className = "ib-leaderboard-row" + (entry.id === ib_getScoreOwnerId() ? " mine" : "");
         row.style.cursor = "pointer";
         const rank = document.createElement("span");
         rank.className = "ib-leaderboard-rank";
@@ -3035,6 +3088,40 @@ function ib_renderLeaderboard(entries) {
         row.appendChild(name);
         row.appendChild(meta);
         if (isModerator) {
+            const actions = document.createElement("span");
+            actions.className = "ib-leaderboard-actions";
+            const changeNameButton = document.createElement("button");
+            changeNameButton.type = "button";
+            changeNameButton.className = "ib-change-name raised";
+            changeNameButton.textContent = "Change name";
+            changeNameButton.title = `Change the name for ${entry.name || "this score"}`;
+            changeNameButton.addEventListener("click", async event => {
+                event.stopPropagation();
+                if (!auth.currentUser || !isModerator) {
+                    showToast("Moderator access is required.", true);
+                    return;
+                }
+                const requestedName = window.prompt("Enter a new leaderboard name:", entry.name || "Anonymous");
+                if (requestedName === null) return;
+                const newName = ib_cleanScoreName(requestedName);
+                if (ib_nameContainsProfanity(newName)) {
+                    showToast("Please choose a name without profanity.", true);
+                    return;
+                }
+                changeNameButton.disabled = true;
+                try {
+                    await leaderboardRef.child(entry.id).update({
+                        name: newName,
+                        nameKey: ib_scoreNameKey(newName)
+                    });
+                    showToast("Leaderboard name changed.");
+                } catch (error) {
+                    changeNameButton.disabled = false;
+                    console.error("Could not change leaderboard name.", error);
+                    showToast("Could not change that name. Check your Firebase rules.", true);
+                }
+            });
+            actions.appendChild(changeNameButton);
             const removeButton = document.createElement("button");
             removeButton.type = "button";
             removeButton.className = "ib-remove-score raised";
@@ -3057,7 +3144,8 @@ function ib_renderLeaderboard(entries) {
                     showToast("Could not remove that score. Check your Firebase rules.", true);
                 }
             });
-            row.appendChild(removeButton);
+            actions.appendChild(removeButton);
+            row.appendChild(actions);
         }
         row.addEventListener("click", () => ib_openPlayerDetailsModal(entry));
         leaderboardList.appendChild(row);
