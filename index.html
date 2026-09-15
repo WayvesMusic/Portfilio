@@ -1097,11 +1097,6 @@ body.custom-cursor-ready .custom-cursor { display: block; }
     </div>
 </div>
 
-<audio id="clickSound" src="ClickSound.mp3" preload="auto"></audio>
-<audio id="errorSound" src="ErrorSound.mp3" preload="auto"></audio>
-<audio id="notificationSound" src="Notification.mp3" preload="auto"></audio>
-<audio id="wowDogeSound" src="wow-doge.mp3" preload="auto"></audio>
-<audio id="bruhSound" src="bruh.mp3" preload="auto"></audio>
 <div class="toast" id="toast"></div>
 <img class="custom-cursor" id="customCursor" src="Cursor.png" alt="">
 
@@ -1125,9 +1120,6 @@ const moderatorsRef = firebase.database().ref("moderators");
 
 <script>
 const audio = document.getElementById("audio");
-const clickSound = document.getElementById("clickSound");
-const errorSound = document.getElementById("errorSound");
-const notificationSound = document.getElementById("notificationSound");
 const tracks = [...document.querySelectorAll(".track")];
 const filterButtons = [...document.querySelectorAll(".filter")];
 const playBtn = document.getElementById("playBtn");
@@ -1145,16 +1137,110 @@ const toast = document.getElementById("toast");
 let currentIndex = -1;
 let toastTimer;
 let ib_muted = false;
+let ib_audioContext = null;
 
 audio.volume = Number(volume.value);
 
-function playClickSound() {
+function ib_getAudioContext() {
+    if (!ib_audioContext) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return null;
+        ib_audioContext = new AudioContextClass();
+    }
+    if (ib_audioContext.state === "suspended") ib_audioContext.resume().catch(() => {});
+    return ib_audioContext;
+}
+
+function ib_play8BitTone(context, frequency, duration, volume, startTime, type = "square", endFrequency = null) {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const endTime = startTime + duration;
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    if (endFrequency) oscillator.frequency.exponentialRampToValueAtTime(endFrequency, endTime);
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume), startTime + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(startTime);
+    oscillator.stop(endTime + 0.02);
+}
+
+function ib_play8BitNoise(context, duration, volume, startTime) {
+    const buffer = context.createBuffer(1, Math.floor(context.sampleRate * duration), context.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const source = context.createBufferSource();
+    const gain = context.createGain();
+    const endTime = startTime + duration;
+    source.buffer = buffer;
+    gain.gain.setValueAtTime(Math.max(0.0001, volume), startTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+    source.connect(gain);
+    gain.connect(context.destination);
+    source.start(startTime);
+    source.stop(endTime);
+}
+
+function ib_play8BitSound(effect) {
     if (ib_muted) return;
-    try {
-        const sound = clickSound.cloneNode(true);
-        sound.volume = 0.5;
-        sound.play().catch(() => {});
-    } catch {}
+    const context = ib_getAudioContext();
+    if (!context) return;
+    const start = context.currentTime + 0.005;
+    const tone = (frequency, duration, volume, offset = 0, type = "square", endFrequency = null) => {
+        ib_play8BitTone(context, frequency, duration, volume, start + offset, type, endFrequency);
+    };
+    if (effect === "click") {
+        tone(760, 0.045, 0.035, 0, "square", 480);
+    } else if (effect === "hit") {
+        tone(180, 0.07, 0.055, 0, "square", 85);
+    } else if (effect === "buy") {
+        tone(420, 0.07, 0.045);
+        tone(660, 0.11, 0.045, 0.07);
+    } else if (effect === "upgrade") {
+        tone(440, 0.06, 0.04);
+        tone(660, 0.06, 0.04, 0.06);
+        tone(880, 0.12, 0.04, 0.12);
+    } else if (effect === "confirm") {
+        tone(520, 0.07, 0.04);
+        tone(780, 0.12, 0.04, 0.075);
+    } else if (effect === "error") {
+        tone(230, 0.12, 0.045, 0, "square", 150);
+        tone(130, 0.16, 0.04, 0.12, "square", 90);
+    } else if (effect === "ratingGood") {
+        tone(660, 0.08, 0.04);
+        tone(880, 0.08, 0.04, 0.08);
+        tone(1320, 0.16, 0.04, 0.16);
+    } else if (effect === "ratingBad") {
+        tone(220, 0.12, 0.045, 0, "square", 140);
+        tone(110, 0.2, 0.04, 0.12, "square", 70);
+    } else if (effect === "gold") {
+        tone(880, 0.07, 0.045);
+        tone(1320, 0.14, 0.045, 0.075);
+    } else if (effect === "boss") {
+        tone(120, 0.22, 0.06, 0, "sawtooth", 55);
+        tone(82, 0.3, 0.055, 0.2, "square", 42);
+        ib_play8BitNoise(context, 0.22, 0.035, start + 0.2);
+    } else if (effect === "levelUp") {
+        tone(392, 0.08, 0.04);
+        tone(523, 0.08, 0.04, 0.08);
+        tone(659, 0.08, 0.04, 0.16);
+        tone(784, 0.18, 0.045, 0.24);
+    } else if (effect === "prestige") {
+        tone(262, 0.08, 0.04);
+        tone(330, 0.08, 0.04, 0.08);
+        tone(392, 0.08, 0.04, 0.16);
+        tone(523, 0.08, 0.04, 0.24);
+        tone(784, 0.24, 0.05, 0.32);
+    } else if (effect === "start") {
+        tone(330, 0.08, 0.04);
+        tone(494, 0.14, 0.045, 0.08);
+    }
+}
+
+function playClickSound() {
+    ib_play8BitSound("click");
 }
 
 document.addEventListener("click", event => {
@@ -1181,25 +1267,13 @@ function formatTime(seconds) {
 }
 
 function playErrorSound() {
-    if (ib_muted) return;
-    try {
-        const sound = errorSound.cloneNode(true);
-        sound.volume = 0.6;
-        sound.play().catch(() => {});
-    } catch {}
+    ib_play8BitSound("error");
 }
 
 function playNotificationSound() {
-    if (ib_muted) return;
-    try {
-        const sound = notificationSound.cloneNode(true);
-        sound.volume = 0.6;
-        sound.play().catch(() => {});
-    } catch {}
+    ib_play8BitSound("confirm");
 }
 
-const wowDogeSound = document.getElementById("wowDogeSound");
-const bruhSound = document.getElementById("bruhSound");
 const tomatoOverlay = document.getElementById("tomatoOverlay");
 const WIN98_CONFETTI_COLORS = ["#000080", "#008080", "#800000", "#808000", "#800080", "#c0c0c0", "#00ff00", "#ffff00"];
 let tomatoDurationPromise = null;
@@ -1254,22 +1328,12 @@ function playRatingSound(value) {
     if (value <= 0) return;
     if (value >= 4) {
         launchConfetti();
-        if (!ib_muted) {
-            try {
-                const sound = wowDogeSound.cloneNode(true);
-                sound.volume = 0.6;
-                sound.play().catch(() => {});
-            } catch {}
-        }
+        ib_play8BitSound("ratingGood");
     } else if (value <= 2) {
         spawnTomatoGif();
-        if (!ib_muted) {
-            try {
-                const sound = bruhSound.cloneNode(true);
-                sound.volume = 0.6;
-                sound.play().catch(() => {});
-            } catch {}
-        }
+        ib_play8BitSound("ratingBad");
+    } else {
+        ib_play8BitSound("confirm");
     }
 }
 
@@ -1731,6 +1795,7 @@ function showGameView() {
         gameStarted = true;
         initIdleBreakout();
     }
+    ib_play8BitSound("start");
     ib_lastTime = performance.now();
     ib_reqId = requestAnimationFrame(ib_loop);
 }
@@ -2081,6 +2146,7 @@ function buyBall(type) {
     if (ib_money >= ib_costs[type]) {
         ib_money -= ib_costs[type];
         addBall(type);
+        ib_play8BitSound("buy");
         ib_costs[type] = Math.floor(ib_costs[type] * 1.5);
         ib_lifetimeStats.ballsPurchased[type] = (ib_lifetimeStats.ballsPurchased[type] || 0) + 1;
         updateUI();
@@ -2096,6 +2162,7 @@ function buyLaser() {
     if (ib_money >= ib_costs.laser) {
         ib_money -= ib_costs.laser;
         addLaser();
+        ib_play8BitSound("buy");
         ib_costs.laser = Math.floor(ib_costs.laser * 1.7);
         ib_lifetimeStats.ballsPurchased.laser = (ib_lifetimeStats.ballsPurchased.laser || 0) + 1;
         updateUI();
@@ -2111,6 +2178,7 @@ function buyTurret() {
     if (ib_money >= ib_costs.turret) {
         ib_money -= ib_costs.turret;
         addTurret();
+        ib_play8BitSound("buy");
         ib_costs.turret = Math.floor(ib_costs.turret * 1.75);
         ib_lifetimeStats.ballsPurchased.turret = (ib_lifetimeStats.ballsPurchased.turret || 0) + 1;
         updateUI();
@@ -2202,6 +2270,7 @@ function handleUpgrade(statObj, costKey, type, increment) {
     if (ib_money >= ib_costs[costKey]) {
         ib_money -= ib_costs[costKey];
         statObj[type] += increment;
+        ib_play8BitSound("upgrade");
         ib_costs[costKey] = Math.floor(ib_costs[costKey] * (type === 'dmg' || increment === 1 ? 1.6 : 1.5));
         updateUI();
         ib_saveState();
@@ -2221,6 +2290,7 @@ document.getElementById('btnUpgLaserRate').addEventListener('click', () => {
     if (ib_money >= ib_costs.laserRate) {
         ib_money -= ib_costs.laserRate;
         ib_stats.laser.rate = Math.max(0.4, +(ib_stats.laser.rate - 0.2).toFixed(2));
+        ib_play8BitSound("upgrade");
         ib_costs.laserRate = Math.floor(ib_costs.laserRate * 1.6);
         updateUI();
         ib_saveState();
@@ -2233,6 +2303,7 @@ document.getElementById('btnUpgTurretRate').addEventListener('click', () => {
     if (ib_money >= ib_costs.turretRate) {
         ib_money -= ib_costs.turretRate;
         ib_stats.turret.rate = Math.max(0.35, +(ib_stats.turret.rate - 0.12).toFixed(2));
+        ib_play8BitSound("upgrade");
         ib_costs.turretRate = Math.floor(ib_costs.turretRate * 1.65);
         updateUI();
         ib_saveState();
@@ -2244,6 +2315,7 @@ document.getElementById('btnUpgClick').addEventListener('click', () => {
     if (ib_money >= ib_costs.cDmg) {
         ib_money -= ib_costs.cDmg;
         ib_clickDmg++;
+        ib_play8BitSound("upgrade");
         ib_costs.cDmg = Math.floor(ib_costs.cDmg * 1.4);
         updateUI();
         ib_saveState();
@@ -2254,6 +2326,7 @@ document.getElementById("btnBuyCrit").addEventListener("click", () => {
     if (ib_critChance < IB_CRIT_CAP && ib_money >= ib_costs.crit) {
         ib_money -= ib_costs.crit;
         ib_critChance = Math.min(IB_CRIT_CAP, ib_critChance + 5);
+        ib_play8BitSound("upgrade");
         ib_costs.crit = Math.floor(ib_costs.crit * 1.6);
         updateUI();
         ib_saveState();
@@ -2312,6 +2385,7 @@ function doPrestige() {
     ib_costs = { bouncer: 10, spread: 50, sniper: 200, laser: 750, turret: 1200, bouncerDmg: 25, bouncerSpeed: 20, spreadDmg: 100, spreadSpeed: 80, sniperDmg: 400, sniperSpeed: 300, laserDmg: 500, laserRate: 350, laserSweep: 250, turretDmg: 700, turretRate: 500, turretRange: 400, cDmg: 15, crit: 30 };
     spawnBricks();
     updateUI();
+    ib_play8BitSound("prestige");
     showToast(`Prestiged! Multiplier now x${ib_prestigeMult.toFixed(1)}`);
     ib_saveState();
     ib_submitScore();
@@ -2408,7 +2482,7 @@ canvas.addEventListener("mousedown", (e) => {
             b.hp -= dmgDealt;
             ib_lifetimeStats.totalDamage += dmgDealt;
             ib_lifetimeStats.totalClicks++;
-            playClickSound();
+            ib_play8BitSound("hit");
             ib_spawnParticles(mouseX, mouseY, b.isBoss ? "#ff3535" : (b.isGold ? "#ffd700" : "#5bc8ea"), 3);
             if (b.hp <= 0) b.dead = true;
             break;
@@ -2429,9 +2503,11 @@ function processDeadBricks() {
             ib_spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.isBoss ? "#ff3535" : (b.isGold ? "#ffd700" : "#5bc8ea"), b.isBoss ? 26 : (b.isGold ? 16 : 7));
             if (b.isBoss) {
                 ib_lifetimeStats.bossesDefeated++;
+                ib_play8BitSound("boss");
                 ib_screenShake(0.5, 10);
                 showToast(`☠ BOSS destroyed! +$${ib_formatNumber(payout)}`);
             } else if (b.isGold) {
+                ib_play8BitSound("gold");
                 ib_screenShake(0.3, 5);
                 showToast(`⭐ Gold Block destroyed! +$${ib_formatNumber(payout)}`);
             }
@@ -2441,7 +2517,12 @@ function processDeadBricks() {
     }
     if (changed) {
         updateUI();
-        if (ib_bricks.length === 0) { ib_level++; spawnBricks(); updateUI(); }
+        if (ib_bricks.length === 0) {
+            ib_level++;
+            ib_play8BitSound("levelUp");
+            spawnBricks();
+            updateUI();
+        }
         ib_saveState();
     }
 }
