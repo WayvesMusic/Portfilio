@@ -548,7 +548,16 @@ canvas { display: block; width: 100%; max-width: 380px; height: auto; cursor: cr
 .ib-leaderboard-rank { font-weight: 700; width: 20px; flex: 0 0 auto; }
 .ib-leaderboard-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ib-leaderboard-score { font-family: "Courier New", monospace; font-weight: 700; flex: 0 0 auto; }
+.ib-leaderboard-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
+.ib-leaderboard-time { color: var(--muted); font-size: 9px; white-space: nowrap; }
+.ib-remove-score { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; border: 0; padding: 3px 5px; font: 700 9px Tahoma, sans-serif; color: #800000; cursor: pointer; }
+.ib-remove-score:active { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
 .ib-leaderboard-row.mine { background: #dcdcdc; }
+.ib-moderator-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; padding: 4px 6px; font-size: 10px; }
+.ib-moderator-status { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ib-moderator-btn { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; flex: 0 0 auto; border: 0; padding: 4px 7px; font: 700 10px Tahoma, sans-serif; color: var(--text); cursor: pointer; }
+.ib-moderator-btn:active { box-shadow: inset -1px -1px 0 var(--highlight), inset 1px 1px 0 var(--dark-shadow), inset -2px -2px 0 var(--light), inset 2px 2px 0 var(--shadow) !important; transform: translate(1px, 1px); }
+.ib-auth-error { min-height: 14px; margin-top: 7px; color: #800000; font-size: 10px; text-align: center; }
 .ib-name-input {
     width: 100%;
     height: 26px;
@@ -807,6 +816,10 @@ body.custom-cursor-ready .custom-cursor { display: block; }
                 <div class="title-bar-controls"><span class="raised">_</span><span class="raised">□</span><span class="raised">✕</span></div>
             </div>
             <div class="window-body">
+                <div class="ib-moderator-bar sunken">
+                    <span class="ib-moderator-status" id="moderatorStatus">Moderator tools are signed out</span>
+                    <button type="button" class="ib-moderator-btn raised" id="moderatorAuthBtn">Moderator login</button>
+                </div>
                 <div class="ib-leaderboard-list sunken" id="leaderboardList">
                     <div class="ib-leaderboard-row"><span class="ib-leaderboard-name">No scores yet</span></div>
                 </div>
@@ -1026,6 +1039,26 @@ body.custom-cursor-ready .custom-cursor { display: block; }
     </div>
 </div>
 
+<!-- MODERATOR AUTH MODAL -->
+<div class="ib-modal-overlay" id="moderatorAuthOverlay" style="display:none">
+    <div class="ib-modal raised">
+        <div class="title-bar">
+            <span class="title-bar-text">Moderator Login</span>
+            <div class="title-bar-controls">
+                <span class="raised" id="closeModeratorAuth">✕</span>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="rate-modal-title">Firebase moderator account</div>
+            <input type="email" id="moderatorEmail" class="ib-name-input sunken" autocomplete="username" placeholder="Email address">
+            <input type="password" id="moderatorPassword" class="ib-name-input sunken" autocomplete="current-password" placeholder="Password">
+            <button type="button" class="toggle-btn raised" id="moderatorLoginBtn" style="margin-top:14px;">Sign in</button>
+            <div class="ib-auth-error" id="moderatorAuthError" role="alert"></div>
+            <div class="ib-save-score-note">Credentials are sent to Firebase Authentication and are not stored in this page.</div>
+        </div>
+    </div>
+</div>
+
 <!-- PLAYER DETAILS MODAL -->
 <div class="ib-modal-overlay" id="playerDetailsOverlay" style="display:none">
     <div class="ib-modal raised">
@@ -1051,6 +1084,7 @@ body.custom-cursor-ready .custom-cursor { display: block; }
 
 <!-- FIREBASE (free Spark plan, no card required) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
 const firebaseConfig = {
@@ -1060,8 +1094,10 @@ const firebaseConfig = {
     projectId: "portfolio-e4692"
 };
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const ratingsRef = firebase.database().ref("ratings");
 const leaderboardRef = firebase.database().ref("leaderboard");
+const moderatorsRef = firebase.database().ref("moderators");
 </script>
 
 <script>
@@ -1241,6 +1277,132 @@ function getAnonId() {
 const anonId = getAnonId();
 const ratings = {};
 const rateButtons = [];
+let isModerator = false;
+let moderatorUser = null;
+let latestLeaderboardEntries = [];
+
+const moderatorStatus = document.getElementById("moderatorStatus");
+const moderatorAuthBtn = document.getElementById("moderatorAuthBtn");
+const moderatorAuthOverlay = document.getElementById("moderatorAuthOverlay");
+const moderatorEmail = document.getElementById("moderatorEmail");
+const moderatorPassword = document.getElementById("moderatorPassword");
+const moderatorLoginBtn = document.getElementById("moderatorLoginBtn");
+const moderatorAuthError = document.getElementById("moderatorAuthError");
+const closeModeratorAuthBtn = document.getElementById("closeModeratorAuth");
+
+// This is a client-side first-pass filter. Firebase rules below still need to
+// restrict who may write/delete leaderboard records.
+const IB_PROFANITY_WORDS = [
+    "arse", "asshole", "bastard", "bitch", "bollocks", "bullshit",
+    "crap", "cunt", "damn", "dick", "fag", "fuck", "motherfucker",
+    "nigger", "piss", "prick", "pussy", "shit", "slut", "whore"
+];
+
+function ib_normalizeNameForFilter(value) {
+    return String(value || "")
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[0-9]/g, digit => ({ "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t" }[digit] || digit))
+        .replace(/[^a-z]+/g, " ")
+        .trim();
+}
+
+function ib_nameContainsProfanity(value) {
+    const normalized = ib_normalizeNameForFilter(value);
+    const words = normalized.split(/\s+/).filter(Boolean);
+    return IB_PROFANITY_WORDS.some(word => {
+        if (word.length < 4) return words.includes(word);
+        return words.includes(word) || normalized.replace(/\s/g, "").includes(word);
+    });
+}
+
+function ib_formatSubmittedTime(timestamp) {
+    const numericTimestamp = Number(timestamp);
+    if (!Number.isFinite(numericTimestamp) || numericTimestamp <= 0) return "Time unavailable";
+    try {
+        return new Intl.DateTimeFormat(undefined, {
+            dateStyle: "short",
+            timeStyle: "short"
+        }).format(new Date(numericTimestamp));
+    } catch {
+        return new Date(numericTimestamp).toLocaleString();
+    }
+}
+
+function ib_setModeratorUi() {
+    if (!moderatorUser || moderatorUser.isAnonymous) {
+        moderatorStatus.textContent = "Moderator tools are signed out";
+        moderatorAuthBtn.textContent = "Moderator login";
+    } else if (isModerator) {
+        moderatorStatus.textContent = `Moderator tools enabled${moderatorUser.email ? ` for ${moderatorUser.email}` : ""}`;
+        moderatorAuthBtn.textContent = "Sign out";
+    } else {
+        moderatorStatus.textContent = "Signed in, but this account is not a moderator";
+        moderatorAuthBtn.textContent = "Sign out";
+    }
+    ib_renderLeaderboard(latestLeaderboardEntries);
+}
+
+auth.onAuthStateChanged(async user => {
+    moderatorUser = user;
+    isModerator = false;
+    if (!user) {
+        auth.signInAnonymously().catch(error => {
+            console.error("Anonymous Firebase sign-in failed.", error);
+            showToast("Firebase sign-in is unavailable. Scores may not save.", true);
+        });
+    } else if (!user.isAnonymous) {
+        try {
+            const moderatorSnapshot = await moderatorsRef.child(user.uid).once("value");
+            if (moderatorUser !== user || auth.currentUser !== user) return;
+            isModerator = moderatorSnapshot.val() === true;
+        } catch (error) {
+            console.error("Could not check moderator role.", error);
+        }
+    }
+    ib_setModeratorUi();
+});
+
+moderatorAuthBtn.addEventListener("click", () => {
+    if (auth.currentUser && !auth.currentUser.isAnonymous) {
+        auth.signOut().catch(error => showToast(`Sign out failed: ${error.message}`, true));
+        return;
+    }
+    moderatorAuthError.textContent = "";
+    moderatorEmail.value = "";
+    moderatorPassword.value = "";
+    moderatorAuthOverlay.style.display = "flex";
+    moderatorEmail.focus();
+});
+
+closeModeratorAuthBtn.addEventListener("click", () => {
+    moderatorAuthOverlay.style.display = "none";
+});
+
+moderatorLoginBtn.addEventListener("click", async () => {
+    const email = moderatorEmail.value.trim();
+    const password = moderatorPassword.value;
+    moderatorAuthError.textContent = "";
+    if (!email || !password) {
+        moderatorAuthError.textContent = "Enter both your email and password.";
+        return;
+    }
+    moderatorLoginBtn.disabled = true;
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        moderatorAuthOverlay.style.display = "none";
+    } catch (error) {
+        moderatorAuthError.textContent = "Firebase could not sign you in. Check the account details.";
+        console.error("Moderator sign-in failed.", error);
+    } finally {
+        moderatorLoginBtn.disabled = false;
+    }
+});
+
+moderatorPassword.addEventListener("keydown", event => {
+    if (event.key === "Enter") moderatorLoginBtn.click();
+});
 
 function sanitizeKey(src) {
     return src.replace(/[.#$\[\]/]/g, "_");
@@ -2795,14 +2957,21 @@ function ib_setSavedName(name) {
     } catch {}
 }
 
-function ib_submitScore(name) {
+async function ib_submitScore(name) {
     const score = ib_computeScore();
-    if (score <= 0) return;
-    const finalName = (name || ib_getSavedName() || "Anonymous").slice(0, 16);
-    leaderboardRef.child(anonId).once("value").then(snapshot => {
+    if (score <= 0) return false;
+    const finalName = String(name || ib_getSavedName() || "Anonymous").trim().replace(/\s+/g, " ").slice(0, 16) || "Anonymous";
+    if (ib_nameContainsProfanity(finalName)) {
+        showToast("Please choose a name without profanity.", true);
+        return false;
+    }
+    try {
+        const ownerId = auth.currentUser?.uid || anonId;
+        const snapshot = await leaderboardRef.child(ownerId).once("value");
         const existing = snapshot.val();
+        const isNewBest = !existing || score >= Number(existing.score || 0);
         const bestScore = existing ? Math.max(score, existing.score || 0) : score;
-        leaderboardRef.child(anonId).set({
+        await leaderboardRef.child(ownerId).set({
             name: finalName,
             score: bestScore,
             level: ib_level,
@@ -2812,14 +2981,22 @@ function ib_submitScore(name) {
             clicks: ib_lifetimeStats.totalClicks,
             ballsPurchased: ib_lifetimeStats.ballsPurchased,
             bossesDefeated: ib_lifetimeStats.bossesDefeated,
-            updatedAt: Date.now()
+            submittedAt: isNewBest
+                ? firebase.database.ServerValue.TIMESTAMP
+                : (existing.submittedAt || firebase.database.ServerValue.TIMESTAMP)
         });
-    }).catch(() => {});
+        return true;
+    } catch (error) {
+        console.error("Could not save score.", error);
+        showToast("Could not save the score. Check your Firebase rules.", true);
+        return false;
+    }
 }
 
 const leaderboardList = document.getElementById("leaderboardList");
 
 function ib_renderLeaderboard(entries) {
+    latestLeaderboardEntries = entries;
     leaderboardList.innerHTML = "";
     if (!entries.length) {
         const row = document.createElement("div");
@@ -2830,7 +3007,7 @@ function ib_renderLeaderboard(entries) {
     }
     entries.forEach((entry, index) => {
         const row = document.createElement("div");
-        row.className = "ib-leaderboard-row" + (entry.id === anonId ? " mine" : "");
+        row.className = "ib-leaderboard-row" + (entry.id === (auth.currentUser?.uid || anonId) ? " mine" : "");
         row.style.cursor = "pointer";
         const rank = document.createElement("span");
         rank.className = "ib-leaderboard-rank";
@@ -2838,12 +3015,44 @@ function ib_renderLeaderboard(entries) {
         const name = document.createElement("span");
         name.className = "ib-leaderboard-name";
         name.textContent = entry.name || "Anonymous";
+        const meta = document.createElement("span");
+        meta.className = "ib-leaderboard-meta";
         const score = document.createElement("span");
         score.className = "ib-leaderboard-score";
         score.textContent = ib_formatNumber(entry.score || 0);
+        const time = document.createElement("span");
+        time.className = "ib-leaderboard-time";
+        time.textContent = `Submitted ${ib_formatSubmittedTime(entry.submittedAt || entry.updatedAt)}`;
+        meta.appendChild(score);
+        meta.appendChild(time);
         row.appendChild(rank);
         row.appendChild(name);
-        row.appendChild(score);
+        row.appendChild(meta);
+        if (isModerator) {
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className = "ib-remove-score raised";
+            removeButton.textContent = "Remove";
+            removeButton.title = `Remove ${entry.name || "this score"}`;
+            removeButton.addEventListener("click", async event => {
+                event.stopPropagation();
+                if (!auth.currentUser || !isModerator) {
+                    showToast("Moderator access is required.", true);
+                    return;
+                }
+                if (!window.confirm(`Remove ${entry.name || "this score"} from the leaderboard?`)) return;
+                removeButton.disabled = true;
+                try {
+                    await leaderboardRef.child(entry.id).remove();
+                    showToast("Score removed.");
+                } catch (error) {
+                    removeButton.disabled = false;
+                    console.error("Could not remove score.", error);
+                    showToast("Could not remove that score. Check your Firebase rules.", true);
+                }
+            });
+            row.appendChild(removeButton);
+        }
         row.addEventListener("click", () => ib_openPlayerDetailsModal(entry));
         leaderboardList.appendChild(row);
     });
@@ -2874,12 +3083,16 @@ function ib_closeSaveScoreModal() {
     saveScoreOverlay.style.display = "none";
 }
 
-saveScoreConfirmBtn.addEventListener("click", () => {
+saveScoreConfirmBtn.addEventListener("click", async () => {
     const name = saveScoreName.value.trim() || "Anonymous";
-    ib_setSavedName(name);
-    ib_submitScore(name);
-    showToast("Score saved to leaderboard!");
-    ib_closeSaveScoreModal();
+    saveScoreConfirmBtn.disabled = true;
+    const saved = await ib_submitScore(name);
+    saveScoreConfirmBtn.disabled = false;
+    if (saved) {
+        ib_setSavedName(name);
+        showToast("Score saved to leaderboard!");
+        ib_closeSaveScoreModal();
+    }
 });
 
 closeSaveScoreBtn.addEventListener("click", ib_closeSaveScoreModal);
@@ -2911,6 +3124,7 @@ function ib_openPlayerDetailsModal(entry) {
     playerDetailsList.innerHTML = "";
     const balls = entry.ballsPurchased || {};
     ib_addDetailRow("Score", ib_formatNumber(entry.score ?? 0));
+    ib_addDetailRow("Submitted", ib_formatSubmittedTime(entry.submittedAt || entry.updatedAt));
     ib_addDetailRow("Level Reached", entry.level ?? 1);
     ib_addDetailRow("Prestige Multiplier", `x${(entry.prestige ?? 1).toFixed(1)}`);
     ib_addDetailRow("Total Damage Dealt", ib_formatNumber(entry.damage ?? 0));
